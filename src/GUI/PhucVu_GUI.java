@@ -59,21 +59,46 @@ public class PhucVu_GUI extends JFrame implements ActionListener{
         jCen.setBackground(Color.WHITE);
         pnBan = new JPanel();
         pnBan.setBackground(Color.WHITE);
-        FlowLayout flShowTable = new FlowLayout(FlowLayout.LEFT, 20 ,20);
-        pnBan.setLayout(flShowTable);
-        pnBan.setPreferredSize(new Dimension(banWidth, banheight));
-        for (int i = 1; i <= 25; i++) {
-            JButton btnBan = new JButton("Bàn " + i);
-            btnBan.setPreferredSize(new Dimension(180, 90)); // kích thước mỗi bàn
+        pnBan.setBackground(Color.WHITE);
+        pnBan.setLayout(new GridLayout(0, 5, 30, 30));
+        pnBan.setBorder(BorderFactory.createEmptyBorder(30, 50, 30, 50));
+        for (int i = 1; i <= 30; i++) {
+        	final int soBan = i;
+            JButton btnBan = new JButton("Bàn " + soBan);
+            btnBan.setPreferredSize(new Dimension(200, 100)); // kích thước mỗi bàn
             pnBan.add(btnBan);
+            btnBan.setFocusPainted(false);   // tắt viền focus
+            btnBan.setForeground(Color.WHITE); // màu chữ
+            btnBan.setBackground(Color.decode("#E3CFC1")); // màu nâu nhạt
+            btnBan.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
+            ImageIcon iconTable = new ImageIcon(
+                    new ImageIcon(getClass().getResource("/img/iconlyCF.png"))
+                    .getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH)
+                );
+            btnBan.setIcon(iconTable);
+            btnBan.addActionListener(e -> {
+            	this.setVisible(false);
+                // mở màn hình menu và truyền số bàn
+                new Menu_GUI(soBan).setVisible(true);
+                dispose();
+            });
         }
 
         JScrollPane spBan = new JScrollPane(pnBan, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        spBan.getVerticalScrollBar().setUI(new javax.swing.plaf.basic.BasicScrollBarUI() {
+            @Override
+            protected void configureScrollBarColors() {
+                thumbColor = Color.decode("#E3CFC1"); // màu tay kéo
+                trackColor = Color.decode("#F5E9E0"); // màu nền
+            }
+        });
         spBan.setBackground(Color.WHITE);
         spBan.getVerticalScrollBar().setUnitIncrement(10);
         jCen.add(spBan, BorderLayout.CENTER);
         add(jCen, BorderLayout.CENTER);
+        
+        
         
 	}
 	public static void main(String[] args) {
