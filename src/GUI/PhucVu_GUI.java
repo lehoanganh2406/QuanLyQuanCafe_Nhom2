@@ -18,8 +18,7 @@ public class PhucVu_GUI extends JFrame implements ActionListener{
 	private JPanel pnBan;
 	public PhucVu_GUI() {
 		setTitle("MH nhân viên phục vụ - Order");
-		setSize(1280, 700);
-        setResizable(false);
+		setExtendedState(JFrame.MAXIMIZED_BOTH);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         

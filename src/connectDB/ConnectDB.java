@@ -4,7 +4,13 @@ import java.sql.*;
 
 public class ConnectDB {
 	private static Connection con = null;
-	
+	private static ConnectDB instance = new ConnectDB();
+
+    public static ConnectDB getInstance() {
+        if (instance == null)
+            instance = new ConnectDB();
+        return instance;
+    }
 	public void connect()  {
         String severName = "localhost";
         String databaseName = "QuanLyQuanCafe";

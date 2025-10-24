@@ -5,21 +5,25 @@ import connectDB.ConnectDB;
 import entity.Ban;
 
 public class Ban_DAO {
-	
-	private Connection con;
+	 private static Ban_DAO instance;
+	 public static Ban_DAO getInstance() {
+	        if (instance == null)
+	            instance = new Ban_DAO();
+	        return instance;
+	    }  
 
-	public ArrayList<Ban> dsBan() {
+	public ArrayList<Ban> getAll() {
 		String query = "SELECT * FROM dbo.Ban";
-		ArrayList<Ban> ds = new ArrayList<Ban>();        
+		ArrayList<Ban> dsList = new ArrayList<Ban>();        
         try {
-            con = ConnectDB.getConnection();
+        	Connection con = ConnectDB.getConnection();
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery(query);
 			 while (rs.next()) {
 	                int maBan = rs.getInt("maBan");
 	                String tenBan = rs.getString("tenBan");
 	                String trangThai = rs.getString("trangThai");
-	                ds.add(new Ban(maBan, tenBan, trangThai));
+	                dsList.add(new Ban(rs));
 	            }
 			 System.out.println("Lấy danh sách bàn thành công\n");
 			 rs.close();
@@ -27,15 +31,13 @@ public class Ban_DAO {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}finally {
-			ConnectDB.closeConnection(con);
 		}
         
-		return ds;
+		return dsList;
 		
 	}
 	
-	public Ban xemBanTheoMaBan(int maBan) {
+	public Ban getBanByMaBan(int maBan) {
 		String query = "select * FROM dbo.Ban WHERE maBan = ?";
 		Ban b = null;
 		try (Connection c = ConnectDB.getConnection()) {
@@ -55,7 +57,7 @@ public class Ban_DAO {
     }
 	
 	public boolean themBan(Ban b) {
-        final String sql = "INSERT INTO dbo.Ban (tenBan, trangThai) VALUES (?, ?)";
+        String sql = "INSERT INTO dbo.Ban (tenBan, trangThai) VALUES (?, ?)";
 
         try (Connection con = ConnectDB.getConnection();
              PreparedStatement pst = con.prepareStatement(sql)) {

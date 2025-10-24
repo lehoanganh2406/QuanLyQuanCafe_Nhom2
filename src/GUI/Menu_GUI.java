@@ -19,8 +19,7 @@ public class Menu_GUI extends JFrame {
 
 	public Menu_GUI(int soBan) {
 		setTitle("Menu - Bàn " + soBan);
-		setSize(1280, 700);
-        setResizable(false);
+		setExtendedState(JFrame.MAXIMIZED_BOTH);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         
