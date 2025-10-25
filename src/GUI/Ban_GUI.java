@@ -7,7 +7,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class PhucVu_GUI extends JFrame implements ActionListener{
+
+public class Ban_GUI extends JFrame implements ActionListener{
 	private JButton btnMenu;
 	private JLabel lblOrder;
 	private JButton btnDong;
@@ -16,7 +17,7 @@ public class PhucVu_GUI extends JFrame implements ActionListener{
 	private int banWidth = 310;
 	private int banheight = 140;
 	private JPanel pnBan;
-	public PhucVu_GUI() {
+	public Ban_GUI() {
 		setTitle("MH nhân viên phục vụ - Order");
 		setExtendedState(JFrame.MAXIMIZED_BOTH);
         setLocationRelativeTo(null);
@@ -78,7 +79,7 @@ public class PhucVu_GUI extends JFrame implements ActionListener{
             btnBan.addActionListener(e -> {
             	this.setVisible(false);
                 // mở màn hình menu và truyền số bàn
-                new Menu_GUI(soBan).setVisible(true);
+                new Order_GUI(soBan).setVisible(true);
                 dispose();
             });
         }
@@ -101,7 +102,7 @@ public class PhucVu_GUI extends JFrame implements ActionListener{
         
 	}
 	public static void main(String[] args) {
-		new PhucVu_GUI().setVisible(true);
+		new Ban_GUI().setVisible(true);
 	}
 	@Override
 	public void actionPerformed(ActionEvent e) {

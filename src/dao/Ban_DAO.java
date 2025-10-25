@@ -38,7 +38,7 @@ public class Ban_DAO {
 	}
 	
 	public Ban getBanByMaBan(int maBan) {
-		String query = "select * FROM dbo.Ban WHERE maBan = ?";
+		String query = "SELECT * FROM dbo.Ban WHERE maBan = ?";
 		Ban b = null;
 		try (Connection c = ConnectDB.getConnection()) {
 			PreparedStatement pst = c.prepareStatement(query);
