@@ -9,6 +9,7 @@ public class Order {
 	private int soLuong;
 	private double donGia;
 	private double total;
+	private String loaiSP;
 	private String img;
 	public int getMaSP() {
 		return maSP;
@@ -35,12 +36,6 @@ public class Order {
 		this.img = img;
 	}
 	
-	public double getTotal() {
-		return total;
-	}
-	public void setTotal(double total) {
-		this.total = total;
-	}
 	public Order(int maSP) {
 		this.maSP = maSP;
 	}
@@ -51,16 +46,23 @@ public class Order {
 		this.soLuong = soLuong;
 	}
 	
-	public Order(int maSP, String tenSP, int soLuong, double donGia, double total, String img) {
+	public String getLoaiSP() {
+		return loaiSP;
+	}
+	public void setLoaiSP(String loaiSP) {
+		this.loaiSP = loaiSP;
+	}
+	
+	public Order(int maSP, String tenSP, int soLuong, double donGia, String loaiSP, String img) {
 		this.maSP = maSP;
 		this.tenSP = tenSP;
 		this.soLuong = soLuong;
 		this.donGia = donGia;
-		this.total = total;
+		this.loaiSP = loaiSP;
 		this.img = img;
 	}
 	public Order(ResultSet rs) throws SQLException {
-        this(rs.getInt("maSP"),rs.getString("tenSP"), rs.getInt("soLuong"), rs.getDouble("donGia"), rs.getDouble("total"), rs.getString("img"));
+        this(rs.getInt("maSP"),rs.getString("tenSP"), rs.getInt("soLuong"), rs.getDouble("donGia"),  rs.getString("loaiSP"), rs.getString("img"));
     }
 	
 	

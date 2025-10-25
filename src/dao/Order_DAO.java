@@ -12,38 +12,75 @@ import entity.Order;
 
 public class Order_DAO {
 	private static Order_DAO instance;
-	 public static Order_DAO getInstance() {
+	public static Order_DAO getInstance() {
 	        if (instance == null)
 	            instance = new Order_DAO();
 	        return instance;
 	    }  
 
-	 public ArrayList<Order> getSanPhamByMASP(int maSP) {
-		    String sql = "SELECT maSP, tenSP, soLuong, donGia, total, img FROM dbo.SanPham WHERE maSP = ?";
-		    ArrayList<Order> dsList = new ArrayList<>();
+	public ArrayList<Order> getSanPhamByMaSP(int maSP) {
+	    String sql =
+	        "SELECT sp.maSP, sp.tenSP, sp.soLuong, sp.donGia, sp.img, " +
+	        "       ls.loaiSP AS tenLoai " +
+	        "FROM dbo.SanPham sp " +
+	        "JOIN dbo.LoaiSanPham ls ON ls.maLoai = sp.maLoai " +
+	        "WHERE sp.maSP = ?";
 
-		    try (Connection con = ConnectDB.getConnection();
-		         PreparedStatement ps = con.prepareStatement(sql)) {
+	    ArrayList<Order> dsList = new ArrayList<>();
+	    Connection con = ConnectDB.getInstance().getConnection();
+	    try (
+	         PreparedStatement ps = con.prepareStatement(sql)) {
 
-		        ps.setInt(1, maSP);
+	        ps.setInt(1, maSP);
+	        try (ResultSet rs = ps.executeQuery()) {
+	            while (rs.next()) {
+	                dsList.add(new Order(
+	                    rs.getInt("maSP"),
+	                    rs.getString("tenSP"),
+	                    rs.getInt("soLuong"),
+	                    rs.getDouble("donGia"),
+	                    rs.getString("tenLoai"),
+	                    rs.getString("img")
+	                ));
+	            }
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return dsList;
+	}
+	 
+	public ArrayList<Order> getSanPhamByLoai(int maLoai) {
+	    String sql =
+	        "SELECT sp.maSP, sp.tenSP, sp.soLuong, sp.donGia, sp.img, " +
+	        "       ls.loaiSP AS tenLoai " +
+	        "FROM dbo.SanPham sp " +
+	        "JOIN dbo.LoaiSanPham ls ON ls.maLoai = sp.maLoai " +
+	        "WHERE sp.maLoai = ? " +
+	        "ORDER BY sp.tenSP";
 
-		        try (ResultSet rs = ps.executeQuery()) {
-		            while (rs.next()) {
-		                Order o = new Order(
-		                    rs.getInt("maSP"),
-		                    rs.getString("tenSP"),
-		                    rs.getInt("soLuong"),
-		                    rs.getDouble("donGia"),
-		                    rs.getDouble("total"),
-		                    rs.getString("img")
-		                );
-		                dsList.add(o);
-		            }
-		        }
-		    } catch (SQLException e) {
-		        e.printStackTrace();
-		    }
+	    ArrayList<Order> ds = new ArrayList<>();
+	    Connection con = ConnectDB.getInstance().getConnection();
+	    try (
+	         PreparedStatement ps = con.prepareStatement(sql)) {
 
-		    return dsList;
-		}
+	        ps.setInt(1, maLoai);
+
+	        try (ResultSet rs = ps.executeQuery()) {
+	            while (rs.next()) {
+	                ds.add(new Order(
+	                    rs.getInt("maSP"),
+	                    rs.getString("tenSP"),
+	                    rs.getInt("soLuong"),
+	                    rs.getDouble("donGia"),
+	                    rs.getString("tenLoai"),
+	                    rs.getString("img")
+	                ));
+	            }
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return ds;
+	}
 }

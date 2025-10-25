@@ -14,9 +14,9 @@ public class Ban_DAO {
 
 	public ArrayList<Ban> getAll() {
 		String query = "SELECT * FROM dbo.Ban";
-		ArrayList<Ban> dsList = new ArrayList<Ban>();        
+		ArrayList<Ban> dsList = new ArrayList<Ban>();       
+		Connection con = ConnectDB.getInstance().getConnection();
         try {
-        	Connection con = ConnectDB.getConnection();
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery(query);
 			 while (rs.next()) {

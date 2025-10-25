@@ -5,15 +5,17 @@ import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
 
-
+import connectDB.ConnectDB;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
-
+import dao.*;
+import entity.*;
 public class Order_GUI extends JFrame {
 	private JButton btnMenu;
 	private JLabel lblOrder;
+	private Order_DAO orderDAO = new Order_DAO();
 	// Sidebar trái
     private JPanel jWes;
     private JButton btnCoffee, btnTra, btnTraSua, btnNuocEp, btnBanh, btnKhac;
@@ -54,6 +56,7 @@ public class Order_GUI extends JFrame {
         
 	}
 	public static void main(String[] args) {
+		ConnectDB.getInstance().connect();
 		SwingUtilities.invokeLater(() -> new Order_GUI(1).setVisible(true));
 	}
 	// ========== Thanh tiêu đề =========
@@ -139,108 +142,25 @@ public class Order_GUI extends JFrame {
 
         btn.addActionListener(e -> {
             for (Component c : jWes.getComponents()) {
-                if (c instanceof JButton) {
-                    c.setBackground(defaultColor);
-                }
+                if (c instanceof JButton) c.setBackground(defaultColor);
             }
             btn.setBackground(selectedColor);
 
-            // === Điều hướng card theo text nút ===
             switch (text) {
-                case "Coffee"   -> cenCards.show(pCen, CARD_COFFEE);
-                case "Trà"      -> cenCards.show(pCen, CARD_TRA);
-                case "Trà Sữa"  -> cenCards.show(pCen, CARD_TRASUA);
-                case "Nước Ép"  -> cenCards.show(pCen, CARD_NUOCEP);
-                case "Bánh"     -> cenCards.show(pCen, CARD_BANH);
-                case "Khác"     -> cenCards.show(pCen, CARD_KHAC);
+                case "Coffee"  -> cenCards.show(pCen, CARD_COFFEE);
+                case "Trà"     -> cenCards.show(pCen, CARD_TRA);
+                case "Trà Sữa" -> cenCards.show(pCen, CARD_TRASUA);
+                case "Nước Ép" -> cenCards.show(pCen, CARD_NUOCEP);
+                case "Bánh"    -> cenCards.show(pCen, CARD_BANH);
+                case "Khác"    -> cenCards.show(pCen, CARD_KHAC);
             }
+            pCen.revalidate();
+            pCen.repaint();
         });
 
         return btn;
     }
     
- // ===== Grid card sản phẩm (3 cột + scroll) =====
-    private JComponent buildCategoryGrid(String[] names, String[] prices, String[] imagePaths) {
-        JPanel grid = new JPanel(new GridBagLayout());
-        grid.setBackground(new Color(0xD8C1AC)); // nền be nhẹ
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(15, 15, 15, 15);
-        gbc.gridx = 0; gbc.gridy = 0;
-
-        for (int i = 0; i < names.length; i++) {
-            JPanel card = createProductCard(names[i], prices[i], imagePaths[i]);
-            grid.add(card, gbc);
-
-            gbc.gridx++;
-            if (gbc.gridx == 3) { // 3 cột
-                gbc.gridx = 0;
-                gbc.gridy++;
-            }
-        }
-
-        JScrollPane scroll = new JScrollPane(grid,
-                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        scroll.getVerticalScrollBar().setUnitIncrement(16);
-        scroll.setBorder(null);
-        return scroll;
-    }
-    // ===== Card item: ảnh (200x150) + tên + giá đỏ =====
-    private JPanel createProductCard(String name, String price, String imgPath) {
-        JPanel card = new JPanel(new BorderLayout());
-        card.setPreferredSize(new Dimension(220, 240));
-        card.setBackground(Color.WHITE);
-        card.setBorder(BorderFactory.createLineBorder(new Color(220, 210, 200), 1));
-        card.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
-        // Ảnh
-        JLabel lblImg;
-        try {
-            ImageIcon img = new ImageIcon(getClass().getResource(imgPath));
-            Image scaled = img.getImage().getScaledInstance(220, 150, Image.SCALE_SMOOTH);
-            lblImg = new JLabel(new ImageIcon(scaled));
-        } catch (Exception ex) {
-            // fallback khi thiếu ảnh
-            lblImg = new JLabel("No Image", SwingConstants.CENTER);
-            lblImg.setPreferredSize(new Dimension(220, 150));
-            lblImg.setOpaque(true);
-            lblImg.setBackground(new Color(0xF0F0F0));
-        }
-        lblImg.setHorizontalAlignment(SwingConstants.CENTER);
-
-        // Tên + giá
-        JPanel info = new JPanel(new BorderLayout());
-        info.setBackground(Color.WHITE);
-        info.setBorder(BorderFactory.createEmptyBorder(8, 10, 8, 10));
-
-        JLabel lblName = new JLabel(name);
-        lblName.setFont(new Font("Segoe UI", Font.PLAIN, 16));
-
-        JLabel lblPrice = new JLabel(price);
-        lblPrice.setForeground(Color.RED);
-        lblPrice.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        lblPrice.setHorizontalAlignment(SwingConstants.RIGHT);
-
-        info.add(lblName, BorderLayout.WEST);
-        info.add(lblPrice, BorderLayout.EAST);
-
-        card.add(lblImg, BorderLayout.CENTER);
-        card.add(info, BorderLayout.SOUTH);
-
-        // Hover nhẹ cho card
-        card.addMouseListener(new MouseAdapter() {
-            Color border = new Color(220,210,200);
-            @Override public void mouseEntered(MouseEvent e) {
-                card.setBorder(BorderFactory.createLineBorder(new Color(200, 180, 160), 2));
-            }
-            @Override public void mouseExited(MouseEvent e) {
-                card.setBorder(BorderFactory.createLineBorder(border, 1));
-            }
-        });
-
-        return card;
-    }
  // ===== Ánh xạ nút → card (set selected mặc định) =====
     private void mapButtonToCard() {
         // giả sử mặc định chọn Coffee
@@ -276,12 +196,13 @@ public class Order_GUI extends JFrame {
         btnTim.setFocusPainted(false);
         btnTim.setFont(new Font("Times New Roman", Font.BOLD, 18));
 
-        pNor.add(Box.createHorizontalStrut(500)); 
+        pNor.add(Box.createHorizontalStrut(60)); 
 
         lblBan = new JLabel("Bàn " + soBan);
         lblBan.setFont(new Font("Times New Roman", Font.BOLD, 30));
         pNor.add(lblBan);
-        pNor.add(Box.createHorizontalStrut(500)); 
+        
+        pNor.add(Box.createHorizontalStrut(40)); 
         JButton btnChuyenBan = new JButton("Chuyển bàn", iconChuyenBan);
         btnChuyenBan.setPreferredSize(new Dimension(200, 40));
         btnChuyenBan.setBackground(Color.WHITE);
@@ -306,13 +227,43 @@ public class Order_GUI extends JFrame {
                 }
             }
         });
-        // Khu card
+        btnChuyenBan.addActionListener(e -> {
+            String input = JOptionPane.showInputDialog(
+                    this,
+                    "Nhập số bàn mới:",
+                    String.valueOf(soBan)
+            );
+            if (input != null && input.trim().matches("\\d+")) {
+                int banMoi = Integer.parseInt(input.trim());
+
+                if (banMoi <= 0 || banMoi>25) {
+                    JOptionPane.showMessageDialog(this, "Số bàn không hợp lệ!");
+                    return;
+                }
+
+                soBan = banMoi;
+                lblBan.setText("Bàn " + soBan);
+
+            }
+        });
+     // Khu card
         pCen = new JPanel(cenCards);
         pCen.setBackground(Color.decode("#E3CFC1"));
 
         jCen.add(pNor, BorderLayout.NORTH);
         jCen.add(pCen,  BorderLayout.CENTER);
         add(jCen, BorderLayout.CENTER);
+
+        // ===== NẠP DỮ LIỆU TỪ DB THEO LOẠI =====
+        napDuLieuVaoCard(CARD_COFFEE);
+        napDuLieuVaoCard(CARD_TRA);
+        napDuLieuVaoCard(CARD_TRASUA);
+        napDuLieuVaoCard(CARD_NUOCEP);
+        napDuLieuVaoCard(CARD_BANH);
+        napDuLieuVaoCard(CARD_KHAC);
+
+        // Hiển thị mặc định
+        mapButtonToCard();
         
 	}
     private void thanhBenPhai() {
@@ -356,7 +307,114 @@ public class Order_GUI extends JFrame {
         south.add(buttons, BorderLayout.SOUTH);
 
         jEst.add(south, BorderLayout.SOUTH);
+        jEst.setPreferredSize(new Dimension(700, getHeight()));
         add(jEst, BorderLayout.EAST);
 
 	}
+    private int chonMaLoai(String key) {
+        return switch (key) {
+            case CARD_COFFEE -> 1;
+            case CARD_TRA    -> 2;
+            case CARD_TRASUA -> 3;
+            case CARD_NUOCEP -> 4;
+            case CARD_BANH   -> 5;
+            case CARD_KHAC   -> 6;
+            default -> 0;
+        };
+    }
+ // ===== Load 1 category từ DB và add vào CardLayout =====
+    private void napDuLieuVaoCard(String cardKey) {
+    	int maLoai = chonMaLoai(cardKey);
+        ArrayList<Order> list = orderDAO.getSanPhamByLoai(maLoai);
+        JComponent pane = gridForm(list);
+        pCen.add(pane, cardKey);
+    }
+    
+    private JComponent gridForm(ArrayList<Order> items) {
+        JPanel grid = new JPanel(new FlowLayout(FlowLayout.LEFT, 60, 40));
+        grid.setBackground(Color.decode("#E3CFC1"));
+
+        for (Order o : items) {
+            JPanel card = cardOrder(o);
+            grid.add(card);
+        }
+
+        JScrollPane scroll = new JScrollPane(grid,
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scroll.setBorder(null);
+
+        scroll.getViewport().addChangeListener(e -> {
+            int width = scroll.getViewport().getWidth();
+            grid.setPreferredSize(new Dimension(width, grid.getPreferredSize().height));
+            grid.revalidate();
+        });
+
+        return scroll;
+    }
+
+    
+ // ===== Card từ Order =====
+    private JPanel cardOrder(Order o) {
+        JPanel card = new JPanel(new BorderLayout());
+        card.setPreferredSize(new Dimension(280, 270));
+        card.setBackground(Color.WHITE);
+        card.setBorder(BorderFactory.createLineBorder(new Color(220,210,200), 1));
+        card.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        
+
+        // Ảnh
+        JLabel lblImg = taiAnh(o.getImg());
+
+        // Tên + Giá
+        JPanel info = new JPanel(new BorderLayout());
+        info.setBackground(Color.WHITE);
+        info.setBorder(BorderFactory.createEmptyBorder(8,10,8,10));
+
+        JLabel lblName = new JLabel(o.getTenSP());
+        lblName.setFont(new Font("Segoe UI", Font.PLAIN, 20));
+
+        JLabel lblPrice = new JLabel(formatVND(o.getDonGia()));
+        lblPrice.setForeground(Color.RED);
+        lblPrice.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        lblPrice.setHorizontalAlignment(SwingConstants.RIGHT);
+
+
+        info.add(lblName, BorderLayout.WEST);
+        info.add(lblPrice, BorderLayout.EAST);
+
+        card.add(lblImg, BorderLayout.CENTER);
+        card.add(info, BorderLayout.SOUTH);
+        
+        return card;
+    }
+    
+ // ===== Load ảnh từ DB path  =====
+    private JLabel taiAnh(String imgPath) {
+        JLabel lbl = new JLabel("", SwingConstants.CENTER);
+        lbl.setPreferredSize(new Dimension(220, 150));
+
+        String p = (imgPath == null || imgPath.isBlank()) ? null
+                : (imgPath.startsWith("/") ? imgPath : "/img/" + imgPath);
+
+        java.net.URL url = (p != null) ? getClass().getResource(p) : null;
+        ImageIcon icon = (url != null) ? new ImageIcon(url) : null;
+
+
+        if (icon != null) {
+            Image scaled = icon.getImage().getScaledInstance(280, 225, Image.SCALE_SMOOTH);
+            lbl.setIcon(new ImageIcon(scaled));
+        } else {
+            lbl.setText("No Image");
+            lbl.setOpaque(true);
+            lbl.setBackground(new Color(0xF0F0F0));
+        }
+        return lbl;
+    }
+    
+    private String formatVND(double vnd) {
+        long v = Math.round(vnd);
+        return String.format("%,d", v).replace(',', '.');
+    }
+
 }
