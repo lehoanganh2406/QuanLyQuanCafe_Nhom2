@@ -17,6 +17,34 @@ public class Order_DAO {
 	            instance = new Order_DAO();
 	        return instance;
 	    }  
+	
+	public ArrayList<Order> getAllSanPham() {
+	    ArrayList<Order> ds = new ArrayList<>();
+	    String sql =
+	        "SELECT sp.maSP, sp.tenSP, sp.soLuong, sp.donGia, sp.img, " +
+	        "       ls.loaiSP AS tenLoai " +
+	        "FROM dbo.SanPham sp " +
+	        "JOIN dbo.LoaiSanPham ls ON ls.maLoai = sp.maLoai " +
+	        "ORDER BY sp.tenSP";
+	    Connection con = ConnectDB.getInstance().getConnection();
+	    try (
+	         PreparedStatement ps = con.prepareStatement(sql);
+	         ResultSet rs = ps.executeQuery()) {
+	        while (rs.next()) {
+	            ds.add(new Order(
+	                rs.getInt("maSP"),
+	                rs.getString("tenSP"),
+	                rs.getInt("soLuong"),
+	                rs.getDouble("donGia"),
+	                rs.getString("tenLoai"),
+	                rs.getString("img")
+	            ));
+	        }
+	    } catch (SQLException ex) {
+	        ex.printStackTrace();
+	    }
+	    return ds;
+	}
 
 	public ArrayList<Order> getSanPhamByMaSP(int maSP) {
 	    String sql =
@@ -83,4 +111,63 @@ public class Order_DAO {
 	    }
 	    return ds;
 	}
+	public ArrayList<Order> searchByName(String keyword) {
+	    ArrayList<Order> ds = new ArrayList<>();
+	    String sql = """
+	        SELECT sp.maSP, sp.tenSP, sp.soLuong, sp.donGia, sp.img, ls.loaiSP AS tenLoai
+	        FROM dbo.SanPham sp
+	        JOIN dbo.LoaiSanPham ls ON ls.maLoai = sp.maLoai
+	        WHERE sp.tenSP LIKE ?
+	        ORDER BY sp.tenSP
+	    """;
+	    Connection c = ConnectDB.getInstance().getConnection();
+	    try (
+	         PreparedStatement ps = c.prepareStatement(sql)) {
+	        ps.setString(1, "%" + keyword + "%");
+	        try (ResultSet rs = ps.executeQuery()) {
+	            while (rs.next()) {
+	                ds.add(new Order(
+	                    rs.getInt("maSP"),
+	                    rs.getString("tenSP"),
+	                    rs.getInt("soLuong"),
+	                    rs.getDouble("donGia"),
+	                    rs.getString("tenLoai"),
+	                    rs.getString("img")
+	                ));
+	            }
+	        }
+	    } catch (SQLException e) { e.printStackTrace(); }
+	    return ds;
+	}
+
+	public ArrayList<Order> searchByNameAndLoai(String keyword, int maLoai) {
+	    ArrayList<Order> ds = new ArrayList<>();
+	    String sql = """
+	        SELECT sp.maSP, sp.tenSP, sp.soLuong, sp.donGia, sp.img, ls.loaiSP AS tenLoai
+	        FROM dbo.SanPham sp
+	        JOIN dbo.LoaiSanPham ls ON ls.maLoai = sp.maLoai
+	        WHERE sp.maLoai = ? AND sp.tenSP LIKE ?
+	        ORDER BY sp.tenSP
+	    """;
+	    Connection c = ConnectDB.getInstance().getConnection();
+	    try (
+	         PreparedStatement ps = c.prepareStatement(sql)) {
+	        ps.setInt(1, maLoai);
+	        ps.setString(2, "%" + keyword + "%");
+	        try (ResultSet rs = ps.executeQuery()) {
+	            while (rs.next()) {
+	                ds.add(new Order(
+	                    rs.getInt("maSP"),
+	                    rs.getString("tenSP"),
+	                    rs.getInt("soLuong"),
+	                    rs.getDouble("donGia"),
+	                    rs.getString("tenLoai"),
+	                    rs.getString("img")
+	                ));
+	            }
+	        }
+	    } catch (SQLException e) { e.printStackTrace(); }
+	    return ds;
+	}
+
 }
