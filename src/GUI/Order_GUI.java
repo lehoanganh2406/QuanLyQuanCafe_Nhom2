@@ -181,7 +181,8 @@ public class Order_GUI extends JFrame {
         pNor = new JPanel(new FlowLayout(FlowLayout.LEFT, 16, 8));
         pNor.setBorder(BorderFactory.createEmptyBorder(10,16,6,16));
         JTextField txtTimKiem = new JTextField();
-        JButton btnTim = new JButton("Tìm", iconTimKiem);
+        JButton btnTim = taoNut("Tìm", iconTimKiem);
+        btnTim.setPreferredSize(new Dimension(140, 40));
         pNor.add(txtTimKiem);
         pNor.add(btnTim);
         pNor.setBackground(new Color(255,228,196));
@@ -194,11 +195,6 @@ public class Order_GUI extends JFrame {
                 BorderFactory.createLineBorder(new Color(180, 180, 180), 1),
                 BorderFactory.createEmptyBorder(6, 12, 6, 12)
         ));
-        btnTim.setPreferredSize(new Dimension(140, 40));
-        btnTim.setBackground(Color.WHITE);
-        btnTim.setForeground(Color.BLACK);
-        btnTim.setFocusPainted(false);
-        btnTim.setFont(new Font("Times New Roman", Font.BOLD, 18));
 
         pNor.add(Box.createHorizontalStrut(60));
 
@@ -207,12 +203,8 @@ public class Order_GUI extends JFrame {
         pNor.add(lblBan);
 
         pNor.add(Box.createHorizontalStrut(40));
-        JButton btnChuyenBan = new JButton("Chuyển bàn", iconChuyenBan);
+        JButton btnChuyenBan = taoNut("Chuyển Bàn", iconChuyenBan);
         btnChuyenBan.setPreferredSize(new Dimension(200, 40));
-        btnChuyenBan.setBackground(Color.WHITE);
-        btnChuyenBan.setForeground(Color.BLACK);
-        btnChuyenBan.setFocusPainted(false);
-        btnChuyenBan.setFont(new Font("Times New Roman", Font.PLAIN, 20));
         pNor.add(btnChuyenBan);
 
         txtTimKiem.addFocusListener(new FocusAdapter() {
@@ -368,29 +360,18 @@ public class Order_GUI extends JFrame {
         total.add(lblTongTien);
 
         JPanel buttonsTrai = new JPanel(new FlowLayout(FlowLayout.LEFT,10,0));
-        JButton btnQuayLai = new JButton("Quay lại", iconQuayLai);
+        JButton btnQuayLai = taoNut("Quay lại", iconQuayLai);
         buttonsTrai.add(btnQuayLai);
         btnQuayLai.setPreferredSize(new Dimension(140, 40));
-        btnQuayLai.setBackground(Color.WHITE);
-        btnQuayLai.setForeground(Color.BLACK);
-        btnQuayLai.setFocusPainted(false);
-        btnQuayLai.setFont(new Font("Times New Roman", Font.BOLD, 18));
 
         JPanel buttonsPhai = new JPanel(new FlowLayout(FlowLayout.RIGHT,10,0));
-        JButton btnRemove = new JButton("Bỏ món", iconBoMon);
-        JButton btnThanhToan = new JButton("Thanh toán", iconThanhToan);
+        JButton btnRemove = taoNut("Bỏ món", iconBoMon);
+        JButton btnThanhToan = taoNut("Thanh toán", iconThanhToan);
         buttonsPhai.add(btnRemove);
         buttonsPhai.add(btnThanhToan);
         btnRemove.setPreferredSize(new Dimension(140, 40));
-        btnRemove.setBackground(Color.WHITE);
-        btnRemove.setForeground(Color.BLACK);
-        btnRemove.setFocusPainted(false);
-        btnRemove.setFont(new Font("Times New Roman", Font.BOLD, 18));
         btnThanhToan.setPreferredSize(new Dimension(170, 40));
-        btnThanhToan.setBackground(Color.WHITE);
-        btnThanhToan.setForeground(Color.BLACK);
-        btnThanhToan.setFocusPainted(false);
-        btnThanhToan.setFont(new Font("Times New Roman", Font.BOLD, 18));
+        
 
         JPanel bottomBar = new JPanel(new BorderLayout());
         bottomBar.setBorder(BorderFactory.createEmptyBorder(0,0,0,0));
@@ -645,4 +626,15 @@ public class Order_GUI extends JFrame {
         newGrid.repaint();
     }
 
+    private JButton taoNut(String ten,ImageIcon icon ) {
+        JButton btn = new JButton(ten, icon);
+        btn.setBackground(Color.WHITE);
+        btn.setForeground(Color.BLACK);
+        btn.setFocusPainted(false);
+        btn.setFont(new Font("Times New Roman", Font.BOLD, 18));
+        return btn;
+    }
+    private JButton taoNut(String ten) {
+        return taoNut(ten, null);
+    }
 }
