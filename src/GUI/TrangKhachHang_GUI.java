@@ -4,6 +4,7 @@ package GUI;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -36,18 +37,19 @@ public class TrangKhachHang_GUI extends JFrame implements ActionListener,MouseLi
 	public TrangKhachHang_GUI() {
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		setSize(550, 500);
+		setExtendedState(JFrame.MAXIMIZED_BOTH);
 		setTitle("thêm khách hàng");
 		
 		Color nen= new Color(230, 190, 145);
 		Color brownColor = new Color(125, 95, 87);
 		JPanel pNhap = new JPanel(new BorderLayout());
+		pNhap.setPreferredSize(new Dimension(0,60));
 		pNhap.setBackground(brownColor);
 		JLabel til;
 		pNhap.add(til=new JLabel("Khách Hàng"));
 		til.setHorizontalAlignment(JLabel.CENTER);
 		til.setForeground(Color.white);
-		til.setFont(new Font("Arial", Font.BOLD, 25));
+		til.setFont(new Font("Arial", Font.BOLD, 40));
 		
 //		nut dong
 		
