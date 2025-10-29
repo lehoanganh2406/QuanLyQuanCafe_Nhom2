@@ -3,6 +3,8 @@ package GUI;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
+import connectDB.ConnectDB;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -102,6 +104,7 @@ public class Ban_GUI extends JFrame implements ActionListener{
         
 	}
 	public static void main(String[] args) {
+		ConnectDB.getInstance().connect();
 		new Ban_GUI().setVisible(true);
 	}
 	@Override

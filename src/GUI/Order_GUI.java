@@ -328,6 +328,9 @@ public class Order_GUI extends JFrame {
         colss.getColumn(2).setPreferredWidth(60);
         colss.getColumn(3).setPreferredWidth(100);
         colss.getColumn(4).setPreferredWidth(120);
+        TableCellRenderer vndR = new VNDRenderer();
+        tblCart.getColumnModel().getColumn(3).setCellRenderer(vndR); // Đơn giá
+        tblCart.getColumnModel().getColumn(4).setCellRenderer(vndR); // Thành tiền
 
         JTableHeader header = tblCart.getTableHeader();
         header.setPreferredSize(new Dimension(header.getWidth(), 48));
@@ -445,6 +448,32 @@ public class Order_GUI extends JFrame {
         btnQuayLai.addActionListener(e -> {
             new Ban_GUI().setVisible(true);
             dispose();
+        });
+        btnThanhToan.addActionListener(e -> {
+        	int rows = cartModel.getRowCount();
+            if (rows == 0) {
+                JOptionPane.showMessageDialog(this, "Giỏ hàng đang trống!");
+                return;
+            }
+
+            ArrayList<Object[]> items = new ArrayList<>();
+            long tongTien = 0L;
+
+            for (int i = 0; i < cartModel.getRowCount(); i++) {
+                items.add(new Object[]{
+                    cartModel.getValueAt(i, 0),
+                    cartModel.getValueAt(i, 1),
+                    cartModel.getValueAt(i, 2),
+                    cartModel.getValueAt(i, 3),
+                    cartModel.getValueAt(i, 4)
+                });
+                tongTien += (Long) cartModel.getValueAt(i, 4);
+            }
+
+            // mở màn thanh toán, truyền dữ liệu
+            ThanhToan_GUI tt = new ThanhToan_GUI(this, soBan, items, tongTien);
+            tt.setVisible(true);
+//            this.setVisible(false); 
         });
     }
 
@@ -589,7 +618,7 @@ public class Order_GUI extends JFrame {
         } else {
             lbl.setText("No Image");
             lbl.setOpaque(true);
-            lbl.setBackground(new Color(0xF0F0F0));
+            lbl.setBackground(Color.WHITE);
         }
         return lbl;
     }
@@ -637,4 +666,16 @@ public class Order_GUI extends JFrame {
     private JButton taoNut(String ten) {
         return taoNut(ten, null);
     }
+    private class VNDRenderer extends DefaultTableCellRenderer {
+        @Override
+        protected void setValue(Object value) {
+            if (value instanceof Number n) {
+                setText(formatVND(n.doubleValue())); // dùng hàm bạn đã có
+            } else {
+                setText("");
+            }
+            setHorizontalAlignment(SwingConstants.RIGHT);
+        }
+    }
+
 }
