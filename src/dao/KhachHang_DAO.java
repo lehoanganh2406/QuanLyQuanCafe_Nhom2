@@ -5,6 +5,8 @@ import entity.KhachHang;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.JOptionPane;
 //import java.util.*;
 //import java.sql.Connection;
 //import java.sql.PreparedStatement;
@@ -14,30 +16,40 @@ public class KhachHang_DAO {
     
     private Connection con; 
     public boolean themKhachHang(KhachHang kh) {
-        String sql = "INSERT INTO KhachHang (tenKH, soDienThoai, diemTichLuy) VALUES (?, ?, ?)";        
+        String sql = "INSERT INTO KhachHang (maKH, tenKH, soDienThoai, diemTichLuy) VALUES (?, ?, ?, ?)";        
         con = null; 
         try {
             con = ConnectDB.getConnection(); // Lấy kết nối
             PreparedStatement ps = con.prepareStatement(sql);
             
-            ps.setString(1, kh.getTenKH());
-            ps.setString(2, kh.getSdt());
-            ps.setInt(3, kh.getDiemTL()); 
+            // Gán giá trị cho các tham số
+            ps.setString(1, kh.getMaKH()); // Giả sử bạn đã có mã khách hàng
+            ps.setString(2, kh.getTenKH());
+            ps.setString(3, kh.getSdt());
+            
+//            int diemTL= tinhDiemTL(kh.get)
+            ps.setInt(4, kh.getDiemTL()); // Điểm tích lũy được nhập vào
 
             int rowsAffected = ps.executeUpdate();
-            System.out.println("Thêm khách hàng thành công: " + kh.getTenKH() + "\n");
+            
+            // Thông báo thêm khách hàng thành công
+            JOptionPane.showMessageDialog(null, "Thêm khách hàng thành công: " + kh.getTenKH());
             ps.close();
 
-            
             return rowsAffected > 0;
 
         } catch (SQLException e) {
+            // Hiển thị thông báo lỗi
+            JOptionPane.showMessageDialog(null, "Lỗi khi thêm khách hàng: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
             return false;
         } finally {
-            // Đảm bảo kết nối luôn được đóng
             ConnectDB.closeConnection(con);
         }
+    }
+    
+    private int tinhDiemTL(double amountSpent) {
+        return (int) (amountSpent / 1000); // 1.000 VND = 1 điểm
     }
     
     public List<KhachHang> layTatCaKhachHang() {

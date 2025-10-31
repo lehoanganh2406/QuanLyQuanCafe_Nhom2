@@ -4,22 +4,32 @@ package GUI;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
+
+import com.itextpdf.text.pdf.PdfStructTreeController.returnType;
+
+import entity.KhachHang;
 
 public class TrangKhachHang_GUI extends JFrame implements ActionListener,MouseListener{
 	private JTextField txtma;
@@ -73,34 +83,35 @@ public class TrangKhachHang_GUI extends JFrame implements ActionListener,MouseLi
 		b1.add(new JLabel("Mã khách hang:"));
 		b.add(Box.createVerticalStrut(5));
 		b1.add(Box.createHorizontalStrut(30));
-		b1.add(txtma= new JTextField(10));
+		b1.add(txtma= new JTextField(20));
 		b.add(b1);
 		
 		
 		b2=Box.createHorizontalBox();
 		b2.add(new JLabel("Tên khách hàng :"));
 		b2.add(Box.createHorizontalStrut(20));
-		b2.add(txtten=new JTextField(10));
+		b2.add(txtten=new JTextField(20));
 		b.add(Box.createVerticalStrut(5));
 		b.add(b2);
 		
 		b3=Box.createHorizontalBox();
 		b3.add(new JLabel("SDT liên hệ:"));
 		b3.add(Box.createHorizontalStrut(49));
-		b3.add(txtsdt=new JTextField(8));
+		b3.add(txtsdt=new JTextField(20));
 		b.add(Box.createVerticalStrut(5));
 		b.add(b3);
 		
 		b4=Box.createHorizontalBox();
 		b4.add(new JLabel("Điểm tích lũy:"));
 		b4.add(Box.createHorizontalStrut(40));
-		b4.add(txtdtl=new JTextField(10));
+		b4.add(txtdtl=new JTextField(20));
 		b.add(Box.createVerticalStrut(5));
 		b.add(b4);
-		
+		b.setPreferredSize(new Dimension(400, 150));
 		
 		pform.add(b,BorderLayout.NORTH);
 		pcenter.add(pform,BorderLayout.NORTH);
+		
 		
 		add(pcenter);
 		
@@ -120,7 +131,7 @@ public class TrangKhachHang_GUI extends JFrame implements ActionListener,MouseLi
 		a.add(Box.createHorizontalStrut(20));
 		a.add(btnBack=new JButton("Quay lại"));
 		a.add(Box.createHorizontalStrut(5));
-		a.add(btnTim=new JButton("Tìm"));
+		a.add(btnTim=new JButton("Tìm theo SDT"));
 		a.add(Box.createHorizontalStrut(10));
 		a.add(txtTim = new JTextField(10));		
 		
@@ -141,6 +152,7 @@ public class TrangKhachHang_GUI extends JFrame implements ActionListener,MouseLi
 		c.add(a);
 		c.add(Box.createVerticalStrut(15));
 		pcenter.add(c,BorderLayout.SOUTH);
+		setFontSizeForAllComponents(pcenter, 15);
 		
 		btnBack.addActionListener(this);
 		btnClose.addActionListener(this);
@@ -148,8 +160,23 @@ public class TrangKhachHang_GUI extends JFrame implements ActionListener,MouseLi
 		btnThem.addActionListener(this);
 		tableKH.addMouseListener(this);
 		
+		taidulieuKH();
 		
 		
+		
+	}
+	private static void setFontSizeForAllComponents(Container container, int newSize) {
+	    for (Component component : container.getComponents()) {
+	        Font currentFont = component.getFont();
+	        if (currentFont != null) {
+	            Font newFont = new Font(currentFont.getName(), currentFont.getStyle(), newSize);
+	            component.setFont(newFont);
+	        }
+	        
+	        if (component instanceof Container) {
+	            setFontSizeForAllComponents((Container) component, newSize); // Đệ quy cho các thành phần con
+	        }
+	    }
 	}
 
 	public static void main(String[] args) {
@@ -159,7 +186,7 @@ public class TrangKhachHang_GUI extends JFrame implements ActionListener,MouseLi
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-//	    }
+
 		
 		int row=tableKH.getSelectedRow();
 		if (row!=-1) {
@@ -197,8 +224,78 @@ public class TrangKhachHang_GUI extends JFrame implements ActionListener,MouseLi
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
+		Object o= e.getSource();
+		if (o.equals(btnThem)) {
+			if (!valiData()) {
+				return ;
+			}
+			String maKH = txtma.getText().trim();
+	        String tenKH = txtten.getText().trim();
+	        String sdt = txtsdt.getText().trim();
+	        int diemTL = Integer.parseInt(txtdtl.getText().trim()); 
+	        KhachHang kh = new KhachHang(maKH, tenKH, sdt, diemTL);
+	        try {
+	            // Gọi hàm thêm khách hàng vào cơ sở dữ liệu
+	            boolean success = themKhachHang(kh);
+	            
+	            if (success) {
+	            	taidulieuKH();
+	                Object[] rowData = { kh.getMaKH(), kh.getTenKH(), kh.getSdt(), kh.getDiemTL() };
+	                mdKH.addRow(rowData);
+	                
+	                // Thông báo thêm thành công
+	                JOptionPane.showMessageDialog(null, "Thêm khách hàng thành công và đã cập nhật bảng.");
+	                
+	            } else {
+	                JOptionPane.showMessageDialog(null, "Không thể thêm khách hàng.");
+	            }
+	        } catch (Exception e1) {
+	            e1.printStackTrace(); 
+	            JOptionPane.showMessageDialog(null, "Đã xảy ra lỗi khi thêm khách hàng: " + e1.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+	        }
+		}
 		
 	}
 
+	private boolean themKhachHang(KhachHang kh) {
+		// TODO Auto-generated method stub
+		return true;
+	}
+	private boolean valiData() {
+		String ma=txtma.getText().trim();
+		String ten= txtten.getText().trim();
+		String sdt= txtsdt.getText().trim();
+		
+		if (!(ma.length()>0&& ma.matches("^KH\\d{3}"))) {
+			JOptionPane.showMessageDialog(this, "mã không hợp lệ , nhập đúng : KH001");
+			return false;
+		} 
+		if (!(ten.length()>0 && sdt.length()>0)) {
+			JOptionPane.showMessageDialog(this, "các ô nhập không được rỗng");
+			return false;
+		}
+		if (!(sdt.matches("0\\d{9}"))) {
+			JOptionPane.showMessageDialog(this, "SDT phải đầy đủ 9 số");
+		}
+		
+		
+		return true;
+		
+	}
+	
+	private void taidulieuKH() {
+		List<KhachHang> ds= new ArrayList<KhachHang>();
+		hienthiKH(ds);
+		
+	}
+	
+	private void hienthiKH(List<KhachHang> list) {
+		mdKH.setRowCount(0);
+		for (KhachHang k : list) {
+			Object[] rowData= {
+					k.getMaKH(),k.getTenKH(),k.getSdt(),k.getDiemTL()
+			};
+			mdKH.addRow(rowData);
+		}
+	}
 }
