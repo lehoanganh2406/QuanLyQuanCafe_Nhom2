@@ -10,6 +10,7 @@ import entity.KhachHang;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.List;
 import java.util.ArrayList;
 
 public class ThanhToan_GUI extends JFrame {
@@ -37,7 +38,11 @@ public class ThanhToan_GUI extends JFrame {
     private JLabel lblTienThua;
     private JComboBox<String> cboPhuongThuc;
     private JButton thanhToan;
-
+    
+    public static void main(String[] args) {
+        ConnectDB.getInstance().connect();
+        SwingUtilities.invokeLater(() -> new ThanhToan_GUI(null, 1, new ArrayList<>(), 0L).setVisible(true));
+    }
     public ThanhToan_GUI(Order_GUI orderGui, int soBan, ArrayList<Object[]> cartRows, Long tongTien) {
         this.soBan = soBan;
         this.orderGui = orderGui;
@@ -58,18 +63,15 @@ public class ThanhToan_GUI extends JFrame {
         updateFooterSum();
         syncFooterColumnWidths();
     }
-    public static void main(String[] args) {
-        ConnectDB.getInstance().connect();
-        SwingUtilities.invokeLater(() -> new ThanhToan_GUI(null, 1, new ArrayList<>(), 0L).setVisible(true));
-    }
+    
 
-    // =================== Header ===================
+    // Thanh tiêu đề
     private void thanhTieuDe() {
     	PanelTieuDe panel = new PanelTieuDe("Thanh Toán", "/img/thanhtoan.png");
         add(panel, BorderLayout.NORTH);
     }
 
-    // =================== Center ===================
+    // Center
     private void taoCenter() {
         JPanel trungTam = new JPanel(new FlowLayout(FlowLayout.LEFT, 24, 12));
         trungTam.setOpaque(false);
@@ -303,7 +305,7 @@ public class ThanhToan_GUI extends JFrame {
         });
     }
 
-    // =================== Helpers ===================
+    // JLabel tiêu đề
     private JLabel tieuDe(String nhan, String giaTri) {
         JLabel lbl = new JLabel(nhan + "   " + giaTri);
         lbl.setFont(new Font("Times New Roman", Font.BOLD, 28));
@@ -318,7 +320,8 @@ public class ThanhToan_GUI extends JFrame {
         btn.setFont(new Font("Times New Roman", Font.BOLD, 20));
         return btn;
     }
-    private JButton taoNut(String ten) { return taoNut(ten, null); }
+    private JButton taoNut(String ten) { return taoNut(ten, null); 
+    }
     private JPanel tieuDeDonGian(String nhan) {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         p.setOpaque(false);
@@ -339,12 +342,12 @@ public class ThanhToan_GUI extends JFrame {
         return p;
     }
 
-    // ===== Helpers cho input style giống ô search =====
+    // ô text
     private JTextField taoOText(String placeholder) {
         JTextField tf = new JTextField();
         tf.setColumns(10);
         tf.setPreferredSize(new Dimension(220, 36));
-        tf.setFont(new Font("Montserrat", Font.PLAIN, 16));
+        tf.setFont(new Font("Times New Roman", Font.PLAIN, 16));
         tf.setBackground(Color.WHITE);
         tf.setForeground(Color.GRAY);
         tf.setText(placeholder);
@@ -401,7 +404,7 @@ public class ThanhToan_GUI extends JFrame {
         });
     }
 
-    /** Renderer định dạng tiền VND (dùng cho cả bảng chính & footer) */
+ 
     private static class VNDRenderer extends DefaultTableCellRenderer {
         @Override protected void setValue(Object value) {
             if (value instanceof Number n) {
@@ -414,8 +417,8 @@ public class ThanhToan_GUI extends JFrame {
         }
     }
 
-    /** Nạp giỏ hàng vào bảng chính */
-    private void napDuLieuGioHang(java.util.List<Object[]> cartRows) {
+    // nập dữ liệu bảng bên order vào thanh toán
+    private void napDuLieuGioHang(List<Object[]> cartRows) {
         modelBang.setRowCount(0);
         for (Object[] row : cartRows) modelBang.addRow(row);
     }
