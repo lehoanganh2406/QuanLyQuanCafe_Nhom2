@@ -4,6 +4,10 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
 import javax.swing.text.*;
+
+import connectDB.ConnectDB;
+import entity.KhachHang;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
@@ -53,6 +57,10 @@ public class ThanhToan_GUI extends JFrame {
         capNhatTongThanhToan();
         updateFooterSum();
         syncFooterColumnWidths();
+    }
+    public static void main(String[] args) {
+        ConnectDB.getInstance().connect();
+        SwingUtilities.invokeLater(() -> new ThanhToan_GUI(null, 1, new ArrayList<>(), 0L).setVisible(true));
     }
 
     // =================== Header ===================
@@ -223,6 +231,19 @@ public class ThanhToan_GUI extends JFrame {
             updateFooterSum();
             capNhatTongThanhToan();
         });
+        
+        nutThemKhach.addActionListener(e -> {
+            TrangKhachHang_GUI trangKH = new TrangKhachHang_GUI(SwingUtilities.getWindowAncestor(this));
+            trangKH.setLocationRelativeTo(this);
+            trangKH.setVisible(true);              // modal → chờ đóng
+            KhachHang chon = trangKH.getSelected();
+            if (chon != null) {
+                capNhatThongTinKhachHang(chon);
+                txtTruDiem.requestFocus(); // UX: cho thu ngân nhập luôn
+            }
+        });
+
+
 
         // Nút quay lại
         JButton nutQuayLai = taoNut("Quay lại", iconQuayLai);
@@ -572,4 +593,20 @@ public class ThanhToan_GUI extends JFrame {
         p.add(rowBtn);
         return p;
     }
+    /** Nhận KH từ trang chọn và đổ xuống UI (label + giới hạn ô Trừ điểm) */
+    private void capNhatThongTinKhachHang(KhachHang kh) {
+        if (kh == null) return;
+        // Cập nhật label “Mã khách hàng: …”
+        lblThongTinKhachHang.setText(String.format("Mã khách hàng: %s — %s (Điểm TL: %d)",
+                kh.getMaKH(), kh.getTenKH(), kh.getDiemTL()));
+
+        // Giới hạn ô Trừ điểm theo điểm tích lũy hiện có
+        setNumericFilter(txtTruDiem, 0, kh.getDiemTL());      // thay max động = điểm KH
+        txtTruDiem.setText("0");                               // reset về 0 cho chắc
+        txtTruDiem.setToolTipText("Tối đa " + kh.getDiemTL() + " điểm");
+
+        // Tính lại tổng + tiền thừa
+        capNhatTongThanhToan();
+    }
+
 }
