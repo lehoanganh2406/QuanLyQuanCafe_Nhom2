@@ -2,6 +2,7 @@ package GUI;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+import javax.swing.plaf.basic.BasicScrollBarUI;
 
 import connectDB.ConnectDB;
 
@@ -24,40 +25,25 @@ public class Ban_GUI extends JFrame implements ActionListener{
 		setExtendedState(JFrame.MAXIMIZED_BOTH);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        
-       //====== Thanh tiêu đề =======
-        JPanel jNor = new JPanel(new BorderLayout());
-        jNor.setBackground(Color.decode("#865A52"));   // màu nâu
-        jNor.setPreferredSize(new Dimension(0,60));
-        
-        JPanel jNorLeft = new JPanel(new FlowLayout(FlowLayout.LEFT,10,8));
-        jNorLeft.setOpaque(false); // để hiện nền nâu của jNor
-        ImageIcon iconMenu = new ImageIcon(new ImageIcon(getClass().getResource("/img/iconMenu.png"))
-        		.getImage().getScaledInstance(49, 32, Image.SCALE_SMOOTH));
-        jNorLeft.add(btnMenu = new JButton(iconMenu));
-        btnMenu.setBackground(Color.decode("#865A52"));
-        btnMenu.setBorderPainted(false); // tắt viền
-        btnMenu.setFocusPainted(false);   // tắt viền focus
-        
-        JPanel jNorCen = new JPanel(new FlowLayout(FlowLayout.LEFT,0,0));
-        jNorCen.setOpaque(false); // để hiện nền nâu của jNor
-        ImageIcon iconOrder = new ImageIcon(new ImageIcon(getClass().getResource("/img/iconOrder.png"))
-        		.getImage().getScaledInstance(38, 48, Image.SCALE_SMOOTH));
-        jNorCen.add(lblOrder = new JLabel("Order", iconOrder, SwingConstants.CENTER));
-        lblOrder.setBackground(Color.decode("#FFF1E6"));  // be nhạt
-        lblOrder.setFont(new Font("Montserrat", Font.PLAIN, 32));
-        lblOrder.setBorder(BorderFactory.createEmptyBorder(6, 12, 6, 12)); // padding
-        lblOrder.setForeground(Color.BLACK);
-        lblOrder.setOpaque(true);   // hirnt thị nền
-        lblOrder.setIconTextGap(10); // khoảng cách chữ và icon
-        lblOrder.setHorizontalAlignment(SwingConstants.LEFT);
+        thanhTieuDe();
+        cacBan();
         
         
-        jNor.add(jNorLeft, BorderLayout.WEST);
-        jNor.add(jNorCen, BorderLayout.CENTER);
-        add(jNor, BorderLayout.NORTH);
-        
-        jCen = new JPanel(new BorderLayout());
+	}
+	
+	public static void main(String[] args) {
+		ConnectDB.getInstance().connect();
+		new Ban_GUI().setVisible(true);
+	}
+	@Override
+	public void actionPerformed(ActionEvent e) {
+	}
+	private void thanhTieuDe() {
+    	PanelTieuDe panel = new PanelTieuDe("Order", "/img/iconOrder.png");
+        add(panel, BorderLayout.NORTH);
+    }
+	private void cacBan() {
+		jCen = new JPanel(new BorderLayout());
         jCen.setBackground(Color.WHITE);
         pnBan = new JPanel();
         pnBan.setBackground(Color.WHITE);
@@ -68,9 +54,10 @@ public class Ban_GUI extends JFrame implements ActionListener{
         	final int soBan = i;
             JButton btnBan = new JButton("Bàn " + soBan);
             btnBan.setPreferredSize(new Dimension(200, 100)); // kích thước mỗi bàn
+            btnBan.setFont(new Font("Times New Roman", Font.BOLD, 25));
             pnBan.add(btnBan);
             btnBan.setFocusPainted(false);   // tắt viền focus
-            btnBan.setForeground(Color.WHITE); // màu chữ
+            btnBan.setForeground(Color.BLACK); // màu chữ
             btnBan.setBackground(Color.decode("#E3CFC1")); // màu nâu nhạt
             btnBan.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
             ImageIcon iconTable = new ImageIcon(
@@ -88,7 +75,7 @@ public class Ban_GUI extends JFrame implements ActionListener{
 
         JScrollPane spBan = new JScrollPane(pnBan, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        spBan.getVerticalScrollBar().setUI(new javax.swing.plaf.basic.BasicScrollBarUI() {
+        spBan.getVerticalScrollBar().setUI(new BasicScrollBarUI() {
             @Override
             protected void configureScrollBarColors() {
                 thumbColor = Color.decode("#E3CFC1"); // màu tay kéo
@@ -100,17 +87,7 @@ public class Ban_GUI extends JFrame implements ActionListener{
         jCen.add(spBan, BorderLayout.CENTER);
         add(jCen, BorderLayout.CENTER);
         
-        
-        
+
 	}
-	public static void main(String[] args) {
-		ConnectDB.getInstance().connect();
-		new Ban_GUI().setVisible(true);
-	}
-	@Override
-	public void actionPerformed(ActionEvent e) {
-	}
-	
-	
 
 }
