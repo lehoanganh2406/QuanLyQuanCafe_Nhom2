@@ -167,6 +167,21 @@ VALUES
 (N'Thạch phô mai',   100, 10000, N'khacphomai.jpg',        @LSP_Khac, N'Thạch nhân cheese béo mặn'),
 (N'Kem cheese',       80, 12000, N'khackem.jpg',           @LSP_Khac, N'Topping béo mặn, siêu cuốn'),
 (N'Thạch dừa',        90,  8000, N'khacthachdua.jpg',      @LSP_Khac, N'Giòn nhẹ, mát lạnh');
+
+GO
+
+INSERT INTO dbo.KhachHang (tenKH, sdt, diemTL)
+VALUES
+(N'Nguyễn Văn An',      N'0901000001', 120),
+(N'Trần Thị Bích',      N'0901000002',  80),
+(N'Lê Hoàng Anh',       N'0901000003', 200),
+(N'Phạm Minh Khoa',     N'0901000004',  50),
+(N'Võ Thị Thu Trang',   N'0901000005',  30),
+(N'Đỗ Thanh Tùng',      N'0901000006', 150),
+(N'Bùi Ngọc Hân',       N'0901000007',  70),
+(N'Huỳnh Đức Thịnh',    N'0901000008',  95),
+(N'Phan Thảo Nhi',      N'0901000009',  40),
+(N'Ngô Quang Huy',      N'0901000010', 110);
 GO
 
 SELECT * FROM Ban;
@@ -178,3 +193,4 @@ SELECT * FROM TaiKhoan;
 SELECT * FROM LoaiSanPham;
 SELECT * FROM ChiTietHoaDon;
 GO
+

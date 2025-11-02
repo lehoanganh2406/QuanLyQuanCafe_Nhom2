@@ -12,14 +12,15 @@ public class ConnectDB {
         return instance;
     }
 	public void connect()  {
-        String severName = "localhost";
-        String databaseName = "QuanLyQuanCafe";
         String username = "sa";
         String password = "Qazwsxedc@12345";
         String url = "jdbc:sqlserver://localhost:1433;databaseName=QuanLyQuanCF;encrypt=true;trustServerCertificate=true;loginTimeout=5";
         try {
-			con = DriverManager.getConnection(url, username, password);
-			System.out.println("Kết nối database thành công.");
+        	if (con == null || con.isClosed()) {
+        		con = DriverManager.getConnection(url, username, password);
+    			System.out.println("Kết nối database thành công.");
+            }
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
 			System.out.println("Kết nối thất bại!");

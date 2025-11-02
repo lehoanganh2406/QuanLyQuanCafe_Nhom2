@@ -4,7 +4,6 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
 import javax.swing.text.*;
-import connectDB.ConnectDB;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
@@ -17,7 +16,7 @@ public class ThanhToan_GUI extends JFrame {
     private JTextField txtTruDiem, txtGiamGia;
     private JLabel lblTongThanhToan;
     private final ImageIcon iconQuayLai = new ImageIcon(getClass().getResource("/img/back_16.png"));
-    private ImageIcon iconThanhToan = new ImageIcon(getClass().getResource("/img/bill_16.png"));
+    private final ImageIcon iconThanhToan = new ImageIcon(getClass().getResource("/img/bill_16.png"));
     private Order_GUI orderGui;
 
     // Bảng chính + footer
@@ -28,10 +27,12 @@ public class ThanhToan_GUI extends JFrame {
     private JScrollPane spMain;
     private JScrollPane spFooter;
     private JPanel tableStack;
-	private JTextField txtTienKhachTra;
-	private JLabel lblTienThua;
-	private JComboBox cboPhuongThuc;
-	private JButton thanhToan;
+
+    // Cột phải
+    private JTextField txtTienKhachTra;
+    private JLabel lblTienThua;
+    private JComboBox<String> cboPhuongThuc;
+    private JButton thanhToan;
 
     public ThanhToan_GUI(Order_GUI orderGui, int soBan, ArrayList<Object[]> cartRows, Long tongTien) {
         this.soBan = soBan;
@@ -40,7 +41,7 @@ public class ThanhToan_GUI extends JFrame {
         if (tongTien == null) tongTien = 0L;
 
         setTitle("Menu - Bàn " + soBan);
-        setSize(1650,1024);
+        setSize(1650, 1024);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -52,11 +53,6 @@ public class ThanhToan_GUI extends JFrame {
         capNhatTongThanhToan();
         updateFooterSum();
         syncFooterColumnWidths();
-    }
-
-    public static void main(String[] args) {
-        ConnectDB.getInstance().connect();
-        SwingUtilities.invokeLater(() -> new ThanhToan_GUI(null, 1, null, null).setVisible(true));
     }
 
     // =================== Header ===================
@@ -129,16 +125,20 @@ public class ThanhToan_GUI extends JFrame {
         thongTinTren.add(ghiChu);
 
         // ===== Bảng chính
-        modelBang = new DefaultTableModel(new Object[]{"Mã","Tên món","Số lượng","Đơn Giá","Thành tiền"}, 0) {
+        modelBang = new DefaultTableModel(
+            new Object[]{"Mã","Tên món","Số lượng","Đơn Giá","Thành tiền"}, 0) {
             @Override public boolean isCellEditable(int r, int c) { return false; }
             @Override public Class<?> getColumnClass(int c) {
                 return switch (c) {
-                    case 0, 2 -> Integer.class;
-                    case 3, 4 -> Long.class;
-                    default -> String.class;
+                    case 0 -> String.class;    // Mã SP (varchar)
+                    case 1 -> String.class;    // Tên món
+                    case 2 -> Integer.class;   // Số lượng
+                    case 3, 4 -> Long.class;   // Giá tiền
+                    default -> Object.class;
                 };
             }
         };
+
         bangMon = new JTable(modelBang);
         bangMon.setRowHeight(36);
         bangMon.setFont(new Font("Times New Roman", Font.PLAIN, 20));
@@ -158,22 +158,28 @@ public class ThanhToan_GUI extends JFrame {
         spMain.setPreferredSize(new Dimension(1010, 900));
 
         // ===== Footer (1 dòng tổng) – cố định
-        footerModel = new DefaultTableModel(new Object[]{"Mã","Tên món","Số lượng","Đơn Giá","Thành tiền"}, 0) {
+        footerModel = new DefaultTableModel(
+            new Object[]{"Mã","Tên món","Số lượng","Đơn Giá","Thành tiền"}, 0) {
             @Override public boolean isCellEditable(int r, int c) { return false; }
             @Override public Class<?> getColumnClass(int c) {
                 return switch (c) {
-                    case 0, 2 -> Integer.class;
-                    case 3, 4 -> Long.class;
-                    default -> String.class;
+                    case 0 -> String.class;   // để ""
+                    case 1 -> String.class;   // "TỔNG"
+                    case 2 -> Integer.class;  // tổng SL
+                    case 3, 4 -> Long.class;  // 0L và tổng tiền
+                    default -> Object.class;
                 };
             }
         };
+
         tblFooter = new JTable(footerModel);
         tblFooter.setTableHeader(null);
         tblFooter.setEnabled(false);
         tblFooter.setRowHeight(bangMon.getRowHeight());
 
-        // Footer renderer: bold + nền + format VND nếu là số
+        
+
+        // Nền + font footer
         DefaultTableCellRenderer footerRenderer = new DefaultTableCellRenderer() {
             @Override public Component getTableCellRendererComponent(JTable table, Object value,
                                                                      boolean isSelected, boolean hasFocus,
@@ -241,20 +247,21 @@ public class ThanhToan_GUI extends JFrame {
         phanNor.add(tieuDeDonGian("Mã nhân viên:"));
         phanNor.add(Box.createVerticalStrut(16));
 
-        // >>> Sửa theo yêu cầu: ô text nhập trực tiếp (không còn spinner, không label % rời)
-        txtTruDiem = taoOText("Nhập điểm tích lũy...");     // số điểm, >= 0
-        txtGiamGia = taoOText("Nhập % giảm giá...");     // % 0..100
+        // Ô text nhập trực tiếp
+        txtTruDiem = taoOText("Nhập điểm tích lũy...");
+        txtGiamGia = taoOText("Nhập % giảm giá...");
         setNumericFilter(txtTruDiem, 0, Integer.MAX_VALUE);
         setNumericFilter(txtGiamGia, 0, 100);
 
         phanNor.add(hangNhap("Trừ điểm:", txtTruDiem));
         phanNor.add(Box.createVerticalStrut(10));
-        phanNor.add(hangNhap("Giảm giá:",     txtGiamGia));
+        phanNor.add(hangNhap("Giảm giá:", txtGiamGia));
         phanNor.add(Box.createVerticalStrut(16));
 
         lblTongThanhToan = new JLabel("0 VND");
         lblTongThanhToan.setFont(new Font("Times New Roman", Font.BOLD, 22));
         phanNor.add(hangDong("Tổng thanh toán:", lblTongThanhToan));
+
         txtTienKhachTra = taoOText("Nhập tiền khách trả...");
         setNumericFilter(txtTienKhachTra, 0, -1);
         phanNor.add(Box.createVerticalStrut(10));
@@ -272,8 +279,10 @@ public class ThanhToan_GUI extends JFrame {
         txtTruDiem.addKeyListener(recalc);
         txtGiamGia.addKeyListener(recalc);
         txtTienKhachTra.addKeyListener(recalc);
+
         cotPhai.add(phanNor, BorderLayout.NORTH);
         cotPhai.add(taoPhanSouthPhai(), BorderLayout.SOUTH);
+
         txtTienKhachTra.addFocusListener(new FocusAdapter() {
             @Override public void focusLost(FocusEvent e) {
                 String s = txtTienKhachTra.getText().trim().replace(".", "");
@@ -283,13 +292,11 @@ public class ThanhToan_GUI extends JFrame {
                     txtTienKhachTra.setText(String.valueOf(val)); // để capNhat… format VND ra label
                     capNhatTongThanhToan();
                 } catch (NumberFormatException ex) {
-                    // nếu sai thì để trống
                     txtTienKhachTra.setText("");
                     capNhatTongThanhToan();
                 }
             }
         });
-
 
         // Đặt 2 cột
         trungTam.add(cotTrai);
@@ -338,6 +345,45 @@ public class ThanhToan_GUI extends JFrame {
         return p;
     }
 
+    // ===== Helpers cho input style giống ô search =====
+    private JTextField taoOText(String placeholder) {
+        JTextField tf = new JTextField();
+        tf.setColumns(10);
+        tf.setPreferredSize(new Dimension(220, 36));
+        tf.setFont(new Font("Montserrat", Font.PLAIN, 16));
+        tf.setBackground(Color.WHITE);
+        tf.setForeground(Color.GRAY);
+        tf.setText(placeholder);
+        tf.setHorizontalAlignment(SwingConstants.LEFT);
+
+        Color line = new Color(180,180,180);
+        tf.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(line, 1),
+                BorderFactory.createEmptyBorder(6, 12, 6, 12)
+        ));
+
+        tf.addFocusListener(new FocusAdapter() {
+            @Override public void focusGained(FocusEvent e) {
+                if (tf.getText().equals(placeholder)) tf.setText("");
+                tf.setForeground(Color.BLACK);
+                tf.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(new Color(140,140,140), 1),
+                        BorderFactory.createEmptyBorder(6, 12, 6, 12)
+                ));
+            }
+            @Override public void focusLost(FocusEvent e) {
+                if (tf.getText().trim().isEmpty()) {
+                    tf.setText(placeholder);
+                    tf.setForeground(Color.GRAY);
+                } else tf.setForeground(Color.BLACK);
+                tf.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(line, 1),
+                        BorderFactory.createEmptyBorder(6, 12, 6, 12)
+                ));
+            }
+        });
+        return tf;
+    }
 
     // DocumentFilter số nguyên, với min/max (max < 0 => không giới hạn)
     private void setNumericFilter(JTextField field, int min, int max) {
@@ -361,8 +407,17 @@ public class ThanhToan_GUI extends JFrame {
         });
     }
 
-    private int safeInt(String s) {
-        try { return Integer.parseInt(s.trim()); } catch (Exception e) { return 0; }
+    /** Renderer định dạng tiền VND (dùng cho cả bảng chính & footer) */
+    private static class VNDRenderer extends DefaultTableCellRenderer {
+        @Override protected void setValue(Object value) {
+            if (value instanceof Number n) {
+                long v = n.longValue();
+                setText(String.format("%,d", v).replace(',', '.'));
+            } else {
+                setText(value == null ? "" : value.toString());
+            }
+            setHorizontalAlignment(SwingConstants.RIGHT);
+        }
     }
 
     /** Nạp giỏ hàng vào bảng chính */
@@ -375,60 +430,75 @@ public class ThanhToan_GUI extends JFrame {
         return String.format("%,d", vnd).replace(',', '.') + " VND";
     }
 
-    private class VNDRenderer extends DefaultTableCellRenderer {
-        @Override
-        protected void setValue(Object value) {
-            if (value instanceof Number n) {
-                long v = n.longValue();
-                setText(String.format("%,d", v).replace(',', '.'));
-            } else {
-                setText("");
-            }
-            setHorizontalAlignment(SwingConstants.RIGHT);
-        }
+    private long parseVND(String s) {
+        if (s == null) return 0L;
+        s = s.replace(".", "").replace(" VND", "").trim();
+        try { return Long.parseLong(s); } catch (Exception e) { return 0L; }
+    }
+
+    private int safeInt(String s) {
+        try { return Integer.parseInt(s.trim()); } catch (Exception e) { return 0; }
     }
     private long safeLong(String s) {
         try { return Long.parseLong(s.trim()); } catch (Exception e) { return 0L; }
     }
 
+    /** Tính toán tổng thanh toán + tiền thừa, theo phương thức */
     private void capNhatTongThanhToan() {
-    // 1) Tính tổng gốc từ bảng
-    long tongGoc = 0L;
-    for (int i = 0; i < modelBang.getRowCount(); i++) {
-        tongGoc += ((Number) modelBang.getValueAt(i, 4)).longValue();
+        // 1) Tổng gốc
+        long tongGoc = 0L;
+        for (int i = 0; i < modelBang.getRowCount(); i++) {
+            Number n = (Number) modelBang.getValueAt(i, 4);
+            if (n != null) tongGoc += n.longValue();
+        }
+
+        // 2) Giảm giá & trừ điểm
+        int tru  = safeInt(txtTruDiem.getText());
+        int giam = safeInt(txtGiamGia.getText());
+        if (giam > 100) giam = 100;
+        if (giam < 0)   giam = 0;
+        if (tru  < 0)   tru  = 0;
+
+        double sauPhanTram = tongGoc * (1.0 - (giam / 100.0));
+        long tongCuoi = Math.max(0, Math.round(sauPhanTram) - tru * 1000L);
+        lblTongThanhToan.setText(dinhDangVND(tongCuoi));
+
+        // 3) Theo phương thức thanh toán
+        boolean laTienMat = (cboPhuongThuc == null) || "Tiền mặt".equals(cboPhuongThuc.getSelectedItem());
+        long tra;
+        if (laTienMat) {
+            txtTienKhachTra.setEnabled(true);
+            tra = safeLong(txtTienKhachTra.getText());
+        } else {
+            txtTienKhachTra.setEnabled(false);
+            txtTienKhachTra.setText(String.valueOf(tongCuoi));
+            tra = tongCuoi;
+        }
+
+        // 4) Tiền thừa (có thể âm)
+        long thua = tra - tongCuoi;
+        lblTienThua.setText(dinhDangVND(thua));
+        lblTienThua.setForeground(thua < 0 ? Color.RED : new Color(0,128,0));
     }
 
-    // 2) Áp giảm giá (%) và trừ điểm (1 điểm = 1.000 VND)
-    int tru  = safeInt(txtTruDiem.getText());
-    int giam = safeInt(txtGiamGia.getText());
-    if (giam > 100) giam = 100;
-    if (giam < 0)   giam = 0;
-    if (tru  < 0)   tru  = 0;
+    /** Tính tổng SL/Thành tiền cho footer (1 dòng) */
+    private void updateFooterSum() {
+        if (footerModel == null) return;
 
-    double sauPhanTram = tongGoc * (1.0 - (giam / 100.0));
-    long tongCuoi = Math.max(0, Math.round(sauPhanTram) - tru * 1000L);
-    lblTongThanhToan.setText(dinhDangVND(tongCuoi));
+        footerModel.setRowCount(0);
+        int  sumSL = 0;
+        long sumTT = 0L;
 
-    // 3) Xử lý theo phương thức thanh toán
-    boolean laTienMat = (cboPhuongThuc == null) || "Tiền mặt".equals(cboPhuongThuc.getSelectedItem());
-    long tra;
-    if (laTienMat) {
-        // Cho nhập tự do (đã có filter >= 0)
-        txtTienKhachTra.setEnabled(true);
-        tra = safeLong(txtTienKhachTra.getText());
-    } else {
-        // CK/Visa: auto = tổng thanh toán, khóa ô nhập
-        txtTienKhachTra.setEnabled(false);
-        txtTienKhachTra.setText(String.valueOf(tongCuoi)); // để đồng bộ UI
-        tra = tongCuoi;
+        for (int r = 0; r < modelBang.getRowCount(); r++) {
+            Number sl = (Number) modelBang.getValueAt(r, 2);
+            Number tt = (Number) modelBang.getValueAt(r, 4);
+            if (sl != null) sumSL += sl.intValue();
+            if (tt != null) sumTT += tt.longValue();
+        }
+
+        // Cột 0: "", cột 1: "TỔNG", cột 2: sumSL (Integer), cột 3: 0L, cột 4: sumTT (Long)
+        footerModel.addRow(new Object[]{"", "TỔNG", sumSL, 0L, sumTT});
     }
-
-    // 4) Tính tiền thừa (có thể âm nếu khách đưa thiếu)
-    long thua = tra - tongCuoi;
-    lblTienThua.setText(dinhDangVND(thua));
-    lblTienThua.setForeground(thua < 0 ? Color.RED : new Color(0,128,0));
-}
-
 
     /** Đồng bộ độ rộng cột footer theo bảng chính */
     private void syncFooterColumnWidths() {
@@ -444,19 +514,6 @@ public class ThanhToan_GUI extends JFrame {
         tblFooter.repaint();
     }
 
-    /** Tính tổng SL/Thành tiền cho footer */
-    private void updateFooterSum() {
-        if (footerModel == null) return;
-        footerModel.setRowCount(0);
-        int sumSL = 0; long sumTT = 0;
-        for (int r = 0; r < modelBang.getRowCount(); r++) {
-            sumSL += ((Number) modelBang.getValueAt(r, 2)).intValue();
-            sumTT += ((Number) modelBang.getValueAt(r, 4)).longValue();
-        }
-        // giữ đúng kiểu dữ liệu (Long) để renderer format VND
-        footerModel.addRow(new Object[]{null, "TỔNG", sumSL, 0L, sumTT});
-    }
-
     private JPanel hangDong(String nhan, JComponent comp) {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         p.setOpaque(false);
@@ -467,107 +524,52 @@ public class ThanhToan_GUI extends JFrame {
         p.add(comp);
         return p;
     }
- // ===== Helpers cho input style giống ô search =====
-    private JTextField taoOText(String placeholder) {
-        JTextField tf = new JTextField();
-        tf.setColumns(10);
-        tf.setPreferredSize(new Dimension(220, 36));
-        tf.setFont(new Font("Montserrat", Font.PLAIN, 16)); // hoặc SansSerif nếu thiếu
-        tf.setBackground(Color.WHITE);
-        tf.setForeground(Color.GRAY);            // placeholder màu xám
-        tf.setText(placeholder);
-        tf.setHorizontalAlignment(SwingConstants.LEFT);
 
-        // padding + viền xám nhạt
-        Color line = new Color(180,180,180);
-        tf.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(line, 1),
-                BorderFactory.createEmptyBorder(6, 12, 6, 12)
-        ));
+    private JPanel taoPhanSouthPhai() {
+        JPanel p = new JPanel();
+        p.setOpaque(false);
+        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
+        p.setBorder(BorderFactory.createEmptyBorder(16, 0, 0, 0));
 
-        // focus: đổi màu viền + ẩn/hiện placeholder
-        tf.addFocusListener(new FocusAdapter() {
-            @Override public void focusGained(FocusEvent e) {
-                if (tf.getText().equals(placeholder)) {
-                    tf.setText("");
-                }
-                tf.setForeground(Color.BLACK);
-                tf.setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(new Color(140,140,140), 1),
-                        BorderFactory.createEmptyBorder(6, 12, 6, 12)
-                ));
-            }
-            @Override public void focusLost(FocusEvent e) {
-                if (tf.getText().trim().isEmpty()) {
-                    tf.setText(placeholder);
-                    tf.setForeground(Color.GRAY);
-                }
-                else tf.setForeground(Color.BLACK);
-                tf.setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(line, 1),
-                        BorderFactory.createEmptyBorder(6, 12, 6, 12)
-                ));
+        // === Row 1: Phương thức + ComboBox
+        JPanel rowPM = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        rowPM.setOpaque(false);
+
+        JLabel lbl = new JLabel("Phương thức:");
+        lbl.setFont(new Font("Times New Roman", Font.BOLD, 22));
+
+        cboPhuongThuc = new JComboBox<>(new String[]{ "Tiền mặt", "Chuyển khoản", "Visa" });
+        cboPhuongThuc.setPreferredSize(new Dimension(200, 36));
+        cboPhuongThuc.setFont(new Font("Times New Roman", Font.PLAIN, 18));
+
+        rowPM.add(lbl);
+        rowPM.add(cboPhuongThuc);
+
+        // Handler chọn phương thức
+        cboPhuongThuc.addActionListener(e -> {
+            boolean laTienMat = "Tiền mặt".equals(cboPhuongThuc.getSelectedItem());
+            txtTienKhachTra.setEnabled(laTienMat);
+
+            if (!laTienMat) {
+                long tong = parseVND(lblTongThanhToan.getText());
+                txtTienKhachTra.setText(String.valueOf(tong));
+                capNhatTongThanhToan();
             }
         });
-        return tf;
+
+        // === Tạo khoảng cách giữa 2 hàng
+        p.add(rowPM);
+        p.add(Box.createVerticalStrut(150));
+
+        // === Row 2: Nút Thanh Toán (căn phải)
+        JPanel rowBtn = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        rowBtn.setOpaque(false);
+
+        thanhToan = taoNut("Thanh Toán", iconThanhToan);
+        thanhToan.setPreferredSize(new Dimension(200, 70));
+        rowBtn.add(thanhToan);
+
+        p.add(rowBtn);
+        return p;
     }
-    private JPanel taoPhanSouthPhai() {
-    JPanel p = new JPanel();
-    p.setOpaque(false);
-    p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
-    p.setBorder(BorderFactory.createEmptyBorder(16, 0, 0, 0));
-
-    // === Row 1: Phương thức + ComboBox
-    JPanel rowPM = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
-    rowPM.setOpaque(false);
-
-    JLabel lbl = new JLabel("Phương thức:");
-    lbl.setFont(new Font("Times New Roman", Font.BOLD, 22));
-
-    cboPhuongThuc = new JComboBox<>(new String[]{ "Tiền mặt", "Chuyển khoản", "Visa" });
-    cboPhuongThuc.setPreferredSize(new Dimension(200, 36));
-    cboPhuongThuc.setFont(new Font("Times New Roman", Font.PLAIN, 18));
-
-    rowPM.add(lbl);
-    rowPM.add(cboPhuongThuc);
-
-    // Handler chọn phương thức
-    cboPhuongThuc.addActionListener(e -> {
-        boolean laTienMat = "Tiền mặt".equals(cboPhuongThuc.getSelectedItem());
-        txtTienKhachTra.setEnabled(laTienMat);
-
-        if (!laTienMat) {
-            long tong = parseVND(lblTongThanhToan.getText());
-            txtTienKhachTra.setText(String.valueOf(tong)); 
-            capNhatTongThanhToan();
-        }
-    });
-
-    // === Tạo khoảng cách giữa 2 hàng
-    p.add(rowPM);
-    p.add(Box.createVerticalStrut(150)); 
-
-    // === Row 2: Nút Thanh Toán (căn phải)
-    JPanel rowBtn = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
-    rowBtn.setOpaque(false);
-
-    thanhToan = taoNut("Thanh Toán", iconThanhToan);
-    thanhToan.setPreferredSize(new Dimension(200, 70));
-
-    rowBtn.add(thanhToan);
-
-    // Add vào panel chính
-    p.add(rowBtn);
-
-    return p;
-}
-
-
-    private long parseVND(String s) {
-        if (s == null) return 0L;
-        s = s.replace(".", "").replace(" VND", "").trim();
-        try { return Long.parseLong(s); } catch (Exception e) { return 0L; }
-    }
-
-
 }

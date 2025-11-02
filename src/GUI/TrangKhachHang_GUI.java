@@ -62,11 +62,11 @@ public class TrangKhachHang_GUI extends JFrame implements ActionListener,MouseLi
 		til.setFont(new Font("Arial", Font.BOLD, 40));
 		
 //		nut dong
-		
-		btnClose= new JButton("X");
-		btnClose.setBackground(brownColor);
-		btnClose.setForeground(Color.white);
-		pNhap.add(btnClose,BorderLayout.EAST);
+//		
+//		btnClose= new JButton("X");
+//		btnClose.setBackground(brownColor);
+//		btnClose.setForeground(Color.white);
+//		pNhap.add(btnClose,BorderLayout.EAST);
 		
 		
 		add(pNhap,BorderLayout.NORTH);
@@ -191,9 +191,10 @@ public class TrangKhachHang_GUI extends JFrame implements ActionListener,MouseLi
 		int row=tableKH.getSelectedRow();
 		if (row!=-1) {
 			txtma.setText(tableKH.getValueAt(row, 0).toString());
-			txtdtl.setText(tableKH.getValueAt(row, 1).toString());
+			txtten.setText(tableKH.getValueAt(row, 1).toString());
 			txtsdt.setText(tableKH.getValueAt(row, 2).toString());
-			txtten.setText(tableKH.getValueAt(row, 3).toString());
+			txtdtl.setText(tableKH.getValueAt(row, 3).toString());
+			
 		}
 		
 	}
