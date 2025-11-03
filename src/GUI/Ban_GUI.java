@@ -3,7 +3,7 @@ package GUI;
 import java.awt.*;
 import javax.swing.*;
 
-import connectDB.connectDB;
+import connectDB.ConnectDB;
 
 public class Ban_GUI extends JFrame {
 	
@@ -20,7 +20,7 @@ public class Ban_GUI extends JFrame {
         
 	}
 	public static void main(String[] args) {
-		connectDB.getConnection();		
+		ConnectDB.getInstance().connect();
 		new  Ban_GUI().setVisible(true);
 	}
 	private void thanhTieuDe() {

@@ -2,38 +2,47 @@ package connectDB;
 
 import java.sql.*;
 
-import javax.swing.JOptionPane;
+public class ConnectDB {
+	private static Connection con = null;
+	private static ConnectDB instance = new ConnectDB();
 
-public class connectDB {
-	private static Connection connection = null;
-
-	public static Connection getConnection() {
-		if (connection == null) {
-			try {
-				Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-				String url = "jdbc:sqlserver://CHATLGPT:1433;databaseName=QuanLyQuanCF;encrypt=false";
-				String userName = "sa";
-				String password = "123456";
-				
-				connection = DriverManager.getConnection(url, userName, password);
-		//		JOptionPane.showMessageDialog(null, "Kết nối CSDL thành công");
-			} catch (Exception e) {
-				e.printStackTrace();
-				JOptionPane.showMessageDialog(null, "Kết nối CSDL tất bại");
-			}
+    public static ConnectDB getInstance() {
+        if (instance == null)
+            instance = new ConnectDB();
+        return instance;
+    }
+	public void connect()  {
+        String username = "sa";
+        String password = "Qazwsxedc@12345";
+        String url = "jdbc:sqlserver://localhost:1433;databaseName=QuanLyQuanCF;encrypt=true;trustServerCertificate=true;loginTimeout=5";
+        try {
+        	if (con == null || con.isClosed()) {
+        		con = DriverManager.getConnection(url, username, password);
+    			System.out.println("Kết nối database thành công.");
+            }
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("Kết nối thất bại!");
 		}
-		return connection;
+        
+    }
+    
+	public static void closeConnection(Connection c) {
+		try {
+			if (c != null && !c.isClosed()) {
+				c.close();
+				System.out.println("Đã đóng kết nối database.");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
+
+
+    public static Connection getConnection() {
+        return con;
+    }
+
 	
-	public static void closeConnection() {
-		if (connection != null) {
-			try {
-				connection.close();
-				connection = null;
-				System.out.println("Đóng kết nối với CSDL");
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-	}
 }

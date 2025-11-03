@@ -1,6 +1,5 @@
 package GUI;
 
-import GUI_Login.Login;
 
 import javax.swing.*;
 import java.awt.*;

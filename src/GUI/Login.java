@@ -1,8 +1,8 @@
-package GUI_Login;
+package GUI;
 import GUI.ManHinhChinh;
 import javax.swing.*;
 
-import connectDB.connectDB;
+import connectDB.ConnectDB;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -93,12 +93,11 @@ public class Login extends JFrame implements ActionListener{
 	    String dangNhap = txtMaNV.getText().trim();
 	    String matKhau = new String(txtPassword.getPassword()).trim(); 
 
-	    Connection con = null;
+	    Connection con = ConnectDB.getInstance().getConnection();
 	    PreparedStatement stmt = null;
 	    ResultSet rs = null;
 
 	    try {
-	        con = connectDB.getConnection();
 	        String sql = "SELECT * FROM TaiKhoang WHERE tenDangNhap = ? AND matKhau = ?";
 	        stmt = con.prepareStatement(sql);
 	        stmt.setString(1, dangNhap);

@@ -5,8 +5,7 @@ import java.awt.event.*;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.table.*;
-
-import connectDB.connectDB;
+import connectDB.ConnectDB;
 import dao.KhachHang_DAO;
 import entity.KhachHang;
 
@@ -229,7 +228,7 @@ public class TrangKhachHang_GUI extends JDialog implements ActionListener, Mouse
     public void mouseExited(MouseEvent e) {}
 
     public static void main(String[] args) {
-    	connectDB.getConnection();
+        ConnectDB.getInstance().connect();
         SwingUtilities.invokeLater(() -> new TrangKhachHang_GUI((Window) null).setVisible(true));
     }
     private void timTheoSoDienThoai() {

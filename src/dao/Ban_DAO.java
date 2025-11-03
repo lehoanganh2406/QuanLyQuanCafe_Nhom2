@@ -4,7 +4,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import connectDB.connectDB;
+import connectDB.ConnectDB;
 import entity.Ban;
 
 public class Ban_DAO {
@@ -19,7 +19,7 @@ public class Ban_DAO {
     public List<Ban> getAllBan() {
         String sql = "SELECT maBan, tenBan, trangThai FROM dbo.Ban";
         List<Ban> dsList = new ArrayList<>();
-        Connection con = connectDB.getConnection();
+        Connection con = ConnectDB.getInstance().getConnection();
         try (
              Statement stmt = con.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -38,7 +38,7 @@ public class Ban_DAO {
     public Ban getBanByMaBan(String maBan) {
         String sql = "SELECT maBan, tenBan, trangThai FROM dbo.Ban WHERE maBan = ?";
         Ban b = null;
-        Connection con = connectDB.getConnection();
+        Connection con = ConnectDB.getInstance().getConnection();
         try (
              PreparedStatement pst = con.prepareStatement(sql)) {
 
@@ -57,7 +57,7 @@ public class Ban_DAO {
 //    Thêm bàn 
     public boolean themBan(Ban b) {
         String sql = "INSERT INTO dbo.Ban (tenBan, trangThai) VALUES (?, ?)";
-        Connection con = connectDB.getConnection();
+        Connection con = ConnectDB.getInstance().getConnection();
         try (
              PreparedStatement pst = con.prepareStatement(sql)) {
 
@@ -74,7 +74,7 @@ public class Ban_DAO {
 //    Cập nhật bàn theo mã  
     public boolean capNhatBan(Ban b) {
         String sql = "UPDATE dbo.Ban SET tenBan = ?, trangThai = ? WHERE maBan = ?";
-        Connection con = connectDB.getConnection();
+        Connection con = ConnectDB.getInstance().getConnection();
         try (
              PreparedStatement pst = con.prepareStatement(sql)) {
 
@@ -92,7 +92,7 @@ public class Ban_DAO {
 //     Xoá bàn theo mã 
     public boolean xoaBan(String maBan) {
         String sql = "DELETE FROM dbo.Ban WHERE maBan = ?";
-        Connection con = connectDB.getConnection();
+        Connection con = ConnectDB.getInstance().getConnection();
         try (
              PreparedStatement pst = con.prepareStatement(sql)) {
 

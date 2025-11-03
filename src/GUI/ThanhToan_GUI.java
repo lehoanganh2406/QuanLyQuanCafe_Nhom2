@@ -5,7 +5,7 @@ import javax.swing.event.*;
 import javax.swing.table.*;
 import javax.swing.text.*;
 
-import connectDB.connectDB;
+import connectDB.ConnectDB;
 import entity.KhachHang;
 
 import java.awt.*;
@@ -40,7 +40,7 @@ public class ThanhToan_GUI extends JFrame {
     private JButton thanhToan;
     
     public static void main(String[] args) {
-    	connectDB.getConnection();
+        ConnectDB.getInstance().connect();
         SwingUtilities.invokeLater(() -> new ThanhToan_GUI(null, 1, new ArrayList<>(), 0L).setVisible(true));
     }
     public ThanhToan_GUI(Order_GUI orderGui, int soBan, ArrayList<Object[]> cartRows, Long tongTien) {
