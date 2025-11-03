@@ -9,6 +9,18 @@ GO
 
 USE QuanLyQuanCF;
 GO
+
+-- Tạo bảng Tài Khoảng
+create table TaiKhoang(
+	tenDangNhap nvarchar(100) not null primary key,
+	matKhau nvarchar(100) not null
+);
+
+INSERT INTO TaiKhoang (tenDangNhap, matKhau)
+VALUES (N'admin', N'123');
+
+
+
 -- TẠO SEQUENCE CHO CÁC MÃ TỰ SINH
 CREATE SEQUENCE seq_Ban AS INT START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE seq_NhanVien AS INT START WITH 1 INCREMENT BY 1;

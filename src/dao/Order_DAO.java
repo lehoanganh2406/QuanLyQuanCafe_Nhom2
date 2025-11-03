@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import connectDB.ConnectDB;
+import connectDB.connectDB;
 import entity.Order;
 
 public class Order_DAO {
@@ -26,7 +26,7 @@ public class Order_DAO {
             "JOIN dbo.LoaiSanPham ls ON ls.maLoai = sp.maLoai " +
             "ORDER BY sp.tenSP";
 
-        Connection con = ConnectDB.getInstance().getConnection();
+        Connection con = connectDB.getConnection();
         try (PreparedStatement ps = con.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
@@ -55,7 +55,7 @@ public class Order_DAO {
             "WHERE sp.maSP = ?";
 
         ArrayList<Order> dsList = new ArrayList<>();
-        Connection con = ConnectDB.getInstance().getConnection();
+        Connection con = connectDB.getConnection();
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, maSP);
             try (ResultSet rs = ps.executeQuery()) {
@@ -87,7 +87,7 @@ public class Order_DAO {
             "ORDER BY sp.tenSP";
 
         ArrayList<Order> ds = new ArrayList<>();
-        Connection con = ConnectDB.getInstance().getConnection();
+        Connection con = connectDB.getConnection();
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, maLoai);
             try (ResultSet rs = ps.executeQuery()) {
@@ -118,7 +118,7 @@ public class Order_DAO {
             "WHERE sp.tenSP LIKE ? " +
             "ORDER BY sp.tenSP";
 
-        Connection c = ConnectDB.getInstance().getConnection();
+        Connection c = connectDB.getConnection();
         try (PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setString(1, "%" + keyword + "%");
             try (ResultSet rs = ps.executeQuery()) {
@@ -149,7 +149,7 @@ public class Order_DAO {
             "WHERE sp.maLoai = ? AND sp.tenSP LIKE ? " +
             "ORDER BY sp.tenSP";
 
-        Connection c = ConnectDB.getInstance().getConnection();
+        Connection c = connectDB.getConnection();
         try (PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setString(1, maLoai);
             ps.setString(2, "%" + keyword + "%");

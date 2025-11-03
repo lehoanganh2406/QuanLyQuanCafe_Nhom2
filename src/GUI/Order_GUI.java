@@ -2,7 +2,8 @@ package GUI;
 
 import javax.swing.*;
 import javax.swing.table.*;
-import connectDB.ConnectDB;
+
+import connectDB.connectDB;
 import dao.Order_DAO;
 import entity.Order;
 
@@ -54,13 +55,35 @@ public class Order_GUI extends JFrame {
     }
 
     public static void main(String[] args) {
-        ConnectDB.getInstance().connect();
+    	connectDB.getConnection();
         SwingUtilities.invokeLater(() -> new Order_GUI(1).setVisible(true));
     }
 //    Thanh tiêu đề
     private void thanhTieuDe() {
 		PanelTieuDe tieude = new PanelTieuDe("Order", "/img/iconOrder.png");
-		add(tieude, BorderLayout.NORTH);
+		
+		JButton btnBack = new JButton("Quay lại", iconQuayLai);
+	    btnBack.setFocusPainted(false);
+	    btnBack.setFont(new Font("Times New Roman", Font.BOLD, 18));
+	    btnBack.setBackground(Color.WHITE);
+	    btnBack.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)));
+
+	    // Sự kiện quay lại
+	    btnBack.addActionListener(e -> {
+	        new ManHinhChinh().setVisible(true);
+	        dispose();
+	    });
+
+	    // Panel bao ngoài phần tiêu đề + nút
+	    JPanel topPanel = new JPanel(new BorderLayout());
+	    topPanel.add(tieude, BorderLayout.CENTER);
+	    topPanel.add(btnBack, BorderLayout.EAST);
+	    topPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+		
+	    
+	    add(topPanel, BorderLayout.NORTH);
+		
+
 	}
 //    Thanh Bên Trái
     private void thanhBenTrai() {
@@ -440,7 +463,7 @@ public class Order_GUI extends JFrame {
     private void napMaLoaiFromDB() {
         // tên -> mã
         String[] tenLoais = {"Coffee","Trà","Trà sữa","Nước ép","Bánh","Khác"};
-        Connection con = ConnectDB.getInstance().getConnection();
+        Connection con = connectDB.getConnection();
         try (
              PreparedStatement ps = con.prepareStatement(
                      "SELECT maLoai, loaiSP FROM dbo.LoaiSanPham WHERE loaiSP IN (N'Coffee',N'Trà',N'Trà sữa',N'Nước ép',N'Bánh',N'Khác')")) {
