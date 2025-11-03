@@ -45,8 +45,15 @@ public class Ban {
             rs.getString("trangThai")
         );
     }
+    
 
-    @Override
+    public Ban(String tenBan, String trangThai) {
+		super();
+		this.tenBan = tenBan;
+		this.trangThai = trangThai;
+	}
+
+	@Override
     public String toString() {
         return "Ban [maBan=" + maBan + ", tenBan=" + tenBan + ", trangThai=" + trangThai + "]";
     }
