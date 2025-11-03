@@ -1,8 +1,8 @@
 ﻿USE master;
 GO
 
--- DROP DATABASE QuanLyQuanCF;
--- GO
+--DROP DATABASE QuanLyQuanCF;
+--GO
 
 CREATE DATABASE QuanLyQuanCF;
 GO
@@ -92,17 +92,15 @@ CREATE TABLE ChiTietHoaDon (
     soLuong INT NOT NULL DEFAULT (1) CHECK (soLuong > 0)
 );
 GO
+DELETE FROM dbo.SanPham;
+DELETE FROM dbo.LoaiSanPham;
+
 
 
 INSERT INTO LoaiSanPham(loaiSP)
 VALUES (N'Coffee'), (N'Trà'), (N'Trà sữa'), (N'Nước ép'), (N'Bánh'), (N'Khác');
 /* Lấy mã loại theo tên để dùng khi chèn sản phẩm */
 DECLARE @LSP_Coffee NVARCHAR(20) = (SELECT maLoai FROM dbo.LoaiSanPham WHERE loaiSP = N'Coffee');
-DECLARE @LSP_Tra    NVARCHAR(20) = (SELECT maLoai FROM dbo.LoaiSanPham WHERE loaiSP = N'Trà');
-DECLARE @LSP_TraSua NVARCHAR(20) = (SELECT maLoai FROM dbo.LoaiSanPham WHERE loaiSP = N'Trà sữa');
-DECLARE @LSP_NuocEp NVARCHAR(20) = (SELECT maLoai FROM dbo.LoaiSanPham WHERE loaiSP = N'Nước ép');
-DECLARE @LSP_Banh   NVARCHAR(20) = (SELECT maLoai FROM dbo.LoaiSanPham WHERE loaiSP = N'Bánh');
-DECLARE @LSP_Khac   NVARCHAR(20) = (SELECT maLoai FROM dbo.LoaiSanPham WHERE loaiSP = N'Khác');
 
 -- Coffee
 INSERT INTO dbo.SanPham(tenSP, soLuong, donGia, img, maLoai, moTa)
@@ -114,7 +112,11 @@ VALUES
 (N'Latte',         30, 42000, N'latte.png',  @LSP_Coffee, N'Cà phê pha máy, nhiều sữa, thơm nhẹ'),
 (N'Cappuccino',    30, 45000, N'capu.png',   @LSP_Coffee, N'Lớp foam dày, vị đậm vừa'),
 (N'Mocha',         25, 48000, N'mocha.jpg',  @LSP_Coffee, N'Kết hợp cà phê và chocolate thơm béo');
+go
 
+
+
+DECLARE @LSP_Tra    NVARCHAR(20) = (SELECT maLoai FROM dbo.LoaiSanPham WHERE loaiSP = N'Trà');
 -- Trà
 INSERT INTO dbo.SanPham(tenSP, soLuong, donGia, img, maLoai, moTa)
 VALUES
@@ -125,6 +127,11 @@ VALUES
 (N'Trà vải',              40, 35000, N'travai.jpg',           @LSP_Tra, N'Ngọt nhẹ, hương vải thơm'),
 (N'Trà đào truyền thống', 50, 30000, N'tradaotruyenthong.jpg',@LSP_Tra, N'Đào ngâm nguyên miếng'),
 (N'Trà hoa nhài',         30, 28000, N'trahoanhai.jpeg',      @LSP_Tra, N'Hương thơm thư giãn');
+go
+
+
+DECLARE @LSP_TraSua NVARCHAR(20) = (SELECT maLoai FROM dbo.LoaiSanPham WHERE loaiSP = N'Trà sữa');
+
 
 -- Trà sữa
 INSERT INTO dbo.SanPham(tenSP, soLuong, donGia, img, maLoai, moTa)
@@ -137,6 +144,10 @@ VALUES
 (N'Trà sữa phô mai',   35, 42000, N'suaphomai.jpg',  @LSP_TraSua, N'Lớp kem cheese béo mặn'),
 (N'Trà sữa ô long',    45, 38000, N'suaolong.jpg',   @LSP_TraSua, N'Hương ô long đậm vị');
 
+go
+
+DECLARE @LSP_NuocEp NVARCHAR(20) = (SELECT maLoai FROM dbo.LoaiSanPham WHERE loaiSP = N'Nước ép');
+
 -- Nước ép
 INSERT INTO dbo.SanPham(tenSP, soLuong, donGia, img, maLoai, moTa)
 VALUES
@@ -148,6 +159,10 @@ VALUES
 (N'Nước ép ổi',         30, 32000, N'epoi.jpg',      @LSP_NuocEp, N'Nhiều vitamin C'),
 (N'Nước ép chanh dây',  30, 30000, N'epchanhday.jpg',@LSP_NuocEp, N'Chua ngọt dễ uống');
 
+go
+
+DECLARE @LSP_Banh   NVARCHAR(20) = (SELECT maLoai FROM dbo.LoaiSanPham WHERE loaiSP = N'Bánh');
+
 -- Bánh
 INSERT INTO dbo.SanPham(tenSP, soLuong, donGia, img, maLoai, moTa)
 VALUES
@@ -158,8 +173,12 @@ VALUES
 (N'Bánh su kem',        40, 15000, N'banhsocola.jpg',   @LSP_Banh, N'Nhân kem béo mềm, rất dễ ăn'),
 (N'Bánh flan caramel',  35, 20000, N'banhflan.png',     @LSP_Banh, N'Caramel thơm, mềm tan'),
 (N'Bánh cookies bơ',    50, 10000, N'banhcookies.jpg',  @LSP_Banh, N'Giòn rụm, thơm mùi bơ');
+go
 
 -- Khác (topping)
+
+DECLARE @LSP_Khac   NVARCHAR(20) = (SELECT maLoai FROM dbo.LoaiSanPham WHERE loaiSP = N'Khác');
+
 INSERT INTO dbo.SanPham(tenSP, soLuong, donGia, img, maLoai, moTa)
 VALUES
 (N'Trân châu đen',   100,  8000, N'khacchantrau.jpg',      @LSP_Khac, N'Trân châu dai giòn, thêm vào trà sữa'),
@@ -193,4 +212,19 @@ SELECT * FROM TaiKhoan;
 SELECT * FROM LoaiSanPham;
 SELECT * FROM ChiTietHoaDon;
 GO
+INSERT INTO NhanVien (hoTen, diaChi, dienThoai, CCCD, ngayVaoLam, chucVu)
+VALUES
+(N'Nguyễn Thị Hoa', N'Quận 1, TP.HCM', '0901234567', '079123456789', '2022-05-01', N'Phục vụ'),
+(N'Phạm Minh Quang', N'Quận 3, TP.HCM', '0912345678', '079987654321', '2021-09-12', N'Thu ngân'),
+(N'Lê Thị Mai', N'Quận Bình Thạnh, TP.HCM', '0934567890', '079555666777', '2023-01-10', N'Phục vụ');
+GO
+INSERT INTO HoaDon (maBan, maKH, maNV, trangThai, giamGia, tongTien)
+VALUES 
+('B001', 'KH001', 'NV001', 1, 10, 150000),
+('B002', 'KH002', 'NV001', 1, 5, 200000),
+('B003', 'KH003', 'NV001', 0, 0, 0),
+('B004', NULL,    'NV001', 0, 0, 0),
+('B005', NULL,    'NV001', 1, 0, 100000);
+GO
+
 

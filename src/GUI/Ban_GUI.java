@@ -4,6 +4,8 @@ import java.awt.*;
 import javax.swing.*;
 
 import connectDB.ConnectDB;
+import dao.Ban_DAO;
+import entity.Ban;
 
 public class Ban_GUI extends JFrame {
 	
@@ -21,6 +23,14 @@ public class Ban_GUI extends JFrame {
 	}
 	public static void main(String[] args) {
 		ConnectDB.getInstance().connect();
+		Ban_DAO dao = Ban_DAO.getInstance();
+	    if (dao.getAllBan().isEmpty()) { 
+	        dao.themBan(new Ban("Bàn 1", "Trống"));
+	        dao.themBan(new Ban("Bàn 2", "Trống"));
+	        dao.themBan(new Ban("Bàn 3", "Trống"));
+	        dao.themBan(new Ban("Bàn 4", "Trống"));
+	        dao.themBan(new Ban("Bàn 5", "Trống"));
+	    }
 		new  Ban_GUI().setVisible(true);
 	}
 	private void thanhTieuDe() {

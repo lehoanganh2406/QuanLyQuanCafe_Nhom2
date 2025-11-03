@@ -105,7 +105,13 @@ public class LichsuThanhToan extends JFrame{
         b=Box.createHorizontalBox();
         B.add(Box.createVerticalStrut(20));
         b.add(Box.createHorizontalStrut(35));
+        btnTim=new JButton("Tìm");
+        btnTim.setBackground(Color.decode("#865A52"));
+        btnTim.setForeground(Color.white);
         b.add(txtTim=new JTextField("Nhập mã hóa đơn cần tìm",20));
+        b.add(Box.createHorizontalStrut(35));
+        b.add(btnTim);
+        
         b.add(Box.createHorizontalStrut(15));
         
         JDateChooser dateTuNgay = new JDateChooser();
@@ -113,9 +119,7 @@ public class LichsuThanhToan extends JFrame{
 
         JDateChooser dateDenNgay = new JDateChooser();
         dateDenNgay.setDateFormatString("dd/MM/yyyy");
-        btnTim=new JButton("Tìm");
-        btnTim.setBackground(Color.decode("#865A52"));
-        btnTim.setForeground(Color.white);
+        
         
         b.add(new JLabel("Từ ngày :"));
         b.add(dateTuNgay);
@@ -125,8 +129,7 @@ public class LichsuThanhToan extends JFrame{
         b.add(dateDenNgay);
         b.add(Box.createHorizontalStrut(15));
         
-        b.add(btnTim);
-        b.add(Box.createHorizontalStrut(35));
+        
         b.setPreferredSize(new Dimension(500, 50)); 
         
 
@@ -252,6 +255,15 @@ public class LichsuThanhToan extends JFrame{
         btnXoa.setForeground(Color.white);
         btnBack.setPreferredSize(new Dimension(100, 40));
         btnXoa.setPreferredSize(new Dimension(100, 40));
+        
+        
+        for (JTextField txt : new JTextField[]{txtMaHD, txtMaKH, txtMaNV, txtTGTT,txtTGTao
+        		,txtTenKH,txtTongTien,txtDTL,txtGiam,txtTienthoi,txtThanhtoan}) {
+            txt.setBorder(null);                    
+            txt.setBackground(null);     
+            txt.setForeground(Color.BLACK);        
+            txt.setCaretColor(Color.BLACK);        
+        }
         
         
         
