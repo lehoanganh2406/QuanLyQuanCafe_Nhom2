@@ -6,7 +6,6 @@ import java.sql.SQLException;
 public class Ban {
     private String maBan;     
     private String tenBan;
-    private String trangThai;
 
     public String getMaBan() {
         return maBan;
@@ -24,37 +23,29 @@ public class Ban {
         this.tenBan = tenBan;
     }
 
-    public String getTrangThai() {
-        return trangThai;
-    }
 
-    public void setTrangThai(String trangThai) {
-        this.trangThai = trangThai;
-    }
-
-    public Ban(String maBan, String tenBan, String trangThai) {
+    public Ban(String maBan, String tenBan) {
         this.maBan = maBan;
         this.tenBan = tenBan;
-        this.trangThai = trangThai;
+        
     }
 
     public Ban(ResultSet rs) throws SQLException {
         this(
             rs.getString("maBan"),       
-            rs.getString("tenBan"),
-            rs.getString("trangThai")
+            rs.getString("tenBan")
         );
     }
     
 
-    public Ban(String tenBan, String trangThai) {
-		super();
+    public Ban(String tenBan) {
 		this.tenBan = tenBan;
-		this.trangThai = trangThai;
 	}
 
 	@Override
-    public String toString() {
-        return "Ban [maBan=" + maBan + ", tenBan=" + tenBan + ", trangThai=" + trangThai + "]";
-    }
+	public String toString() {
+		return "Ban [maBan=" + maBan + ", tenBan=" + tenBan + "]";
+	}
+    
+	
 }
