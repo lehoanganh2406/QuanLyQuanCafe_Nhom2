@@ -1,6 +1,10 @@
 package GUI;
 
 import java.awt.*;
+import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.swing.*;
 
 import connectDB.ConnectDB;
@@ -10,6 +14,7 @@ import entity.Ban;
 public class Ban_GUI extends JFrame {
 	
 	private JPanel jCen, pnBan;
+	public static final Map<Integer, Timestamp> thoiGianVao = new HashMap<>();
 	public Ban_GUI() {
 		
 		setTitle("MH nhân viên phục vụ - Order");
@@ -51,6 +56,7 @@ public class Ban_GUI extends JFrame {
             btnBan.setIcon(iconTable);
             pnBan.add(btnBan);
             btnBan.addActionListener(e -> {
+            	thoiGianVao.put(soBan, new Timestamp(System.currentTimeMillis()));
             	this.setVisible(false);
                 new Order_GUI(soBan).setVisible(true);
                 dispose();

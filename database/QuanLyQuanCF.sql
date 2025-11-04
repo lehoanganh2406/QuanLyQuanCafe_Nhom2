@@ -10,14 +10,6 @@ GO
 USE QuanLyQuanCF;
 GO
 
--- Tạo bảng Tài Khoảng
-create table TaiKhoang(
-	tenDangNhap nvarchar(100) not null primary key,
-	matKhau nvarchar(100) not null
-);
-
-INSERT INTO TaiKhoang (tenDangNhap, matKhau)
-VALUES (N'admin', N'123');
 
 
 
@@ -34,7 +26,7 @@ GO
 CREATE TABLE Ban (
     maBan NVARCHAR(20) PRIMARY KEY DEFAULT(CONCAT('B', RIGHT('000' + CAST(NEXT VALUE FOR seq_Ban AS VARCHAR(3)), 3))),
     tenBan NVARCHAR(100) NOT NULL DEFAULT (N'Chưa cập nhật'),
-);
+)
 GO
 WITH n AS (
   SELECT TOP (40) ROW_NUMBER() OVER (ORDER BY (SELECT 1)) AS i
@@ -52,7 +44,7 @@ CREATE TABLE NhanVien (
     CCCD NVARCHAR(20) NOT NULL,
     ngayVaoLam DATE DEFAULT (GETDATE()),
     chucVu NVARCHAR(50) DEFAULT (N'Nhân viên')
-);
+)
 GO
 
 CREATE TABLE KhachHang (
@@ -60,7 +52,7 @@ CREATE TABLE KhachHang (
     tenKH NVARCHAR(100) NOT NULL,
     sdt NVARCHAR(15) UNIQUE,
     diemTL INT
-);
+)
 GO
 
 CREATE TABLE TaiKhoan (
@@ -68,14 +60,14 @@ CREATE TABLE TaiKhoan (
     matKhau NVARCHAR(1000) NOT NULL DEFAULT (N'123456'),
     tenHienThi NVARCHAR(100),
     maNV NVARCHAR(20) NOT NULL FOREIGN KEY REFERENCES NhanVien(maNV) ON DELETE CASCADE,
-    loaiTaiKhoan INT NOT NULL DEFAULT (0)
-);
+    loaiTaiKhoan INT NOT NULL DEFAULT (0)  -- 1 quản lý, 0 nhanvien
+)
 GO
 
 CREATE TABLE LoaiSanPham (
     maLoai NVARCHAR(20) PRIMARY KEY DEFAULT(CONCAT('LSP', RIGHT('000' + CAST(NEXT VALUE FOR seq_LoaiSanPham AS VARCHAR(3)), 3))),
     loaiSP NVARCHAR(100) NOT NULL DEFAULT (N'Chưa cập nhật')
-);
+)
 GO
 
 CREATE TABLE SanPham (
@@ -86,7 +78,7 @@ CREATE TABLE SanPham (
     img NVARCHAR(100),
     maLoai NVARCHAR(20) NOT NULL FOREIGN KEY REFERENCES LoaiSanPham(maLoai),
     moTa NVARCHAR(200)
-);
+)
 GO
 
 CREATE TABLE HoaDon (
@@ -99,19 +91,17 @@ CREATE TABLE HoaDon (
     trangThai INT NOT NULL DEFAULT (0),
     giamGia INT NOT NULL DEFAULT (0) CHECK (giamGia BETWEEN 0 AND 100),
     tongTien DECIMAL(18,2) NOT NULL DEFAULT (0)
-);
+)
 GO
 
 CREATE TABLE ChiTietHoaDon (
-    maCT NVARCHAR(20) PRIMARY KEY DEFAULT(CONCAT('CT', RIGHT('000' + CAST(NEXT VALUE FOR seq_ChiTietHoaDon AS VARCHAR(3)), 3))),
     maHD NVARCHAR(20) NOT NULL FOREIGN KEY REFERENCES HoaDon(maHD) ON DELETE CASCADE,
     maSP NVARCHAR(20) NOT NULL FOREIGN KEY REFERENCES SanPham(maSP),
     maNV NVARCHAR(20) NOT NULL FOREIGN KEY REFERENCES NhanVien(maNV),
-    soLuong INT NOT NULL DEFAULT (1) CHECK (soLuong > 0)
-);
+    soLuong INT NOT NULL CHECK (soLuong > 0),
+    CONSTRAINT PK_ChiTietHoaDon PRIMARY KEY (maHD, maSP)
+)
 GO
-DELETE FROM dbo.SanPham;
-DELETE FROM dbo.LoaiSanPham;
 
 
 
@@ -121,7 +111,7 @@ VALUES (N'Coffee'), (N'Trà'), (N'Trà sữa'), (N'Nước ép'), (N'Bánh'), (N
 DECLARE @LSP_Coffee NVARCHAR(20) = (SELECT maLoai FROM dbo.LoaiSanPham WHERE loaiSP = N'Coffee');
 
 -- Coffee
-INSERT INTO dbo.SanPham(tenSP, soLuong, donGia, img, maLoai, moTa)
+INSERT INTO SanPham(tenSP, soLuong, donGia, img, maLoai, moTa)
 VALUES
 (N'Cà phê đen đá', 50, 20000, N'cf_den.png', @LSP_Coffee, N'Đậm vị truyền thống, rang nguyên chất'),
 (N'Cà phê sữa',    50, 25000, N'cf_sua.png', @LSP_Coffee, N'Ngọt béo hài hòa từ sữa đặc Việt Nam'),
@@ -136,7 +126,7 @@ go
 
 DECLARE @LSP_Tra    NVARCHAR(20) = (SELECT maLoai FROM dbo.LoaiSanPham WHERE loaiSP = N'Trà');
 -- Trà
-INSERT INTO dbo.SanPham(tenSP, soLuong, donGia, img, maLoai, moTa)
+INSERT INTO SanPham(tenSP, soLuong, donGia, img, maLoai, moTa)
 VALUES
 (N'Trà đào cam sả',       40, 35000, N'tradaocamsa.jpg',      @LSP_Tra, N'Thanh mát, hương đào tự nhiên'),
 (N'Trà chanh sả',         50, 30000, N'trachanhsa.jpg',       @LSP_Tra, N'Vị truyền thống dễ uống'),
@@ -152,7 +142,7 @@ DECLARE @LSP_TraSua NVARCHAR(20) = (SELECT maLoai FROM dbo.LoaiSanPham WHERE loa
 
 
 -- Trà sữa
-INSERT INTO dbo.SanPham(tenSP, soLuong, donGia, img, maLoai, moTa)
+INSERT INTO SanPham(tenSP, soLuong, donGia, img, maLoai, moTa)
 VALUES
 (N'Trà sữa trân châu', 60, 35000, N'suatt.jpeg',     @LSP_TraSua, N'Trân châu dai mềm'),
 (N'Trà sữa matcha',    50, 38000, N'suamatcha.jpg',  @LSP_TraSua, N'Vị matcha thanh đắng nhẹ'),
@@ -167,7 +157,7 @@ go
 DECLARE @LSP_NuocEp NVARCHAR(20) = (SELECT maLoai FROM dbo.LoaiSanPham WHERE loaiSP = N'Nước ép');
 
 -- Nước ép
-INSERT INTO dbo.SanPham(tenSP, soLuong, donGia, img, maLoai, moTa)
+INSERT INTO SanPham(tenSP, soLuong, donGia, img, maLoai, moTa)
 VALUES
 (N'Nước ép cam',        40, 30000, N'epcam.jpg',     @LSP_NuocEp, N'Cam tươi 100%'),
 (N'Nước ép dứa',        30, 28000, N'epdua.jpg',     @LSP_NuocEp, N'Giảm mỡ hỗ trợ tiêu hóa'),
@@ -182,7 +172,7 @@ go
 DECLARE @LSP_Banh   NVARCHAR(20) = (SELECT maLoai FROM dbo.LoaiSanPham WHERE loaiSP = N'Bánh');
 
 -- Bánh
-INSERT INTO dbo.SanPham(tenSP, soLuong, donGia, img, maLoai, moTa)
+INSERT INTO SanPham(tenSP, soLuong, donGia, img, maLoai, moTa)
 VALUES
 (N'Bánh phô mai',       30, 40000, N'banhphomai.png',   @LSP_Banh, N'Vị phô mai béo mịn, thơm ngon'),
 (N'Tiramisu',           25, 45000, N'banhtiramisu.jpg', @LSP_Banh, N'Bánh Ý nổi tiếng, mềm và đậm vị cafe'),
@@ -197,7 +187,7 @@ go
 
 DECLARE @LSP_Khac   NVARCHAR(20) = (SELECT maLoai FROM dbo.LoaiSanPham WHERE loaiSP = N'Khác');
 
-INSERT INTO dbo.SanPham(tenSP, soLuong, donGia, img, maLoai, moTa)
+INSERT INTO SanPham(tenSP, soLuong, donGia, img, maLoai, moTa)
 VALUES
 (N'Trân châu đen',   100,  8000, N'khacchantrau.jpg',      @LSP_Khac, N'Trân châu dai giòn, thêm vào trà sữa'),
 (N'Trân châu trắng', 100,  9000, N'khacchanchautrang.jpg', @LSP_Khac, N'Thơm nhẹ vị sữa'),
@@ -207,7 +197,7 @@ VALUES
 
 GO
 
-INSERT INTO dbo.KhachHang (tenKH, sdt, diemTL)
+INSERT INTO KhachHang (tenKH, sdt, diemTL)
 VALUES
 (N'Nguyễn Văn An',      N'0901000001', 120),
 (N'Trần Thị Bích',      N'0901000002',  80),
@@ -232,17 +222,24 @@ SELECT * FROM ChiTietHoaDon;
 GO
 INSERT INTO NhanVien (hoTen, diaChi, dienThoai, CCCD, ngayVaoLam, chucVu)
 VALUES
-(N'Nguyễn Thị Hoa', N'Quận 1, TP.HCM', '0901234567', '079123456789', '2022-05-01', N'Phục vụ'),
-(N'Phạm Minh Quang', N'Quận 3, TP.HCM', '0912345678', '079987654321', '2021-09-12', N'Thu ngân'),
-(N'Lê Thị Mai', N'Quận Bình Thạnh, TP.HCM', '0934567890', '079555666777', '2023-01-10', N'Phục vụ');
+(N'Lê Hoàng Anh', N'Quận 1, TP.HCM', '0901234567', '079123456789', '2022-05-01', N'Quản lý'),
+(N'Huỳnh Thị Ngọc Tiên', N'Quận 3, TP.HCM', '0912345678', '079987654321', '2021-09-12', N'Thu ngân')
 GO
+INSERT INTO TaiKhoan (tenDangNhap, matKhau, tenHienThi, maNV, loaiTaiKhoan)
+VALUES
+ (N'lehoanganh', N'quanly', N'Lê Hoàng Anh', N'NV001', 1),
+ (N'huynhthingoctien', N'nhanvien', N'Huỳnh Thị Ngọc Tiên', N'NV002', 0)
+ GO
+
 INSERT INTO HoaDon (maBan, maKH, maNV, trangThai, giamGia, tongTien)
 VALUES 
 ('B001', 'KH001', 'NV001', 1, 10, 150000),
 ('B002', 'KH002', 'NV001', 1, 5, 200000),
-('B003', 'KH003', 'NV001', 0, 0, 0),
-('B004', NULL,    'NV001', 0, 0, 0),
+('B003', 'KH003', 'NV001', 1, 0, 0),
+('B004', NULL,    'NV001', 1, 0, 0),
 ('B005', NULL,    'NV001', 1, 0, 100000);
 GO
+
+
 
 

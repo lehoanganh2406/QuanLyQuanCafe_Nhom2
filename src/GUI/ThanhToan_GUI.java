@@ -6,14 +6,23 @@ import javax.swing.table.*;
 import javax.swing.text.*;
 
 import connectDB.ConnectDB;
+import dao.ChiTietHoaDon_DAO;
+import dao.HoaDon_DAO;
+import dao.KhachHang_DAO;
+import entity.Ban;
+import entity.ChiTietHoaDon;
+import entity.HoaDon;
 import entity.KhachHang;
+import entity.NhanVien;
+import entity.SanPham;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.ArrayList;
 
-public class ThanhToan_GUI extends JFrame {
+public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener {
     private int soBan;
     private JButton btnMenu;
     private JLabel lblOrder;
@@ -23,21 +32,26 @@ public class ThanhToan_GUI extends JFrame {
     private final ImageIcon iconQuayLai = new ImageIcon(getClass().getResource("/img/back_16.png"));
     private final ImageIcon iconThanhToan = new ImageIcon(getClass().getResource("/img/bill_16.png"));
     private Order_GUI orderGui;
+    private Timestamp thoiGianVao;
 
     // Bảng chính + footer
-    private JTable bangMon;
-    private JTable tblFooter;
-    private DefaultTableModel modelBang;
-    private DefaultTableModel footerModel;
-    private JScrollPane spMain;
-    private JScrollPane spFooter;
+    private JTable bangMon, tblFooter;
+    private DefaultTableModel modelBang, footerModel;
+    private JScrollPane spMain, spFooter;
     private JPanel tableStack;
 
     // Cột phải
     private JTextField txtTienKhachTra;
     private JLabel lblTienThua;
     private JComboBox<String> cboPhuongThuc;
-    private JButton thanhToan;
+    private JButton thanhToan, nutThemKhach, nutQuayLai;
+	private JLabel lblMaHoaDon;
+	private HoaDon_DAO hoaDonDAO;
+	private KhachHang khachHangHienTai;
+	private NhanVien nhanVienDangNhap;
+	private ChiTietHoaDon_DAO chiTietHD;
+	private KhachHang_DAO khachHang_DAO;
+	
     
     public static void main(String[] args) {
         ConnectDB.getInstance().connect();
@@ -46,6 +60,8 @@ public class ThanhToan_GUI extends JFrame {
     public ThanhToan_GUI(Order_GUI orderGui, int soBan, ArrayList<Object[]> cartRows, Long tongTien) {
         this.soBan = soBan;
         this.orderGui = orderGui;
+        this.thoiGianVao = Ban_GUI.thoiGianVao.getOrDefault(
+                soBan, new Timestamp(System.currentTimeMillis()));
         if (cartRows == null) cartRows = new ArrayList<>();
         if (tongTien == null) tongTien = 0L;
 
@@ -62,6 +78,18 @@ public class ThanhToan_GUI extends JFrame {
         capNhatTongThanhToan();
         updateFooterSum();
         syncFooterColumnWidths();
+        
+     // Action
+        nutThemKhach.addActionListener(this);
+        nutQuayLai.addActionListener(this);
+        thanhToan.addActionListener(this);
+        cboPhuongThuc.addActionListener(this);
+
+        // Key – recalculation cho 3 ô
+        txtTruDiem.addKeyListener(this);
+        txtGiamGia.addKeyListener(this);
+        txtTienKhachTra.addKeyListener(this);
+
     }
     
 
@@ -90,7 +118,7 @@ public class ThanhToan_GUI extends JFrame {
         lblThongTinKhachHang = tieuDe("Mã khách hàng:", "— Chưa chọn —");
         thongTinTren.add(lblThongTinKhachHang);
         thongTinTren.add(Box.createVerticalStrut(8));
-        JButton nutThemKhach = taoNut("Thêm thông tin khách hàng");
+        nutThemKhach = taoNut("Thêm thông tin khách hàng");
         nutThemKhach.setAlignmentX(Component.LEFT_ALIGNMENT);
         thongTinTren.add(nutThemKhach);
         thongTinTren.add(Box.createVerticalStrut(8));
@@ -206,22 +234,11 @@ public class ThanhToan_GUI extends JFrame {
             updateFooterSum();
             capNhatTongThanhToan();
         });
-        
-        nutThemKhach.addActionListener(e -> {
-            TrangKhachHang_GUI trangKH = new TrangKhachHang_GUI(SwingUtilities.getWindowAncestor(this));
-            trangKH.setLocationRelativeTo(this);
-            trangKH.setVisible(true);              // modal → chờ đóng
-            KhachHang chon = trangKH.getSelected();
-            if (chon != null) {
-                capNhatThongTinKhachHang(chon);
-                txtTruDiem.requestFocus(); // UX: cho thu ngân nhập luôn
-            }
-        });
 
 
 
         // Nút quay lại
-        JButton nutQuayLai = taoNut("Quay lại", iconQuayLai);
+        nutQuayLai = taoNut("Quay lại", iconQuayLai);
         JPanel dayTrai = new JPanel(new FlowLayout(FlowLayout.LEFT));
         dayTrai.setOpaque(false);
         dayTrai.add(nutQuayLai);
@@ -237,8 +254,11 @@ public class ThanhToan_GUI extends JFrame {
         JPanel phanNor = new JPanel();
         phanNor.setOpaque(false);
         phanNor.setLayout(new BoxLayout(phanNor, BoxLayout.Y_AXIS));
-
-        phanNor.add(tieuDeDonGian("Mã hóa đơn:"));
+        
+        hoaDonDAO = new HoaDon_DAO();
+        lblMaHoaDon = new JLabel(hoaDonDAO.layMaHoaDon());
+        lblMaHoaDon.setFont(new Font("Times New Roman", Font.PLAIN, 22));
+        phanNor.add(hangDong("Mã hóa đơn:", lblMaHoaDon));
         phanNor.add(Box.createVerticalStrut(8));
         phanNor.add(tieuDeDonGian("Mã nhân viên:"));
         phanNor.add(Box.createVerticalStrut(16));
@@ -269,12 +289,6 @@ public class ThanhToan_GUI extends JFrame {
         lblTienThua.setFont(new Font("Times New Roman", Font.BOLD, 22));
         phanNor.add(hangDong("Tiền thừa trả khách:", lblTienThua));
 
-        KeyAdapter recalc = new KeyAdapter() {
-            @Override public void keyReleased(KeyEvent e) { capNhatTongThanhToan(); }
-        };
-        txtTruDiem.addKeyListener(recalc);
-        txtGiamGia.addKeyListener(recalc);
-        txtTienKhachTra.addKeyListener(recalc);
 
         cotPhai.add(phanNor, BorderLayout.NORTH);
         cotPhai.add(taoPhanSouthPhai(), BorderLayout.SOUTH);
@@ -298,11 +312,6 @@ public class ThanhToan_GUI extends JFrame {
         trungTam.add(cotTrai);
         trungTam.add(cotPhai);
         add(trungTam, BorderLayout.CENTER);
-
-        nutQuayLai.addActionListener(e -> {
-            if (orderGui != null) orderGui.setVisible(true);
-            dispose();
-        });
     }
 
     // JLabel tiêu đề
@@ -542,18 +551,6 @@ public class ThanhToan_GUI extends JFrame {
         rowPM.add(lbl);
         rowPM.add(cboPhuongThuc);
 
-        // Handler chọn phương thức
-        cboPhuongThuc.addActionListener(e -> {
-            boolean laTienMat = "Tiền mặt".equals(cboPhuongThuc.getSelectedItem());
-            txtTienKhachTra.setEnabled(laTienMat);
-
-            if (!laTienMat) {
-                long tong = parseVND(lblTongThanhToan.getText());
-                txtTienKhachTra.setText(String.valueOf(tong));
-                capNhatTongThanhToan();
-            }
-        });
-
         // === Tạo khoảng cách giữa 2 hàng
         p.add(rowPM);
         p.add(Box.createVerticalStrut(150));
@@ -572,6 +569,7 @@ public class ThanhToan_GUI extends JFrame {
     /** Nhận KH từ trang chọn và đổ xuống UI (label + giới hạn ô Trừ điểm) */
     private void capNhatThongTinKhachHang(KhachHang kh) {
         if (kh == null) return;
+        this.khachHangHienTai = kh;
         // Cập nhật label “Mã khách hàng: …”
         lblThongTinKhachHang.setText(String.format("Mã khách hàng: %s — %s (Điểm TL: %d)",
                 kh.getMaKH(), kh.getTenKH(), kh.getDiemTL()));
@@ -584,5 +582,107 @@ public class ThanhToan_GUI extends JFrame {
         // Tính lại tổng + tiền thừa
         capNhatTongThanhToan();
     }
+    private void capNhatDiemTichLuySauThanhToan() {
+        if (khachHangHienTai == null) return; // không chọn KH thì bỏ qua
+
+        int diemDangCo = khachHangHienTai.getDiemTL();
+        int diemDaDung = safeInt(txtTruDiem.getText());       // đã giới hạn bởi setNumericFilter
+        long soTienThucTra = parseVND(lblTongThanhToan.getText()); // sau giảm %, sau trừ điểm
+
+        // Quy đổi: 10.000 VND = 1 điểm
+        int diemCong = (int) (soTienThucTra / 10_000L);
+
+        int diemMoi = Math.max(0, diemDangCo - diemDaDung + diemCong);
+        khachHang_DAO = new KhachHang_DAO();
+
+        if (khachHang_DAO.updateDiem(khachHangHienTai.getMaKH(), diemMoi)) {
+            khachHangHienTai.setDiemTL(diemMoi);
+        } else {
+            JOptionPane.showMessageDialog(this,
+                "Không thể cập nhật điểm tích lũy cho khách hàng.",
+                "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+    private void nutThanhToan() {
+		String maHD = lblMaHoaDon.getText();
+		Timestamp tGianRa = new Timestamp(System.currentTimeMillis());
+		Ban banHienTai = new Ban(String.format("B%03d", soBan));
+		if (nhanVienDangNhap == null) {
+	        nhanVienDangNhap = new NhanVien("NV001"); // TODO: thay bằng NV đăng nhập thực
+	    }
+		int giamGia = safeInt(txtGiamGia.getText());
+	    long tongTien = parseVND(lblTongThanhToan.getText());
+	    HoaDon hd = new HoaDon(maHD, banHienTai, khachHangHienTai, nhanVienDangNhap, thoiGianVao, tGianRa, true, giamGia, tongTien);
+	    
+	    if (hoaDonDAO.themHoaDon(hd)) {
+			chiTietHD = new ChiTietHoaDon_DAO();
+			boolean loiChiTiet = false;
+			for (int i = 0; i < modelBang.getRowCount(); i++) {
+				String maSP = (String) modelBang.getValueAt(i, 0);
+				int soLuong = (int) modelBang.getValueAt(i, 2);
+				ChiTietHoaDon ct = new ChiTietHoaDon(hd, new SanPham(maSP), nhanVienDangNhap, soLuong);
+				if (!chiTietHD.themChiTiet(ct)) {
+					loiChiTiet = true;
+				}
+			}
+			if (!loiChiTiet) {
+				capNhatDiemTichLuySauThanhToan();
+				JOptionPane.showMessageDialog(this, "Thanh toán thành công");
+				this.setVisible(false);
+			}else {
+				JOptionPane.showMessageDialog(this, "Thanh toán thất bại");
+			}
+		}else {
+			JOptionPane.showMessageDialog(this, "Thanh toán thất bại");
+		}
+	}
+	@Override
+	public void keyTyped(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void keyPressed(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void keyReleased(KeyEvent e) {
+		Object o = e.getSource();
+		if (o.equals(txtGiamGia) || o.equals(txtTruDiem) || o.equals(txtTienKhachTra)) {
+			capNhatTongThanhToan();
+		}
+		
+	}
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		Object o = e.getSource();
+		if (o.equals(nutQuayLai)) {
+			if (orderGui != null) orderGui.setVisible(true);
+            dispose();
+		}else if (o.equals(nutThemKhach)) {
+			TrangKhachHang_GUI trangKH = new TrangKhachHang_GUI(SwingUtilities.getWindowAncestor(this));
+	        trangKH.setLocationRelativeTo(this);
+	        trangKH.setVisible(true);
+	        KhachHang chon = trangKH.getSelected();
+	        if (chon != null) {
+	            capNhatThongTinKhachHang(chon);
+	            txtTruDiem.requestFocus();
+	        }
+		}else if (o.equals(cboPhuongThuc)) {
+			boolean laTienMat = "Tiền mặt".equals(cboPhuongThuc.getSelectedItem());
+	        txtTienKhachTra.setEnabled(laTienMat);
+	        if (!laTienMat) {
+	            long tong = parseVND(lblTongThanhToan.getText());
+	            txtTienKhachTra.setText(String.valueOf(tong));
+	        }
+	        capNhatTongThanhToan();
+		}else if (o.equals(thanhToan)) {
+			nutThanhToan();
+		}
+		
+	}
+
+
 
 }

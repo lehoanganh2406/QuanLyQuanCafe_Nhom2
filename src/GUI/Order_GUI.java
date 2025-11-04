@@ -4,7 +4,7 @@ import javax.swing.*;
 import javax.swing.table.*;
 import connectDB.ConnectDB;
 import dao.Order_DAO;
-import entity.Order;
+import entity.SanPham;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -298,7 +298,7 @@ public class Order_GUI extends JFrame implements ActionListener {
         };
     }
     private void napDuLieuVaoCard(String cardKey) {
-		List<Order> list;
+		List<SanPham> list;
 		String maLoai = chonMaLoai(cardKey);
 		if (CARD_ALL.equals(cardKey)) {
 			list = orderDAO.getAllSanPham();
@@ -309,7 +309,7 @@ public class Order_GUI extends JFrame implements ActionListener {
         pCen.add(pane, cardKey);
 
 	}
-    private JPanel cardOrder(Order o) {
+    private JPanel cardOrder(SanPham o) {
     	JPanel card = new JPanel(new BorderLayout());
         card.setPreferredSize(new Dimension(280, 270));
         card.setBackground(Color.WHITE);
@@ -359,7 +359,7 @@ public class Order_GUI extends JFrame implements ActionListener {
         } catch (SQLException e) { e.printStackTrace(); }
     }
 
-    private void addToCart(Order o) {
+    private void addToCart(SanPham o) {
         String ma = o.getMaSP();            // String
         String ten = o.getTenSP();
         long donGia = Math.round(o.getDonGia());
@@ -404,16 +404,16 @@ public class Order_GUI extends JFrame implements ActionListener {
         return lbl;
     }
 
-    private JPanel luoiGridPanel(ArrayList<Order> items) {
+    private JPanel luoiGridPanel(ArrayList<SanPham> items) {
     	int hgap = 60, vgap = 40, cols = 3;
         JPanel grid = new JPanel(new GridLayout(0, cols, hgap, vgap));
         grid.setBackground(Color.decode("#E3CFC1"));
-        for (Order o : items) {
+        for (SanPham o : items) {
         	grid.add(cardOrder(o));
         }
         return grid;
 	}
-    private JComponent gridForm(ArrayList<Order> items, String maLoai) {
+    private JComponent gridForm(ArrayList<SanPham> items, String maLoai) {
         JPanel grid = luoiGridPanel(items);
         JScrollPane scroll = new JScrollPane(grid, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scroll.setBorder(null);
@@ -434,7 +434,7 @@ public class Order_GUI extends JFrame implements ActionListener {
         Object val = sp.getClientProperty("maLoai");
         String maLoai = (val instanceof String) ? (String) val : null;
 
-        ArrayList<Order> ds = (maLoai == null)
+        ArrayList<SanPham> ds = (maLoai == null)
                 ? orderDAO.getAllSanPham()
                 : orderDAO.getSanPhamByLoai(maLoai);
 
@@ -520,7 +520,7 @@ public class Order_GUI extends JFrame implements ActionListener {
         Object val = visibleScroll.getClientProperty("maLoai");
         String maLoai = (val instanceof String) ? (String) val : null;
 
-        ArrayList<Order> ds;
+        ArrayList<SanPham> ds;
         if (maLoai == null)
             ds = orderDAO.searchByName(keyword);
         else

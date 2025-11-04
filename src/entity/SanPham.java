@@ -3,18 +3,19 @@ package entity;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class Order {
+public class SanPham {
 	private String maSP;   
     private String tenSP;
     private int soLuong;
     private double donGia; 
-    private String loaiSP; 
     private String img;
+    private LoaiSanPham loaiSP; 
+    private String moTa;
 	
     public double getTotal() {
         return donGia * soLuong;
     }
-
+    
 	public String getMaSP() {
 		return maSP;
 	}
@@ -47,11 +48,11 @@ public class Order {
 		this.donGia = donGia;
 	}
 
-	public String getLoaiSP() {
+	public LoaiSanPham getLoaiSP() {
 		return loaiSP;
 	}
 
-	public void setLoaiSP(String loaiSP) {
+	public void setLoaiSP(LoaiSanPham loaiSP) {
 		this.loaiSP = loaiSP;
 	}
 
@@ -63,7 +64,20 @@ public class Order {
 		this.img = img;
 	}
 
-	public Order(String maSP, String tenSP, int soLuong, double donGia, String loaiSP, String img) {
+	public SanPham(String maSP) {
+		this.maSP = maSP;
+	}
+	
+    
+	 public String getMoTa() {
+		return moTa;
+	}
+
+	public void setMoTa(String moTa) {
+		this.moTa = moTa;
+	}
+
+	public SanPham(String maSP, String tenSP, int soLuong, double donGia, LoaiSanPham loaiSP, String img) {
 		this.maSP = maSP;
 		this.tenSP = tenSP;
 		this.soLuong = soLuong;
@@ -71,18 +85,25 @@ public class Order {
 		this.loaiSP = loaiSP;
 		this.img = img;
 	}
+	
+	
 
-	public Order(String maSP) {
+	 public SanPham(String maSP, String tenSP, int soLuong, double donGia, String img, LoaiSanPham loaiSP, String moTa) {
 		this.maSP = maSP;
+		this.tenSP = tenSP;
+		this.soLuong = soLuong;
+		this.donGia = donGia;
+		this.img = img;
+		this.loaiSP = loaiSP;
+		this.moTa = moTa;
 	}
-    
-	 public Order(ResultSet rs) throws SQLException {
-	        this( rs.getString("maSP"),     
-	            rs.getString("tenSP"),
-	            rs.getInt("soLuong"),
-	            rs.getDouble("donGia"),
-	            rs.getString("loaiSP"),    
-	            rs.getString("img")
-	        );
-	    }
+
+	public SanPham(ResultSet rs) throws SQLException {
+		    this.maSP = rs.getString("maSP");
+		    this.tenSP = rs.getString("tenSP");
+		    this.soLuong = rs.getInt("soLuong");
+		    this.donGia = rs.getDouble("donGia");
+		    this.img = rs.getString("img");
+		    this.loaiSP = new LoaiSanPham(rs.getString("loaiSP"));
+		}
 }

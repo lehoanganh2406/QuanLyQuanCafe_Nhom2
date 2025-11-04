@@ -2,7 +2,7 @@ package dao;
 
 import connectDB.ConnectDB;
 import entity.KhachHang;
-import entity.Order;
+import entity.SanPham;
 
 import java.sql.*;
 import java.util.ArrayList;

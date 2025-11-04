@@ -1,28 +1,31 @@
 package entity;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.Date;
 
 public class HoaDon {
 	private String maHD;
-	private Ban maban;
+	private Ban maBan;
 	private KhachHang maKH;
-//	private nhanvien manv;
-	private Date tgThanhtoan;
-	private Date tgTao;
+	private NhanVien maNV;
+	private Timestamp thoiGianVao;
+	private Timestamp thoiGianRa;
 	private boolean trangThai;
 	private double giamGia;
-	private double tongtien;
+	private double tongTien;
 	public String getMaHD() {
 		return maHD;
 	}
 	public void setMaHD(String maHD) {
 		this.maHD = maHD;
 	}
-	public Ban getMaban() {
-		return maban;
+	public Ban getMaBan() {
+		return maBan;
 	}
-	public void setMaban(Ban maban) {
-		this.maban = maban;
+	public void setMaBan(Ban maBan) {
+		this.maBan = maBan;
 	}
 	public KhachHang getMaKH() {
 		return maKH;
@@ -30,17 +33,17 @@ public class HoaDon {
 	public void setMaKH(KhachHang maKH) {
 		this.maKH = maKH;
 	}
-	public Date getTgThanhtoan() {
-		return tgThanhtoan;
+	public Timestamp getThoiGianVao() {
+		return thoiGianVao;
 	}
-	public void setTgThanhtoan(Date tgThanhtoan) {
-		this.tgThanhtoan = tgThanhtoan;
+	public void setThoiGianVao(Timestamp thoiGianVao) {
+		this.thoiGianVao = thoiGianVao;
 	}
-	public Date getTgTao() {
-		return tgTao;
+	public Timestamp getThoiGianRa() {
+		return thoiGianRa;
 	}
-	public void setTgTao(Date tgTao) {
-		this.tgTao = tgTao;
+	public void setThoiGianRa(Timestamp thoiGianRa) {
+		this.thoiGianRa = thoiGianRa;
 	}
 	public boolean isTrangThai() {
 		return trangThai;
@@ -54,32 +57,52 @@ public class HoaDon {
 	public void setGiamGia(double giamGia) {
 		this.giamGia = giamGia;
 	}
-	public double getTongtien() {
-		return tongtien;
+	public double getTongTien() {
+		return tongTien;
 	}
-	public void setTongtien(double tongtien) {
-		this.tongtien = tongtien;
+	public void setTongTien(double tongTien) {
+		this.tongTien = tongTien;
 	}
-	public HoaDon(String maHD, Ban maban, KhachHang maKH, Date tgThanhtoan, Date tgTao, boolean trangThai,
-			double giamGia, double tongtien) {
-		this.maHD = maHD;
-		this.maban = maban;
-		this.maKH = maKH;
-		this.tgThanhtoan = tgThanhtoan;
-		this.tgTao = tgTao;
-		this.trangThai = trangThai;
-		this.giamGia = giamGia;
-		this.tongtien = tongtien;
+	public NhanVien getMaNV() {
+		return maNV;
+	}
+	public void setMaNV(NhanVien maNV) {
+		this.maNV = maNV;
 	}
 	public HoaDon() {
+		// TODO Auto-generated constructor stub
+	}
+	
+	public HoaDon(String maHD) {
 		super();
+		this.maHD = maHD;
 	}
-	@Override
-	public String toString() {
-		return "HoaDon [maHD=" + maHD + ", maban=" + maban + ", maKH=" + maKH + ", tgThanhtoan=" + tgThanhtoan
-				+ ", tgTao=" + tgTao + ", trangThai=" + trangThai + ", giamGia=" + giamGia + ", tongtien=" + tongtien
-				+ "]";
+	public HoaDon(ResultSet rs) throws SQLException {
+        this.maHD = rs.getString("maHD");
+        this.maBan = new Ban(rs.getString("maBan")); 
+        this.maKH = new KhachHang(rs.getString("maKH"));
+        this.maNV = new NhanVien(rs.getString("maNV"));
+        this.thoiGianVao = rs.getTimestamp("thoiGianVao");
+        this.thoiGianRa = rs.getTimestamp("thoiGianRa");
+        this.trangThai = rs.getInt("trangThai") == 1;
+        this.giamGia = rs.getInt("giamGia");
+        this.tongTien = rs.getDouble("tongTien");
+    }
+	public HoaDon(String maHD, Ban maBan, KhachHang maKH, NhanVien maNV, Timestamp thoiGianVao, Timestamp thoiGianRa,
+			boolean trangThai, double giamGia, double tongTien) {
+		this.maHD = maHD;
+		this.maBan = maBan;
+		this.maKH = maKH;
+		this.maNV = maNV;
+		this.thoiGianVao = thoiGianVao;
+		this.thoiGianRa = thoiGianRa;
+		this.trangThai = trangThai;
+		this.giamGia = giamGia;
+		this.tongTien = tongTien;
 	}
+	
+	
+	
 	
 	
 	

@@ -36,10 +36,14 @@ public class Ban {
             rs.getString("tenBan")
         );
     }
+    public Ban() {
+		// TODO Auto-generated constructor stub
+	}
     
 
-    public Ban(String tenBan) {
-		this.tenBan = tenBan;
+	public Ban(String maBan) {
+		super();
+		this.maBan = maBan;
 	}
 
 	@Override
