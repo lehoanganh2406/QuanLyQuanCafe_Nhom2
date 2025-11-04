@@ -231,14 +231,6 @@ VALUES
  (N'huynhthingoctien', N'nhanvien', N'Huỳnh Thị Ngọc Tiên', N'NV002', 0)
  GO
 
-INSERT INTO HoaDon (maBan, maKH, maNV, trangThai, giamGia, tongTien)
-VALUES 
-('B001', 'KH001', 'NV001', 1, 10, 150000),
-('B002', 'KH002', 'NV001', 1, 5, 200000),
-('B003', 'KH003', 'NV001', 1, 0, 0),
-('B004', NULL,    'NV001', 1, 0, 0),
-('B005', NULL,    'NV001', 1, 0, 100000);
-GO
 
 
 

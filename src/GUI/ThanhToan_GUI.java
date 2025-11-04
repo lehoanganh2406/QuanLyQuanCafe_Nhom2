@@ -18,6 +18,7 @@ import entity.SanPham;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.ArrayList;
@@ -51,6 +52,7 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
 	private NhanVien nhanVienDangNhap;
 	private ChiTietHoaDon_DAO chiTietHD;
 	private KhachHang_DAO khachHang_DAO;
+	private Timestamp tGianRa;
 	
     
     public static void main(String[] args) {
@@ -605,7 +607,7 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
     }
     private void nutThanhToan() {
 		String maHD = lblMaHoaDon.getText();
-		Timestamp tGianRa = new Timestamp(System.currentTimeMillis());
+		tGianRa = new Timestamp(System.currentTimeMillis());
 		Ban banHienTai = new Ban(String.format("B%03d", soBan));
 		if (nhanVienDangNhap == null) {
 	        nhanVienDangNhap = new NhanVien("NV001"); // TODO: thay bằng NV đăng nhập thực
@@ -628,7 +630,12 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
 			if (!loiChiTiet) {
 				capNhatDiemTichLuySauThanhToan();
 				JOptionPane.showMessageDialog(this, "Thanh toán thành công");
+				xuatHoaDonPDF(maHD);
 				this.setVisible(false);
+				orderGui.dispose();
+				Ban_GUI.thoiGianVao.remove(soBan);
+				new Ban_GUI().setVisible(true);
+			
 			}else {
 				JOptionPane.showMessageDialog(this, "Thanh toán thất bại");
 			}
@@ -682,7 +689,48 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
 		}
 		
 	}
+	
+	private void xuatHoaDonPDF(String maHD) {
+	    try {
+	        // 1️ Lấy đường dẫn thư mục hiện tại đang chạy 
+	        String currentDir = System.getProperty("user.dir");
 
+	        // 2️ Tạo file PDF trong cùng thư mục
+	        String outPath = currentDir + File.separator + "HoaDon_" + maHD + ".pdf";
+
+	        // 3️ Đường dẫn font tiếng Việt 
+	        String fontPath = "C:/Windows/Fonts/times.ttf";
+
+	        // 4️ Xuất PDF dạng bảng
+	        XuatPDF.xuatHoaDonPDF(
+	            outPath,
+	            fontPath,
+	            maHD,
+	            thoiGianVao,
+	            tGianRa,
+	            khachHangHienTai != null ? khachHangHienTai.getTenKH() : "Khách lẻ",
+	            nhanVienDangNhap != null ? nhanVienDangNhap.getMaNV() : "",
+	            modelBang,
+	            (int) footerModel.getValueAt(0, 2),
+	            (long) footerModel.getValueAt(0, 4),
+	            safeInt(txtTruDiem.getText()),
+	            safeInt(txtGiamGia.getText()),
+	            parseVND(lblTongThanhToan.getText()),
+	            safeLong(txtTienKhachTra.getText()),
+	            safeLong(txtTienKhachTra.getText()) - parseVND(lblTongThanhToan.getText())
+	        );
+
+	        // 5️⃣ Thông báo thành công
+	        JOptionPane.showMessageDialog(this,
+	            "Xuất hoá đơn PDF thành công!\nFile lưu tại:\n" + outPath);
+
+	    } catch (Exception ex) {
+	        ex.printStackTrace();
+	        JOptionPane.showMessageDialog(this,
+	            "Lỗi khi xuất PDF: " + ex.getMessage(),
+	            "PDF Error", JOptionPane.ERROR_MESSAGE);
+	    }
+	}
 
 
 }
