@@ -439,10 +439,12 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
         boolean laTienMat = (cboPhuongThuc == null) || "Tiền mặt".equals(cboPhuongThuc.getSelectedItem());
         long tra;
         if (laTienMat) {
-            txtTienKhachTra.setEnabled(true);
+        	txtTienKhachTra.setEditable(true);
+        	txtTienKhachTra.setForeground(Color.BLACK);
             tra = safeLong(txtTienKhachTra.getText());
         } else {
-            txtTienKhachTra.setEnabled(false);
+        	txtTienKhachTra.setEditable(false);
+        	txtTienKhachTra.setForeground(Color.BLUE);
             txtTienKhachTra.setText(String.valueOf(tongCuoi));
             tra = tongCuoi;
         }
@@ -519,7 +521,7 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
         p.add(rowBtn);
         return p;
     }
-    /** Nhận KH từ trang chọn và đổ xuống UI (label + giới hạn ô Trừ điểm) */
+//    Nhận KH từ trang chọn và đổ xuống UI (label + giới hạn ô Trừ điểm) 
     private void capNhatThongTinKhachHang(KhachHang kh) {
         if (kh == null) return;
         this.khachHangHienTai = kh;
@@ -631,11 +633,15 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
 	        }
 		}else if (o.equals(cboPhuongThuc)) {
 			boolean laTienMat = "Tiền mặt".equals(cboPhuongThuc.getSelectedItem());
-	        txtTienKhachTra.setEnabled(laTienMat);
+	        long tong = parseVND(lblTongThanhToan.getText());
 	        if (!laTienMat) {
-	            long tong = parseVND(lblTongThanhToan.getText());
+	        	txtTienKhachTra.setEditable(false);
+	        	txtTienKhachTra.setForeground(Color.BLACK);
 	            txtTienKhachTra.setText(String.valueOf(tong));
-	        }
+	        }else {
+	        	txtTienKhachTra.setEditable(true);
+	            txtTienKhachTra.setForeground(Color.BLUE);
+			}
 	        capNhatTongThanhToan();
 		}else if (o.equals(thanhToan)) {
 			nutThanhToan();
