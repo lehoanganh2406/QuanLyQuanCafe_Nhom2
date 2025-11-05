@@ -79,7 +79,6 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
         napDuLieuGioHang(cartRows);
         capNhatTongThanhToan();
         updateFooterSum();
-        syncFooterColumnWidths();
         
      // Action
         nutThemKhach.addActionListener(this);
@@ -138,21 +137,10 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
         thongTinTren.add(ghiChu);
 
         // ===== Bảng chính
-        modelBang = new DefaultTableModel(
-            new Object[]{"Mã","Tên món","Số lượng","Đơn Giá","Thành tiền"}, 0) {
-            @Override public boolean isCellEditable(int r, int c) { return false; }
-            @Override public Class<?> getColumnClass(int c) {
-                return switch (c) {
-                    case 0 -> String.class;    // Mã SP (varchar)
-                    case 1 -> String.class;    // Tên món
-                    case 2 -> Integer.class;   // Số lượng
-                    case 3, 4 -> Long.class;   // Giá tiền
-                    default -> Object.class;
-                };
-            }
-        };
+        modelBang = new DefaultTableModel(new Object[]{"Mã","Tên món","Số lượng","Đơn Giá","Thành tiền"}, 0);
 
         bangMon = new JTable(modelBang);
+        bangMon.setEnabled(false);
         bangMon.setRowHeight(36);
         bangMon.setFont(new Font("Times New Roman", Font.PLAIN, 20));
         bangMon.setFillsViewportHeight(true);
@@ -171,46 +159,13 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
         spMain.setPreferredSize(new Dimension(1010, 900));
 
         // ===== Footer (1 dòng tổng) – cố định
-        footerModel = new DefaultTableModel(
-            new Object[]{"Mã","Tên món","Số lượng","Đơn Giá","Thành tiền"}, 0) {
-            @Override public boolean isCellEditable(int r, int c) { return false; }
-            @Override public Class<?> getColumnClass(int c) {
-                return switch (c) {
-                    case 0 -> String.class;   // để ""
-                    case 1 -> String.class;   // "TỔNG"
-                    case 2 -> Integer.class;  // tổng SL
-                    case 3, 4 -> Long.class;  // 0L và tổng tiền
-                    default -> Object.class;
-                };
-            }
-        };
+        footerModel = new DefaultTableModel(new Object[]{"Mã","Tên món","Số lượng","Đơn Giá","Thành tiền"}, 0) ;
 
         tblFooter = new JTable(footerModel);
         tblFooter.setTableHeader(null);
         tblFooter.setEnabled(false);
         tblFooter.setRowHeight(bangMon.getRowHeight());
 
-        
-
-        // Nền + font footer
-        DefaultTableCellRenderer footerRenderer = new DefaultTableCellRenderer() {
-            @Override public Component getTableCellRendererComponent(JTable table, Object value,
-                                                                     boolean isSelected, boolean hasFocus,
-                                                                     int row, int column) {
-                JLabel c = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                c.setFont(new Font("Times New Roman", Font.BOLD, 22));
-                c.setBackground(new Color(255,248,220));
-                c.setOpaque(true);
-                c.setHorizontalAlignment((column >= 2) ? SwingConstants.RIGHT : SwingConstants.LEFT);
-                if (value instanceof Number && (column == 3 || column == 4)) {
-                    c.setText(dinhDangVND(((Number) value).longValue()));
-                }
-                return c;
-            }
-        };
-        for (int i = 0; i < tblFooter.getColumnCount(); i++) {
-            tblFooter.getColumnModel().getColumn(i).setCellRenderer(footerRenderer);
-        }
 
         spFooter = new JScrollPane(tblFooter);
         spFooter.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
@@ -221,23 +176,6 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
         tableStack = new JPanel(new BorderLayout());
         tableStack.add(spMain,   BorderLayout.CENTER);
         tableStack.add(spFooter, BorderLayout.SOUTH);
-
-        // Đồng bộ width cột footer với bảng chính
-        bangMon.getColumnModel().addColumnModelListener(new TableColumnModelListener() {
-            @Override public void columnMarginChanged(ChangeEvent e) { syncFooterColumnWidths(); }
-            @Override public void columnMoved(TableColumnModelEvent e)   { syncFooterColumnWidths(); }
-            @Override public void columnAdded(TableColumnModelEvent e)   { syncFooterColumnWidths(); }
-            @Override public void columnRemoved(TableColumnModelEvent e) { syncFooterColumnWidths(); }
-            @Override public void columnSelectionChanged(ListSelectionEvent e) {}
-        });
-
-        // Tự cập nhật footer & tổng tiền khi dữ liệu bảng thay đổi
-        modelBang.addTableModelListener(e -> {
-            updateFooterSum();
-            capNhatTongThanhToan();
-        });
-
-
 
         // Nút quay lại
         nutQuayLai = taoNut("Quay lại", iconQuayLai);
@@ -295,6 +233,37 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
         cotPhai.add(phanNor, BorderLayout.NORTH);
         cotPhai.add(taoPhanSouthPhai(), BorderLayout.SOUTH);
 
+        // Đặt 2 cột
+        trungTam.add(cotTrai);
+        trungTam.add(cotPhai);
+        add(trungTam, BorderLayout.CENTER);
+        
+     // Nền + font footer
+        DefaultTableCellRenderer footerRenderer = new DefaultTableCellRenderer() {
+            @Override public Component getTableCellRendererComponent(JTable table, Object value,
+                                                                     boolean isSelected, boolean hasFocus,
+                                                                     int row, int column) {
+                JLabel c = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                c.setFont(new Font("Times New Roman", Font.BOLD, 22));
+                c.setBackground(new Color(255,248,220));
+                c.setOpaque(true);
+                c.setHorizontalAlignment((column >= 2) ? SwingConstants.RIGHT : SwingConstants.LEFT);
+                if (value instanceof Number && (column == 3 || column == 4)) {
+                    c.setText(dinhDangVND(((Number) value).longValue()));
+                }
+                return c;
+            }
+        };
+        for (int i = 0; i < tblFooter.getColumnCount(); i++) {
+            tblFooter.getColumnModel().getColumn(i).setCellRenderer(footerRenderer);
+        }
+        
+     // Tự cập nhật footer & tổng tiền khi dữ liệu bảng thay đổi
+        modelBang.addTableModelListener(e -> {
+            updateFooterSum();
+            capNhatTongThanhToan();
+        });
+
         txtTienKhachTra.addFocusListener(new FocusAdapter() {
             @Override public void focusLost(FocusEvent e) {
                 String s = txtTienKhachTra.getText().trim().replace(".", "");
@@ -309,11 +278,6 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
                 }
             }
         });
-
-        // Đặt 2 cột
-        trungTam.add(cotTrai);
-        trungTam.add(cotPhai);
-        add(trungTam, BorderLayout.CENTER);
     }
 
     // JLabel tiêu đề
@@ -354,14 +318,14 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
     }
 
     // ô text
-    private JTextField taoOText(String placeholder) {
+    private JTextField taoOText(String text) {
         JTextField tf = new JTextField();
-        tf.setColumns(10);
-        tf.setPreferredSize(new Dimension(220, 36));
+
+        tf.setPreferredSize(new Dimension(200, 36));
         tf.setFont(new Font("Times New Roman", Font.PLAIN, 16));
         tf.setBackground(Color.WHITE);
         tf.setForeground(Color.GRAY);
-        tf.setText(placeholder);
+        tf.setText(text);
         tf.setHorizontalAlignment(SwingConstants.LEFT);
 
         Color line = new Color(180,180,180);
@@ -372,7 +336,7 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
 
         tf.addFocusListener(new FocusAdapter() {
             @Override public void focusGained(FocusEvent e) {
-                if (tf.getText().equals(placeholder)) tf.setText("");
+                if (tf.getText().equals(text)) tf.setText("");
                 tf.setForeground(Color.BLACK);
                 tf.setBorder(BorderFactory.createCompoundBorder(
                         BorderFactory.createLineBorder(new Color(140,140,140), 1),
@@ -381,7 +345,7 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
             }
             @Override public void focusLost(FocusEvent e) {
                 if (tf.getText().trim().isEmpty()) {
-                    tf.setText(placeholder);
+                    tf.setText(text);
                     tf.setForeground(Color.GRAY);
                 } else tf.setForeground(Color.BLACK);
                 tf.setBorder(BorderFactory.createCompoundBorder(
@@ -393,7 +357,7 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
         return tf;
     }
 
-    // DocumentFilter số nguyên, với min/max (max < 0 => không giới hạn)
+ // Thiết lập filter để chỉ cho phép nhập số nguyên trong phạm vi min và max
     private void setNumericFilter(JTextField field, int min, int max) {
         ((AbstractDocument) field.getDocument()).setDocumentFilter(new DocumentFilter() {
             @Override public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
@@ -508,19 +472,6 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
         footerModel.addRow(new Object[]{"", "TỔNG", sumSL, 0L, sumTT});
     }
 
-    /** Đồng bộ độ rộng cột footer theo bảng chính */
-    private void syncFooterColumnWidths() {
-        if (bangMon == null || tblFooter == null) return;
-        TableColumnModel m1 = bangMon.getColumnModel();
-        TableColumnModel m2 = tblFooter.getColumnModel();
-        for (int i = 0; i < m1.getColumnCount(); i++) {
-            int w = m1.getColumn(i).getWidth();
-            m2.getColumn(i).setPreferredWidth(w);
-            m2.getColumn(i).setWidth(w);
-        }
-        tblFooter.revalidate();
-        tblFooter.repaint();
-    }
 
     private JPanel hangDong(String nhan, JComponent comp) {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
@@ -580,7 +531,9 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
         setNumericFilter(txtTruDiem, 0, kh.getDiemTL());      // thay max động = điểm KH
         txtTruDiem.setText("0");                               // reset về 0 cho chắc
         txtTruDiem.setToolTipText("Tối đa " + kh.getDiemTL() + " điểm");
-
+        ToolTipManager ttm = ToolTipManager.sharedInstance();
+        ttm.setInitialDelay(0);     // hiện ngay lập tức
+        ttm.registerComponent(txtTruDiem);
         // Tính lại tổng + tiền thừa
         capNhatTongThanhToan();
     }

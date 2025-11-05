@@ -79,9 +79,9 @@ public class SanPham_DAO {
         try {
             Connection con = ConnectDB.getInstance().getConnection();
             String sql = "SELECT sp.maSP, sp.tenSP, sp.soLuong, sp.donGia, sp.img, sp.moTa, " +
-                         "ls.maLoai, ls.loaiSP " +  // ✅ sửa ở đây
+                         "ls.maLoai, ls.loaiSP " +  //  sửa ở đây
                          "FROM SanPham sp JOIN LoaiSanPham ls ON sp.maLoai = ls.maLoai " +
-                         "WHERE sp.maSP LIKE ? OR sp.tenSP LIKE ? OR ls.loaiSP LIKE ?";  // ✅ sửa ở đây
+                         "WHERE sp.maSP LIKE ? OR sp.tenSP LIKE ? OR ls.loaiSP LIKE ?";  //  sửa ở đây
             PreparedStatement stmt = con.prepareStatement(sql);
             String pattern = "%" + keyword + "%";
             stmt.setString(1, pattern);

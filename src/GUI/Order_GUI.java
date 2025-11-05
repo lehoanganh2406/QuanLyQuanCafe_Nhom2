@@ -1,6 +1,7 @@
 package GUI;
 
 import javax.swing.*;
+import javax.swing.event.TableModelEvent;
 import javax.swing.table.*;
 import connectDB.ConnectDB;
 import dao.Order_DAO;
@@ -134,7 +135,8 @@ public class Order_GUI extends JFrame implements ActionListener {
              // Rời khỏi ô nhập
              @Override public void focusLost(FocusEvent e) {
                  if (txtTimKiem.getText().isEmpty()) {
-                     txtTimKiem.setText("Nhập sản phẩm cần tìm..."); txtTimKiem.setForeground(Color.GRAY);
+                     txtTimKiem.setText("Nhập sản phẩm cần tìm..."); 
+                     txtTimKiem.setForeground(Color.GRAY);
                  }
              }
          });
@@ -172,10 +174,12 @@ public class Order_GUI extends JFrame implements ActionListener {
 
         String[] cols = {"Mã món","Tên món", "SL", "Đơn giá", "Thành tiền"};
         cartModel = new DefaultTableModel(cols, 0) {
-            @Override public boolean isCellEditable(int r, int c) { return false; }
+            @Override public boolean isCellEditable(int r, int c) { 
+                return c == 2; // chỉ cho phép sửa cột SL
+            }
             @Override public Class<?> getColumnClass(int c) {
                 return switch (c) {
-                    case 0 -> String.class;  // mã món (SPxxx)
+                    case 0 -> String.class;  // mã món
                     case 2 -> Integer.class; // SL
                     case 3,4 -> Long.class;  // giá
                     default -> String.class; // tên món
@@ -183,10 +187,21 @@ public class Order_GUI extends JFrame implements ActionListener {
             }
         };
 
-        tblCart = new JTable(cartModel);
+        tblCart = new JTable(cartModel) {
+        	@Override
+        	public String getToolTipText(MouseEvent e) {
+        		Point p = e.getPoint();
+        		int col = columnAtPoint(p);
+                if (col == 2) return "Nhập số lượng > 0";
+                return super.getToolTipText(e);
+        	};
+        };
+        ToolTipManager ttm = ToolTipManager.sharedInstance();
+        ttm.setInitialDelay(0);     // hiện ngay lập tức
+        ttm.registerComponent(tblCart);
+        
         tblCart.setRowHeight(36);
         tblCart.setFont(new Font("Times New Roman", Font.PLAIN, 20));
-        tblCart.setDefaultEditor(Object.class, null);
         TableColumnModel colss = tblCart.getColumnModel();
         colss.getColumn(0).setPreferredWidth(110);
         colss.getColumn(1).setPreferredWidth(220);
@@ -206,32 +221,7 @@ public class Order_GUI extends JFrame implements ActionListener {
 
         JScrollPane scroll = new JScrollPane(tblCart);
         jEst.add(scroll, BorderLayout.CENTER);
-        tblCart.addMouseListener(new MouseAdapter() {
-			@Override public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() != 1) return;
-                int viewRow = tblCart.rowAtPoint(e.getPoint());
-                int viewCol = tblCart.columnAtPoint(e.getPoint());
-                if (viewRow < 0 || viewCol != 2) return;
-
-                int modelRow = tblCart.convertRowIndexToModel(viewRow);
-                int curSL = (Integer) cartModel.getValueAt(modelRow, 2);
-                long donGia = (Long) cartModel.getValueAt(modelRow, 3);
-
-                String input = JOptionPane.showInputDialog(Order_GUI.this, "Nhập số lượng (>= 1):", curSL);
-                if (input == null) return;
-                input = input.trim();
-                if (!input.matches("\\d+")) {
-                    JOptionPane.showMessageDialog(Order_GUI.this, "Vui lòng nhập số nguyên hợp lệ."); return;
-                }
-                int sl = Integer.parseInt(input);
-                if (sl < 1) {
-                    JOptionPane.showMessageDialog(Order_GUI.this, "Số lượng không hợp lệ."); return;
-                }
-                cartModel.setValueAt(sl, modelRow, 2);
-                cartModel.setValueAt(sl * donGia, modelRow, 4);
-                tinhTong();
-            }
-        });
+       
 
         JPanel south = new JPanel(new BorderLayout());
         south.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
@@ -267,6 +257,37 @@ public class Order_GUI extends JFrame implements ActionListener {
         jEst.add(south, BorderLayout.SOUTH);
         jEst.setPreferredSize(new Dimension(700, getHeight()));
         add(jEst, BorderLayout.EAST);
+        
+        cartModel.addTableModelListener(e -> {
+            if (e.getType() != TableModelEvent.UPDATE) return;
+            int row = e.getFirstRow();
+            int col = e.getColumn();
+
+            if (row >= 0 && col == 2) {
+                Object val = cartModel.getValueAt(row, 2);
+                int sl;
+
+                // kiểm tra dữ liệu hợp lệ
+                try {
+                    sl = Integer.parseInt(val.toString());
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(null, "Vui lòng nhập số hợp lệ!");
+                    cartModel.setValueAt(1, row, 2);
+                    return;
+                }
+
+                if (sl <= 0) {
+                    JOptionPane.showMessageDialog(null, "Số lượng phải lớn hơn 0!");
+                    cartModel.setValueAt(1, row, 2);
+                    return;
+                }
+
+                long donGia = (Long) cartModel.getValueAt(row, 3);
+                cartModel.setValueAt((long) sl * donGia, row, 4);
+                tinhTong(); // cập nhật tổng SL và tổng tiền
+            }
+        });
+
 
         
     }
@@ -338,6 +359,7 @@ public class Order_GUI extends JFrame implements ActionListener {
         card.addMouseListener(new MouseAdapter() {
             @Override public void mouseClicked(MouseEvent e) { addToCart(o); }
         });
+        
 
         return card;
 
@@ -390,17 +412,39 @@ public class Order_GUI extends JFrame implements ActionListener {
     }
 
     private JLabel taiAnh(String imgPath) {
-        JLabel lbl = new JLabel("", SwingConstants.CENTER);
-        lbl.setPreferredSize(new Dimension(320, 225));
-        String p = (imgPath == null || imgPath.isBlank()) ? null : (imgPath.startsWith("/") ? imgPath : "/img/" + imgPath);
-        java.net.URL url = (p != null) ? getClass().getResource(p) : null;
-        ImageIcon icon = (url != null) ? new ImageIcon(url) : null;
-        if (icon != null) {
-            Image scaled = icon.getImage().getScaledInstance(320, 225, Image.SCALE_SMOOTH);
-            lbl.setIcon(new ImageIcon(scaled));
-        } else {
-            lbl.setText("No Image"); lbl.setOpaque(true); lbl.setBackground(Color.WHITE);
+    	JLabel lbl = new JLabel("", SwingConstants.CENTER);
+        lbl.setPreferredSize(new Dimension(280, 200));
+
+        try {
+            if (imgPath == null || imgPath.trim().isEmpty()) {
+                lbl.setText("Không có ảnh");
+                lbl.setOpaque(true);
+                lbl.setBackground(Color.LIGHT_GRAY);
+                return lbl;
+            }
+
+            // chỉ giữ lại tên file (nếu người dùng lưu cả đường dẫn)
+            if (imgPath.contains("\\"))
+                imgPath = imgPath.substring(imgPath.lastIndexOf("\\") + 1);
+
+            java.net.URL url = getClass().getResource("/img/" + imgPath);
+            if (url != null) {
+                ImageIcon icon = new ImageIcon(url);
+                Image scaled = icon.getImage().getScaledInstance(280, 200, Image.SCALE_SMOOTH);
+                lbl.setIcon(new ImageIcon(scaled));
+            } else {
+                lbl.setText("Không tìm thấy ảnh");
+                lbl.setOpaque(true);
+                lbl.setBackground(Color.LIGHT_GRAY);
+                System.out.println("❌ Không tìm thấy ảnh: " + imgPath);
+            }
+        } catch (Exception ex) {
+            lbl.setText("Lỗi ảnh");
+            lbl.setOpaque(true);
+            lbl.setBackground(Color.PINK);
+            ex.printStackTrace();
         }
+
         return lbl;
     }
 
