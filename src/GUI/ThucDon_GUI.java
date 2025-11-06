@@ -3,6 +3,7 @@ package GUI;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
 import java.util.*;
 import java.util.List;
 
@@ -22,13 +23,21 @@ public class ThucDon_GUI extends JFrame implements ActionListener {
     private JTextField txtTim;
     private CardLayout cardLayout = new CardLayout();
     private JLabel lblTitle;
-
     private SanPham selectedSP;
-
+    private JPanel selectedCard;
+    
     public ThucDon_GUI() {
         setTitle("Quản lý thực đơn");
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+        
+        //Đặt font mặc định cho toàn bộ giao diện
+        Font fontlbl = new Font("Times New Roman", Font.BOLD, 18);
+        Font fonttxt = new Font("Times New Roman", Font.PLAIN, 18);
+        UIManager.put("Label.font", fontlbl);
+        UIManager.put("Button.font", fonttxt);
+        UIManager.put("TextField.font", fonttxt);
+        UIManager.put("ComboBox.font", fonttxt);
         
         buildNorth();
         buildWest();
@@ -93,15 +102,12 @@ public class ThucDon_GUI extends JFrame implements ActionListener {
         pChucNang.add(btnSua);
         pChucNang.add(btnChiTiet);
 
-        // Gộp 2 phần lại: PanelTieuDe ở trên, pChucNang ở dưới
         pNorth = new JPanel(new BorderLayout());
         pNorth.add(tieude, BorderLayout.NORTH);
         pNorth.add(pChucNang, BorderLayout.CENTER);
 
-        // Thêm vào frame
         add(pNorth, BorderLayout.NORTH);
 
-        // Thêm sự kiện
         btnTim.addActionListener(this);
         btnThem.addActionListener(this);
         btnXoa.addActionListener(this);
@@ -109,12 +115,11 @@ public class ThucDon_GUI extends JFrame implements ActionListener {
         btnChiTiet.addActionListener(this);
     }
 
-    
     private void buildWest() {
         pWest = new JPanel(new GridLayout(10, 1, 10, 10));
         pWest.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         pWest.setBackground(MAU_NAU_DAM);
-        pWest.setPreferredSize(new Dimension(170, 0)); // 200px là độ rộng mong muốn
+        pWest.setPreferredSize(new Dimension(170, 0));
 
         btnTatCa = taoNut("Tất cả");
         pWest.add(btnTatCa);
@@ -169,53 +174,56 @@ public class ThucDon_GUI extends JFrame implements ActionListener {
     }
 
     private JPanel cardSanPham(SanPham sp) {
-        JPanel card = new JPanel();
-        card.setLayout(new BorderLayout());
+        JPanel card = new JPanel(new BorderLayout());
         card.setPreferredSize(new Dimension(310, 320));
         card.setBackground(Color.WHITE);
-        card.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1),
-                BorderFactory.createEmptyBorder(5, 5, 5, 5)
-        ));
+        card.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
 
         // Ảnh
         JLabel lblImg = taiAnh(sp.getImg());
         lblImg.setPreferredSize(new Dimension(270, 200));
         card.add(lblImg, BorderLayout.CENTER);
 
-        // Tên món (ở giữa)
+        // Tên món
         JLabel lblTen = new JLabel(sp.getTenSP(), SwingConstants.CENTER);
         lblTen.setFont(new Font("Times New Roman", Font.BOLD, 20));
         lblTen.setBorder(BorderFactory.createEmptyBorder(10, 0, 5, 0));
 
-        // Giá tiền (màu đỏ, giữa)
+        // Giá tiền
         JLabel lblGia = new JLabel(String.format("%,.0f đ", sp.getDonGia()), SwingConstants.CENTER);
         lblGia.setFont(new Font("Times New Roman", Font.BOLD, 18));
         lblGia.setForeground(Color.RED);
 
-        // Panel thông tin
         JPanel info = new JPanel(new GridLayout(2, 1));
         info.setBackground(Color.WHITE);
         info.add(lblTen);
         info.add(lblGia);
-
         card.add(info, BorderLayout.SOUTH);
 
-        // Hiệu ứng hover
         card.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                card.setBorder(BorderFactory.createLineBorder(MAU_NAU_DAM, 5));
+                if (card != selectedCard) {
+                    card.setBorder(BorderFactory.createLineBorder(MAU_NAU_DAM, 3));
+                }
             }
-
             @Override
             public void mouseExited(MouseEvent e) {
-                card.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
+                if (card != selectedCard) {
+                    card.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
+                }
             }
-
             @Override
             public void mouseClicked(MouseEvent e) {
+                // Bỏ viền card cũ
+                if (selectedCard != null && selectedCard != card) {
+                    selectedCard.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
+                }
+                // Đặt card mới
+                selectedCard = card;
                 selectedSP = sp;
+                card.setBorder(BorderFactory.createLineBorder(MAU_NAU_DAM, 5));
+
                 if (e.getClickCount() == 2) {
                     showChiTiet(sp);
                 }
@@ -229,7 +237,6 @@ public class ThucDon_GUI extends JFrame implements ActionListener {
     private JLabel taiAnh(String imgPath) {
         JLabel lbl = new JLabel("", SwingConstants.CENTER);
         lbl.setPreferredSize(new Dimension(280, 200));
-
         try {
             if (imgPath == null || imgPath.trim().isEmpty()) {
                 lbl.setText("Không có ảnh");
@@ -237,29 +244,30 @@ public class ThucDon_GUI extends JFrame implements ActionListener {
                 lbl.setBackground(Color.LIGHT_GRAY);
                 return lbl;
             }
-
-            // chỉ giữ lại tên file (nếu người dùng lưu cả đường dẫn)
-            if (imgPath.contains("\\"))
-                imgPath = imgPath.substring(imgPath.lastIndexOf("\\") + 1);
-
-            java.net.URL url = getClass().getResource("/img/" + imgPath);
-            if (url != null) {
-                ImageIcon icon = new ImageIcon(url);
-                Image scaled = icon.getImage().getScaledInstance(280, 200, Image.SCALE_SMOOTH);
-                lbl.setIcon(new ImageIcon(scaled));
+            ImageIcon icon;
+            if (new File(imgPath).exists()) {
+                //Ảnh nằm ở ổ đĩa máy
+                icon = new ImageIcon(imgPath);
             } else {
-                lbl.setText("Không tìm thấy ảnh");
-                lbl.setOpaque(true);
-                lbl.setBackground(Color.LIGHT_GRAY);
-                System.out.println("❌ Không tìm thấy ảnh: " + imgPath);
+                //Ảnh nằm trong thư mục img của project
+                java.net.URL url = getClass().getResource("/img/" + imgPath);
+                if (url != null) {
+                    icon = new ImageIcon(url);
+                } else {
+                    lbl.setText("Không tìm thấy ảnh");
+                    lbl.setOpaque(true);
+                    lbl.setBackground(Color.LIGHT_GRAY);
+                    return lbl;
+                }
             }
+            Image scaled = icon.getImage().getScaledInstance(280, 200, Image.SCALE_SMOOTH);
+            lbl.setIcon(new ImageIcon(scaled));
         } catch (Exception ex) {
             lbl.setText("Lỗi ảnh");
             lbl.setOpaque(true);
             lbl.setBackground(Color.PINK);
             ex.printStackTrace();
         }
-
         return lbl;
     }
 
@@ -270,23 +278,119 @@ public class ThucDon_GUI extends JFrame implements ActionListener {
         cardLayout.show(pCards, key);
     }
 
+    
     private void showChiTiet(SanPham sp) {
-        JOptionPane.showMessageDialog(this,
-                "Mã: " + sp.getMaSP() +
-                "\nTên: " + sp.getTenSP() +
-                "\nGiá: " + sp.getDonGia() +
-                "\nLoại: " + (sp.getLoaiSP() != null ? sp.getLoaiSP().getTenLoai() : ""));
+        JFrame frmChiTiet = new JFrame("Chi tiết sản phẩm");
+        frmChiTiet.setSize(700, 750);
+        frmChiTiet.setLocationRelativeTo(this);
+        frmChiTiet.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frmChiTiet.setLayout(new BorderLayout());
+
+        JPanel pNorth = new JPanel();
+        pNorth.setBackground(MAU_NAU_DAM);
+        JLabel lblTitle = new JLabel("CHI TIẾT SẢN PHẨM");
+        lblTitle.setForeground(Color.WHITE);
+        lblTitle.setFont(new Font("Times New Roman", Font.BOLD, 26));
+        pNorth.add(lblTitle);
+        frmChiTiet.add(pNorth, BorderLayout.NORTH);
+
+        JPanel pMain = new JPanel();
+        pMain.setBackground(MAU_NAU_NHAT);
+        pMain.setLayout(new BoxLayout(pMain, BoxLayout.Y_AXIS));
+        pMain.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
+
+        pMain.add(createRowView("Mã sản phẩm:", sp.getMaSP()));
+        pMain.add(Box.createVerticalStrut(10));
+        pMain.add(createRowView("Tên sản phẩm:", sp.getTenSP()));
+        pMain.add(Box.createVerticalStrut(10));
+        pMain.add(createRowView("Số lượng:", String.valueOf(sp.getSoLuong())));
+        pMain.add(Box.createVerticalStrut(10));
+        pMain.add(createRowView("Đơn giá:", String.format("%,.0f đ", sp.getDonGia())));
+        pMain.add(Box.createVerticalStrut(10));
+        pMain.add(createRowView("Loại sản phẩm:", 
+            sp.getLoaiSP() != null ? sp.getLoaiSP().getTenLoai() : ""));
+        pMain.add(Box.createVerticalStrut(10));
+        pMain.add(createRowView("Mô tả:", sp.getMoTa() == null ? "(Không có mô tả)" : sp.getMoTa()));
+
+        // ===== Ảnh sản phẩm =====
+        JPanel pAnh = new JPanel();
+        pAnh.setBackground(MAU_NAU_NHAT);
+        JLabel lblAnh = new JLabel("", JLabel.CENTER);
+        lblAnh.setPreferredSize(new Dimension(420, 270));
+        lblAnh.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        lblAnh.setBackground(Color.WHITE);
+
+        try {
+            if (sp.getImg() != null && !sp.getImg().isEmpty()) {
+                File file = new File(sp.getImg());
+                ImageIcon icon;
+                if (file.exists()) {
+                    icon = new ImageIcon(sp.getImg());
+                } else {
+                    java.net.URL url = getClass().getResource("/img/" + sp.getImg());
+                    icon = url != null ? new ImageIcon(url) : null;
+                }
+                if (icon != null) {
+                    Image img = icon.getImage().getScaledInstance(420, 270, Image.SCALE_SMOOTH);
+                    lblAnh.setIcon(new ImageIcon(img));
+                } else {
+                    lblAnh.setText("Không tìm thấy ảnh");
+                }
+            } else {
+                lblAnh.setText("Chưa có ảnh");
+            }
+        } catch (Exception e) {
+            lblAnh.setText("Lỗi ảnh");
+        }
+
+        pAnh.add(lblAnh);
+        pMain.add(Box.createVerticalStrut(20));
+        pMain.add(pAnh);
+
+        // ===== Nút đóng =====
+        JPanel pBtn = new JPanel();
+        pBtn.setBackground(MAU_NAU_NHAT);
+        JButton btnDong = new JButton("Đóng");
+        btnDong.setBackground(MAU_NAU_DAM);
+        btnDong.setForeground(Color.WHITE);
+        btnDong.setPreferredSize(new Dimension(100, 30));
+        pBtn.add(btnDong);
+        pMain.add(Box.createVerticalStrut(20));
+        pMain.add(pBtn);
+
+        frmChiTiet.add(pMain, BorderLayout.CENTER);
+        
+        btnDong.addActionListener(ev -> frmChiTiet.dispose());
+        frmChiTiet.setVisible(true);
+    }
+    // Hàm tạo dòng hiển thị thông tin (chỉ đọc)
+    private JPanel createRowView(String label, String value) {
+        JPanel p = new JPanel(new BorderLayout(10, 10));
+        p.setBackground(new Color(227, 207, 193));
+        JLabel lbl = new JLabel(label);
+        lbl.setPreferredSize(new Dimension(130, 25));
+        JTextField txt = new JTextField(value);
+        txt.setEditable(false);
+        txt.setBackground(Color.WHITE);
+        p.add(lbl, BorderLayout.WEST);
+        p.add(txt, BorderLayout.CENTER);
+        return p;
     }
 
+
+    
     @Override
     public void actionPerformed(ActionEvent e) {
         Object o = e.getSource();
+        
         if (o.equals(btnTim)) {
             String kw = txtTim.getText().trim();
             List<SanPham> kq = spDAO.search(kw);
+            
             if (kq.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Không tìm thấy!");
-            } else {
+            } 
+            else {
                 JPanel grid = new JPanel(new GridLayout(0, 3, 30, 30));
                 for (SanPham sp : kq)
                     grid.add(cardSanPham(sp));
@@ -294,21 +398,48 @@ public class ThucDon_GUI extends JFrame implements ActionListener {
                 pCards.add(scroll, "SEARCH");
                 cardLayout.show(pCards, "SEARCH");
             }
-        } else if (o.equals(btnThem)) {
-            JOptionPane.showMessageDialog(this, "Thêm món mới (chưa code)");
-        } else if (o.equals(btnXoa)) {
+        } 
+        
+        else if (o.equals(btnThem)) {
+            new ThemSanPham_GUI().setVisible(true);
+        } 
+        
+        else if (o.equals(btnXoa)) {
             if (selectedSP == null) {
-                JOptionPane.showMessageDialog(this, "Chọn món cần xóa!");
+                JOptionPane.showMessageDialog(this, "Vui lòng chọn món cần xóa!");
                 return;
             }
-            JOptionPane.showMessageDialog(this, "Xóa: " + selectedSP.getTenSP());
-        } else if (o.equals(btnSua)) {
+            int confirm = JOptionPane.showConfirmDialog(this, "Bạn có chắc muốn xóa sản phẩm: " + selectedSP.getTenSP() + " ?", "Xác nhận", JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                boolean ok = spDAO.xoaSanPham(selectedSP.getMaSP());
+                if (ok) {
+                    JOptionPane.showMessageDialog(this, "Xóa thành công!");
+                    pCards.removeAll();  //tải lại danh sách
+                    loadCard(CARD_ALL);
+                    pCards.revalidate();
+                    pCards.repaint();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Xóa thất bại!");
+                }
+            }
+        }
+        
+        else if (o.equals(btnSua)) {
             if (selectedSP == null) {
-                JOptionPane.showMessageDialog(this, "Chọn món cần sửa!");
+                JOptionPane.showMessageDialog(this, "Vui lòng chọn món cần sửa!");
                 return;
             }
-            JOptionPane.showMessageDialog(this, "Sửa: " + selectedSP.getTenSP());
-        } else if (o.equals(btnChiTiet)) {
+            // Mở form sửa, truyền sản phẩm được chọn
+            ThemSanPham_GUI suaSP = new ThemSanPham_GUI(selectedSP);
+            suaSP.setVisible(true);
+            
+            pCards.removeAll();
+            loadCard(CARD_ALL);
+            pCards.revalidate();
+            pCards.repaint();
+        }
+        
+        else if (o.equals(btnChiTiet)) {
             if (selectedSP != null)
                 showChiTiet(selectedSP);
             else
