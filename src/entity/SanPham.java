@@ -104,6 +104,9 @@ public class SanPham {
 		    this.soLuong = rs.getInt("soLuong");
 		    this.donGia = rs.getDouble("donGia");
 		    this.img = rs.getString("img");
-		    this.loaiSP = new LoaiSanPham(rs.getString("loaiSP"));
+		    this.loaiSP = new LoaiSanPham(
+		    		rs.getString("maLoai"),
+		    		rs.getString("loaiSP"));
+		    this.moTa = rs.getString("moTa");
 		}
 }

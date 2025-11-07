@@ -452,7 +452,7 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
         // 4) Tiền thừa (có thể âm)
         long thua = tra - tongCuoi;
         lblTienThua.setText(dinhDangVND(thua));
-        lblTienThua.setForeground(thua < 0 ? Color.RED : new Color(0,128,0));
+        lblTienThua.setForeground(thua < 0 ? Color.RED : Color.BLACK);
     }
 
     /** Tính tổng SL/Thành tiền cho footer (1 dòng) */
@@ -561,6 +561,15 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
         }
     }
     private void nutThanhToan() {
+    	long tienThua = parseVND(lblTienThua.getText());
+        if (tienThua < 0) {
+            JOptionPane.showMessageDialog(this,
+                    "Tiền khách trả chưa đủ, không thể thanh toán!",
+                    "Thiếu tiền", JOptionPane.WARNING_MESSAGE);
+            txtTienKhachTra.requestFocus();
+            return;
+        }
+        
 		String maHD = lblMaHoaDon.getText();
 		tGianRa = new Timestamp(System.currentTimeMillis());
 		Ban banHienTai = new Ban(String.format("B%03d", soBan));

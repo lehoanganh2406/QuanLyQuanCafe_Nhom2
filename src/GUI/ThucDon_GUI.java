@@ -152,7 +152,7 @@ public class ThucDon_GUI extends JFrame implements ActionListener {
     private void loadCard(String cardKey) {
         List<SanPham> ds = (cardKey.equals(CARD_ALL))
                 ? spDAO.getAllSanPham()
-                : spDAO.getSanPhamByLoai(cardKey);
+                : spDAO.getSanPhamByMaLoai(cardKey);
 
         // Panel chứa các card — dùng FlowLayout để cố định kích thước card
         JPanel grid = new JPanel(new FlowLayout(FlowLayout.LEFT, 25, 25));

@@ -4,7 +4,7 @@ import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.*;
 import connectDB.ConnectDB;
-import dao.Order_DAO;
+import dao.SanPham_DAO;
 import entity.SanPham;
 
 import java.awt.*;
@@ -17,7 +17,7 @@ import java.util.List;
 public class Order_GUI extends JFrame implements ActionListener {
 
     // DAO
-    private final Order_DAO orderDAO = Order_DAO.getInstance();
+    private final SanPham_DAO spDAO = SanPham_DAO.getInstance();
 
     // Icons
     private final ImageIcon iconTimKiem   = new ImageIcon(getClass().getResource("/img/iconTimKiem.png"));
@@ -340,8 +340,8 @@ public class Order_GUI extends JFrame implements ActionListener {
         // Nạp card nếu chưa có
         if (!loadedCards.contains(label)) {
             String maLoai = "Tất cả".equals(label) ? null : maLoaiByTen.get(label);
-            List<SanPham> list = (maLoai == null) ? orderDAO.getAllSanPham()
-                                                  : orderDAO.getSanPhamByLoai(maLoai);
+            List<SanPham> list = (maLoai == null) ? spDAO.getAllSanPham()
+                                                  : spDAO.getSanPhamByMaLoai(maLoai);
             JComponent pane = gridForm(new ArrayList<>(list), maLoai);
             pCen.add(pane, label);
             loadedCards.add(label);
@@ -351,7 +351,7 @@ public class Order_GUI extends JFrame implements ActionListener {
         cenCards.show(pCen, label);
     }
 
-    private JPanel luoiGridPanel(ArrayList<SanPham> items) {
+    private JPanel luoiGridPanel(List<SanPham> items) {
         int hgap = 60, vgap = 40, cols = 3;
         JPanel grid = new JPanel(new GridLayout(0, cols, hgap, vgap));
         grid.setBackground(Color.decode("#E3CFC1"));
@@ -481,9 +481,9 @@ public class Order_GUI extends JFrame implements ActionListener {
         Object val = sp.getClientProperty("maLoai");
         String maLoai = (val instanceof String) ? (String) val : null;
 
-        ArrayList<SanPham> ds = (maLoai == null)
-                ? orderDAO.getAllSanPham()
-                : orderDAO.getSanPhamByLoai(maLoai);
+        List<SanPham> ds = (maLoai == null)
+                ? spDAO.getAllSanPham()
+                : spDAO.getSanPhamByMaLoai(maLoai);
 
         JPanel newGrid = luoiGridPanel(ds);
         sp.setViewportView(newGrid);
@@ -505,9 +505,9 @@ public class Order_GUI extends JFrame implements ActionListener {
         Object val = visibleScroll.getClientProperty("maLoai");
         String maLoai = (val instanceof String) ? (String) val : null;
 
-        ArrayList<SanPham> ds = (maLoai == null)
-                ? orderDAO.searchByName(keyword)
-                : orderDAO.searchByNameAndLoai(keyword, maLoai);
+        List<SanPham> ds = (maLoai == null)
+                ? spDAO.search(keyword)
+                : spDAO.searchByNameAndLoai(keyword, maLoai);
 
         if (ds.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Không tìm thấy \"" + keyword + "\" trong tab hiện tại.");
