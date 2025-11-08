@@ -9,6 +9,9 @@ import java.util.List;
 
 import connectDB.ConnectDB;
 import entity.ChiTietHoaDon;
+import entity.HoaDon;
+import entity.NhanVien;
+import entity.SanPham;
 
 public class ChiTietHoaDon_DAO {
 	public boolean themChiTiet(ChiTietHoaDon ct) {
@@ -51,4 +54,50 @@ public class ChiTietHoaDon_DAO {
         }
         return list;
     }
+	
+	public List<ChiTietHoaDon> getChiTietTheomahd2(String maHD) {
+        List<ChiTietHoaDon> list = new ArrayList<>();
+        String sql = """
+            SELECT cthd.maHD, cthd.maSP, cthd.maNV, cthd.soLuong,
+                   sp.tenSP, sp.donGia
+            FROM ChiTietHoaDon cthd
+            JOIN SanPham sp ON cthd.maSP = sp.maSP
+            WHERE cthd.maHD = ?
+        """;
+
+        try (Connection con = ConnectDB.getInstance().getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, maHD);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    // Lấy thông tin sản phẩm
+                    SanPham sp = new SanPham(
+                        rs.getString("maSP"),
+                        rs.getString("tenSP"),
+                        rs.getInt("soLuong"),
+                        rs.getDouble("donGia"),
+                        null,
+                        null,null
+                    );
+
+                    // Lấy thông tin hóa đơn và nhân viên
+                    HoaDon hd = new HoaDon(rs.getString("maHD"));
+                    NhanVien nv = new NhanVien(rs.getString("maNV"));
+
+                    // Tạo đối tượng ChiTietHoaDon
+                    ChiTietHoaDon cthd = new ChiTietHoaDon(hd, sp, nv, rs.getInt("soLuong"));
+                    list.add(cthd);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+	
+	
+	
 }

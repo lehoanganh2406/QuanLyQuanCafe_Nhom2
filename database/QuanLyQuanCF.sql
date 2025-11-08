@@ -220,6 +220,8 @@ SELECT * FROM TaiKhoan;
 SELECT * FROM LoaiSanPham;
 SELECT * FROM ChiTietHoaDon;
 GO
+
+
 INSERT INTO NhanVien (hoTen, diaChi, dienThoai, CCCD, ngayVaoLam, chucVu)
 VALUES
 (N'Lê Hoàng Anh', N'Quận 1, TP.HCM', '0901234567', '079123456789', '2022-05-01', N'Quản lý'),
@@ -227,11 +229,30 @@ VALUES
 GO
 INSERT INTO TaiKhoan (tenDangNhap, matKhau, tenHienThi, maNV, loaiTaiKhoan)
 VALUES
- (N'lehoanganh', N'quanly', N'Lê Hoàng Anh', N'NV001', 1),
- (N'huynhthingoctien', N'nhanvien', N'Huỳnh Thị Ngọc Tiên', N'NV002', 0)
+ (N'lehoanganh', N'quanly', N'Lê Hoàng Anh', N'NV004', 1),
+ (N'huynhthingoctien', N'nhanvien', N'Huỳnh Thị Ngọc Tiên', N'NV005', 0)
  GO
 
+ INSERT INTO HoaDon (maBan, maKH, maNV, thoiGianVao, thoiGianRa, trangThai, giamGia, tongTien)
+VALUES ('B001', 'KH001', 'NV004', GETDATE(), DATEADD(MINUTE, 25, GETDATE()), 1, 0, 75000);
+
+-- Hóa đơn 2
+INSERT INTO HoaDon (maBan, maKH, maNV, thoiGianVao, thoiGianRa, trangThai, giamGia, tongTien)
+VALUES ('B001', 'KH002', 'NV004', GETDATE(), DATEADD(MINUTE, 10, GETDATE()), 1, 10, 125000);
+go
+
+--hóa đơn 3
+INSERT INTO HoaDon (maBan, maKH, maNV, thoiGianVao, thoiGianRa, trangThai, giamGia, tongTien)
+VALUES ('B001', 'KH005', 'NV004', GETDATE(), DATEADD(MINUTE, 10, GETDATE()), 1, 10, 150000);
+go
 
 
+INSERT INTO ChiTietHoaDon (maHD, maSP, maNV, soLuong)
+VALUES 
+('HD037', 'SP001', 'NV004', 2),
+('HD038', 'SP003', 'NV004', 1)
+GO
+
+ALTER TABLE HoaDon ADD tienKhachTra FLOAT NULL;
 
 

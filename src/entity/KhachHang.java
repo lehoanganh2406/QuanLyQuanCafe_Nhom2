@@ -53,8 +53,14 @@ public class KhachHang {
     }
 
     
+    
 
-    public KhachHang(String maKH) {
+    public KhachHang(String maKH, String tenKH) {
+		super();
+		this.maKH = maKH;
+		this.tenKH = tenKH;
+	}
+	public KhachHang(String maKH) {
 		this.maKH = maKH;
 	}
 	public KhachHang(ResultSet rs) throws SQLException {
@@ -65,5 +71,6 @@ public class KhachHang {
             rs.getInt("diemTL")
         );
     }
+	
 
 }
