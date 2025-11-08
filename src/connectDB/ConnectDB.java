@@ -27,6 +27,17 @@ public class ConnectDB {
 		}
         
     }
+	
+	public static Connection getConnection() {
+        try {
+            if (con == null || con.isClosed()) {
+                ConnectDB.getInstance().connect(); 
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return con;
+    }
     
 	public static void closeConnection(Connection c) {
 		try {
@@ -40,9 +51,6 @@ public class ConnectDB {
 	}
 
 
-    public static Connection getConnection() {
-        return con;
-    }
-
+    
 	
 }

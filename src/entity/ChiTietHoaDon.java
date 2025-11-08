@@ -46,6 +46,12 @@ public class ChiTietHoaDon {
             rs.getInt("soLuong")
         );
     }
+	
+	public ChiTietHoaDon(HoaDon hoaDon, SanPham sanPham, int soLuong) {
+        this.hoaDon = hoaDon;
+        this.sanPham = sanPham;
+        this.soLuong = soLuong;
+    }
     
 	
 }

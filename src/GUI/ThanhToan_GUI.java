@@ -108,7 +108,9 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
         // ===== Cột trái
         JPanel cotTrai = new JPanel(new BorderLayout(0,12));
         cotTrai.setOpaque(false);
-        cotTrai.setPreferredSize(new Dimension(1200, 900));
+        cotTrai.setPreferredSize(new Dimension(700, 600));
+        
+//        datự sửa lại cột này để khớp với mỗi máy tính 
 
         // Top info
         JPanel thongTinTren = new JPanel();
@@ -522,6 +524,30 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
         return p;
     }
 //    Nhận KH từ trang chọn và đổ xuống UI (label + giới hạn ô Trừ điểm) 
+    
+    
+    private void capnhattienkhachtra() {
+        String maHD = lblMaHoaDon.getText(); // Lấy mã hóa đơn từ label
+        long tienKhachTra;
+
+        try {
+            // Lấy số tiền khách trả từ giao diện
+            tienKhachTra = Long.parseLong(txtTienKhachTra.getText().replace(".", "").trim());
+            
+            // Gọi phương thức DAO để cập nhật
+            hoaDonDAO.capNhatTienKhachTra(maHD, tienKhachTra);
+            
+            // Thông báo thành công
+            JOptionPane.showMessageDialog(this, "Cập nhật tiền khách trả thành công!");
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập đúng số tiền!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Có lỗi xảy ra khi cập nhật!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    /** Nhận KH từ trang chọn và đổ xuống UI (label + giới hạn ô Trừ điểm) */
     private void capNhatThongTinKhachHang(KhachHang kh) {
         if (kh == null) return;
         this.khachHangHienTai = kh;
@@ -593,6 +619,7 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
 			}
 			if (!loiChiTiet) {
 				capNhatDiemTichLuySauThanhToan();
+				capnhattienkhachtra();
 				JOptionPane.showMessageDialog(this, "Thanh toán thành công");
 				xuatHoaDonPDF(maHD);
 				this.setVisible(false);
@@ -699,6 +726,8 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
 	            "PDF Error", JOptionPane.ERROR_MESSAGE);
 	    }
 	}
+	
+	
 
 
 }

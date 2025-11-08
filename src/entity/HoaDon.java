@@ -15,6 +15,18 @@ public class HoaDon {
 	private boolean trangThai;
 	private double giamGia;
 	private double tongTien;
+	
+	private double tienKhachTra;
+
+	public double getTienKhachTra() {
+	    return tienKhachTra;
+	}
+
+	public void setTienKhachTra(double tienKhachTra) {
+	    this.tienKhachTra = tienKhachTra;
+	}
+
+	
 	public String getMaHD() {
 		return maHD;
 	}
@@ -87,6 +99,7 @@ public class HoaDon {
         this.trangThai = rs.getInt("trangThai") == 1;
         this.giamGia = rs.getInt("giamGia");
         this.tongTien = rs.getDouble("tongTien");
+        this.tienKhachTra = rs.getDouble("tienKhachTra");
     }
 	public HoaDon(String maHD, Ban maBan, KhachHang maKH, NhanVien maNV, Timestamp thoiGianVao, Timestamp thoiGianRa,
 			boolean trangThai, double giamGia, double tongTien) {
