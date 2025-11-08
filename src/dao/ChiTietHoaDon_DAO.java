@@ -11,6 +11,14 @@ import connectDB.ConnectDB;
 import entity.ChiTietHoaDon;
 
 public class ChiTietHoaDon_DAO {
+	private static ChiTietHoaDon_DAO instance;
+	public static ChiTietHoaDon_DAO getInstance() {
+		if (instance == null) instance = new ChiTietHoaDon_DAO();
+        return instance;
+    }
+	private Connection getConnection() {
+        return ConnectDB.getInstance().getConnection();
+    }
 	public boolean themChiTiet(ChiTietHoaDon ct) {
         String sql = "INSERT INTO ChiTietHoaDon (maHD, maSP, maNV, soLuong) VALUES (?, ?, ?, ?)";
         Connection con = ConnectDB.getInstance().getConnection();

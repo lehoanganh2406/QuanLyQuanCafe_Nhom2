@@ -632,7 +632,7 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
 			if (orderGui != null) orderGui.setVisible(true);
             dispose();
 		}else if (o.equals(nutThemKhach)) {
-			TrangKhachHang_GUI trangKH = new TrangKhachHang_GUI(SwingUtilities.getWindowAncestor(this));
+			KhachHang_JDiglog trangKH = new KhachHang_JDiglog(SwingUtilities.getWindowAncestor(this));
 	        trangKH.setLocationRelativeTo(this);
 	        trangKH.setVisible(true);
 	        KhachHang chon = trangKH.getSelected();

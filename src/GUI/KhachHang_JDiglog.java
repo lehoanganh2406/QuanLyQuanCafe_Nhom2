@@ -9,7 +9,7 @@ import connectDB.ConnectDB;
 import dao.KhachHang_DAO;
 import entity.KhachHang;
 
-public class TrangKhachHang_GUI extends JDialog implements ActionListener, MouseListener {
+public class KhachHang_JDiglog extends JDialog implements ActionListener, MouseListener {
 	private KhachHang selected;
 	private JTextField txtma, txtten, txtsdt, txtdtl, txtTim;
     private DefaultTableModel mdKH;
@@ -18,7 +18,7 @@ public class TrangKhachHang_GUI extends JDialog implements ActionListener, Mouse
     private final Color nen = Color.decode("#E3CFC1");
     private final Color brownColor = Color.decode("#865A52");
 
-    public TrangKhachHang_GUI(Window owner) {
+    public KhachHang_JDiglog(Window owner) {
     	super(owner, "Quản lý khách hàng", Dialog.ModalityType.APPLICATION_MODAL);
         setSize(800, 750);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -229,7 +229,7 @@ public class TrangKhachHang_GUI extends JDialog implements ActionListener, Mouse
 
     public static void main(String[] args) {
         ConnectDB.getInstance().connect();
-        SwingUtilities.invokeLater(() -> new TrangKhachHang_GUI((Window) null).setVisible(true));
+        SwingUtilities.invokeLater(() -> new KhachHang_JDiglog((Window) null).setVisible(true));
     }
     private void timTheoSoDienThoai() {
         String sdt = txtsdt.getText().trim();

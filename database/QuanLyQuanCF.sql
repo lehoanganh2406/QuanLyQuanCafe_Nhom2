@@ -40,8 +40,10 @@ CREATE TABLE NhanVien (
     maNV NVARCHAR(20) PRIMARY KEY DEFAULT(CONCAT('NV', RIGHT('000' + CAST(NEXT VALUE FOR seq_NhanVien AS VARCHAR(3)), 3))),
     hoTen NVARCHAR(100) NOT NULL DEFAULT (N'Chưa cập nhật'),
     diaChi NVARCHAR(255),
-    dienThoai NVARCHAR(20),
     CCCD NVARCHAR(20) NOT NULL,
+    dienThoai NVARCHAR(20),
+    gioiTinh BIT,
+    ngaySinh DATE,
     ngayVaoLam DATE DEFAULT (GETDATE()),
     chucVu NVARCHAR(50) DEFAULT (N'Nhân viên')
 )
@@ -220,11 +222,13 @@ SELECT * FROM TaiKhoan;
 SELECT * FROM LoaiSanPham;
 SELECT * FROM ChiTietHoaDon;
 GO
-INSERT INTO NhanVien (hoTen, diaChi, dienThoai, CCCD, ngayVaoLam, chucVu)
+INSERT INTO NhanVien 
+(hoTen, diaChi, CCCD, dienThoai, gioiTinh, ngaySinh, ngayVaoLam, chucVu)
 VALUES
-(N'Lê Hoàng Anh', N'Quận 1, TP.HCM', '0901234567', '079123456789', '2022-05-01', N'Quản lý'),
-(N'Huỳnh Thị Ngọc Tiên', N'Quận 3, TP.HCM', '0912345678', '079987654321', '2021-09-12', N'Thu ngân')
-GO
+(N'Lê Hoàng Anh', N'123 Nguyễn Trãi, Quận 1, TP.HCM', N'079123456789', N'0901234567', 0, '1998-03-15', '2023-08-01', N'Quản lý'),
+(N'Huỳnh Thị Ngọc Tiên', N'25 Trần Hưng Đạo, Quận 5, TP.HCM', N'079987654321', N'0912345678', 0, '1997-12-20', '2022-10-05', N'Nhân viên'),
+(N'Hoàng Trương Nhật', N'45 Cách Mạng Tháng 8, Quận 3, TP.HCM', N'079456789123', N'0909988776', 1, '1999-07-12', '2023-09-20', N'Nhân viên'),
+(N'Ừng Thị Thanh Trúc', N'12 Nguyễn Văn Cừ, Quận 10, TP.HCM', N'079555555555', N'0905123456', 0, '2000-01-10', '2024-01-15', N'Nhân viên');
 INSERT INTO TaiKhoan (tenDangNhap, matKhau, tenHienThi, maNV, loaiTaiKhoan)
 VALUES
  (N'lehoanganh', N'quanly', N'Lê Hoàng Anh', N'NV001', 1),
