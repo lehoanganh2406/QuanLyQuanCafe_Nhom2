@@ -10,8 +10,8 @@ import dao.KhachHang_DAO;
 import entity.KhachHang;
 
 public class KhachHang_JDiglog extends JDialog implements ActionListener, MouseListener {
-	private KhachHang selected;
-	private JTextField txtma, txtten, txtsdt, txtdtl, txtTim;
+    private KhachHang selected;
+    private JTextField txtma, txtten, txtsdt, txtdtl;
     private DefaultTableModel mdKH;
     private JTable tableKH;
     private JButton btnBack, btnThem, btnChon;
@@ -19,7 +19,7 @@ public class KhachHang_JDiglog extends JDialog implements ActionListener, MouseL
     private final Color brownColor = Color.decode("#865A52");
 
     public KhachHang_JDiglog(Window owner) {
-    	super(owner, "Quản lý khách hàng", Dialog.ModalityType.APPLICATION_MODAL);
+        super(owner, "Quản lý khách hàng", Dialog.ModalityType.APPLICATION_MODAL);
         setSize(800, 750);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocationRelativeTo(owner);
@@ -37,48 +37,47 @@ public class KhachHang_JDiglog extends JDialog implements ActionListener, MouseL
 
         // ===== FORM NHẬP =====
         JPanel pcenter = new JPanel(new BorderLayout());
-		JPanel pform = new JPanel();
-		pcenter.setBackground(nen);
-		pform.setBackground(nen);
-		Box b,b1,b2,b3,b4;
-		b=Box.createVerticalBox();
-		
-		b1=Box.createHorizontalBox();
-		b1.add(new JLabel("Mã khách hàng:"));
-		b.add(Box.createVerticalStrut(5));
-		b1.add(Box.createHorizontalStrut(27));
-		b1.add(txtma= new JTextField(20));
-		txtma.setEditable(false); 
+        JPanel pform = new JPanel();
+        pcenter.setBackground(nen);
+        pform.setBackground(nen);
+
+        Box b = Box.createVerticalBox();
+        Box b1, b2, b3, b4;
+
+        b1 = Box.createHorizontalBox();
+        b1.add(new JLabel("Mã khách hàng:"));
+        b1.add(Box.createHorizontalStrut(27));
+        b1.add(txtma = new JTextField(20));
+        txtma.setEditable(false);
         txtma.setFocusable(false);
-		b.add(b1);
-		
-		
-		b2=Box.createHorizontalBox();
-		b2.add(new JLabel("Tên khách hàng :"));
-		b2.add(Box.createHorizontalStrut(20));
-		b2.add(txtten=new JTextField(20));
-		b.add(Box.createVerticalStrut(5));
-		b.add(b2);
-		
-		b3=Box.createHorizontalBox();
-		b3.add(new JLabel("SDT liên hệ:"));
-		b3.add(Box.createHorizontalStrut(49));
-		b3.add(txtsdt=new JTextField(20));
-		b.add(Box.createVerticalStrut(5));
-		b.add(b3);
-		
-		b4=Box.createHorizontalBox();
-		b4.add(new JLabel("Điểm tích lũy:"));
-		b4.add(Box.createHorizontalStrut(40));
-		b4.add(txtdtl=new JTextField(20));
-		txtdtl.setEditable(false);
+        b.add(Box.createVerticalStrut(5));
+        b.add(b1);
+
+        b2 = Box.createHorizontalBox();
+        b2.add(new JLabel("Tên khách hàng :"));
+        b2.add(Box.createHorizontalStrut(20));
+        b2.add(txtten = new JTextField(20));
+        b.add(Box.createVerticalStrut(5));
+        b.add(b2);
+
+        b3 = Box.createHorizontalBox();
+        b3.add(new JLabel("SDT liên hệ:"));
+        b3.add(Box.createHorizontalStrut(49));
+        b3.add(txtsdt = new JTextField(20));
+        b.add(Box.createVerticalStrut(5));
+        b.add(b3);
+
+        b4 = Box.createHorizontalBox();
+        b4.add(new JLabel("Điểm tích lũy:"));
+        b4.add(Box.createHorizontalStrut(40));
+        b4.add(txtdtl = new JTextField(20));
+        txtdtl.setEditable(false);
         txtdtl.setFocusable(false);
-		b.add(Box.createVerticalStrut(5));
-		b.add(b4);
-		b.setPreferredSize(new Dimension(400, 150));
-		
-		pform.add(b,BorderLayout.NORTH);
-		pcenter.add(pform,BorderLayout.NORTH);
+        b.add(Box.createVerticalStrut(5));
+        b.add(b4);
+
+        b.setPreferredSize(new Dimension(400, 150));
+        pform.add(b, BorderLayout.NORTH);
         pcenter.add(pform, BorderLayout.NORTH);
 
         // ===== BẢNG =====
@@ -97,9 +96,11 @@ public class KhachHang_JDiglog extends JDialog implements ActionListener, MouseL
         headerTable.setBackground(Color.decode("#EDE7E3"));
         headerTable.setBorder(BorderFactory.createEmptyBorder());
 
-        JScrollPane scroll = new JScrollPane(tableKH,
+        JScrollPane scroll = new JScrollPane(
+                tableKH,
                 JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED
+        );
         pcenter.add(scroll, BorderLayout.CENTER);
 
         // ===== BUTTONS =====
@@ -111,7 +112,7 @@ public class KhachHang_JDiglog extends JDialog implements ActionListener, MouseL
         a.add(Box.createHorizontalGlue());
         a.add(btnThem = new JButton("Thêm"));
         a.add(Box.createHorizontalStrut(10));
-        a.add(btnChon = new JButton("Chọn")); 
+        a.add(btnChon = new JButton("Chọn"));
         a.add(Box.createHorizontalStrut(20));
 
         for (JButton btt : new JButton[]{btnBack, btnThem, btnChon}) {
@@ -134,12 +135,12 @@ public class KhachHang_JDiglog extends JDialog implements ActionListener, MouseL
         tableKH.addMouseListener(this);
         txtsdt.addActionListener(e -> timTheoSoDienThoai());
 
-
         // ===== LOAD DATA =====
         taidulieuKH();
     }
 
-    // ===== LOAD DỮ LIỆU TỪ DAO =====
+    /* ===================== LOAD / HIỂN THỊ ===================== */
+
     private void taidulieuKH() {
         List<KhachHang> ds = KhachHang_DAO.getInstance().getAllKhachHang();
         hienthiKH(ds);
@@ -148,14 +149,18 @@ public class KhachHang_JDiglog extends JDialog implements ActionListener, MouseL
     private void hienthiKH(List<KhachHang> list) {
         mdKH.setRowCount(0);
         for (KhachHang k : list) {
-            Object[] row = {k.getMaKH(), k.getTenKH(), k.getSdt(), k.getDiemTL()};
-            mdKH.addRow(row);
+            mdKH.addRow(new Object[]{
+                    k.getMaKH(), k.getTenKH(), k.getSdt(), k.getDiemTL()
+            });
         }
     }
+
+    /* ===================== VALIDATE & INSERT ===================== */
 
     private boolean valiData() {
         String ten = txtten.getText().trim();
         String sdt = txtsdt.getText().trim();
+
         if (ten.isEmpty() || sdt.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Các ô nhập không được rỗng");
             return false;
@@ -171,6 +176,8 @@ public class KhachHang_JDiglog extends JDialog implements ActionListener, MouseL
         return KhachHang_DAO.getInstance().insert(kh);
     }
 
+    /* ===================== ACTION ===================== */
+
     @Override
     public void actionPerformed(ActionEvent e) {
         Object o = e.getSource();
@@ -180,15 +187,20 @@ public class KhachHang_JDiglog extends JDialog implements ActionListener, MouseL
             String tenKH = txtten.getText().trim();
             String sdt = txtsdt.getText().trim();
             int diemTL = 0;
-            KhachHang kh = new KhachHang(null, tenKH, sdt, diemTL);
 
+            KhachHang kh = new KhachHang(null, tenKH, sdt, diemTL);
             boolean success = themKhachHang(kh);
+
             if (success) {
                 taidulieuKH();
                 JOptionPane.showMessageDialog(this, "Thêm khách hàng thành công!");
-                txtma.setText(""); txtten.setText(""); txtsdt.setText(""); txtdtl.setText("");
+                txtma.setText("");
+                txtten.setText("");
+                txtsdt.setText("");
+                txtdtl.setText("");
             } else {
-                JOptionPane.showMessageDialog(this, "Không thể thêm khách hàng (trùng SĐT?)");
+                // ✅ Chỉ báo lỗi rồi RETURN, không đóng dialog, không đụng selected
+                JOptionPane.showMessageDialog(this, "Không thể thêm khách hàng (có thể trùng SĐT)");
             }
         }
 
@@ -198,19 +210,23 @@ public class KhachHang_JDiglog extends JDialog implements ActionListener, MouseL
                 JOptionPane.showMessageDialog(this, "Hãy chọn một khách hàng trong bảng!");
                 return;
             }
-            // Lấy đủ dữ liệu từ bảng, có thể gọi lại DAO theo mã để nhất quán
-            String ma   = tableKH.getValueAt(row, 0).toString();
-            String ten  = tableKH.getValueAt(row, 1).toString();
-            String sdt  = tableKH.getValueAt(row, 2).toString();
-            int diem    = Integer.parseInt(tableKH.getValueAt(row, 3).toString());
+            String ma  = tableKH.getValueAt(row, 0).toString();
+            String ten = tableKH.getValueAt(row, 1).toString();
+            String sdt = tableKH.getValueAt(row, 2).toString();
+            int diem   = Integer.parseInt(tableKH.getValueAt(row, 3).toString());
 
             selected = new KhachHang(ma, ten, sdt, diem);
-            dispose(); // đóng dialog, ThanhToan_GUI sẽ gọi getSelected()
+            dispose(); // ✅ Cho ThanhToan_GUI nhận getSelected()
         }
 
-        if (o.equals(btnBack)) dispose();
-        
+        if (o.equals(btnBack)) {
+            // ✅ Rõ ràng: không chọn khách
+            selected = null;
+            dispose();
+        }
     }
+
+    /* ===================== TABLE CLICK ===================== */
 
     @Override
     public void mouseClicked(MouseEvent e) {
@@ -227,14 +243,11 @@ public class KhachHang_JDiglog extends JDialog implements ActionListener, MouseL
     public void mouseEntered(MouseEvent e) {}
     public void mouseExited(MouseEvent e) {}
 
-    public static void main(String[] args) {
-        ConnectDB.getInstance().connect();
-        SwingUtilities.invokeLater(() -> new KhachHang_JDiglog((Window) null).setVisible(true));
-    }
+    /* ===================== TÌM THEO SĐT ===================== */
+
     private void timTheoSoDienThoai() {
         String sdt = txtsdt.getText().trim();
 
-        // Validate nhanh cho ô tìm
         if (!sdt.matches("^0\\d{9}$")) {
             JOptionPane.showMessageDialog(this, "Nhập SĐT 10 số, bắt đầu bằng 0 (vd: 0901234567)");
             return;
@@ -242,16 +255,13 @@ public class KhachHang_JDiglog extends JDialog implements ActionListener, MouseL
 
         KhachHang kh = KhachHang_DAO.getInstance().getBySDT(sdt);
         if (kh != null) {
-            // Đổ form
             txtma.setText(kh.getMaKH());
             txtten.setText(kh.getTenKH());
+            txtsdt.setText(kh.getSdt());
             txtdtl.setText(String.valueOf(kh.getDiemTL()));
 
-            // Lọc bảng chỉ còn khách này
             mdKH.setRowCount(0);
-            mdKH.addRow(new Object[]{ kh.getMaKH(), kh.getTenKH(), kh.getSdt(), kh.getDiemTL() });
-
-            // Chọn dòng đầu để đồng bộ UI
+            mdKH.addRow(new Object[]{kh.getMaKH(), kh.getTenKH(), kh.getSdt(), kh.getDiemTL()});
             if (tableKH.getRowCount() > 0) {
                 tableKH.setRowSelectionInterval(0, 0);
             }
@@ -260,8 +270,15 @@ public class KhachHang_JDiglog extends JDialog implements ActionListener, MouseL
             taidulieuKH();
         }
     }
+
+    /* ===================== GETTER ===================== */
+
     public KhachHang getSelected() {
         return selected;
     }
 
+    public static void main(String[] args) {
+        ConnectDB.getInstance().connect();
+        SwingUtilities.invokeLater(() -> new KhachHang_JDiglog((Window) null).setVisible(true));
+    }
 }

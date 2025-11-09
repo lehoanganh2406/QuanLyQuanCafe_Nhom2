@@ -11,7 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 public class XuatPDF {
-    private static final NumberFormat VND = NumberFormat.getInstance(new Locale("vi", "VN"));
+	private static final NumberFormat VND =NumberFormat.getInstance(Locale.of("vi", "VN"));
     private static final SimpleDateFormat DF = new SimpleDateFormat("H:mm dd-MM-yyyy");
 
     public static void xuatHoaDonPDF(
@@ -26,7 +26,7 @@ public class XuatPDF {
             double tongSL,
             double thanhTien,
             int diemTru,
-            int giamGiaPT,
+            double giamGiaPT,
             double tongCong,
             double khachTra,
             double traLai

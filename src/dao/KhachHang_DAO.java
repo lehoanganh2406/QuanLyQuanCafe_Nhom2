@@ -74,18 +74,33 @@ public class KhachHang_DAO {
         return null;
     }
 
-    /** Thêm KH (maKH auto từ DEFAULT của DB) */
     public boolean insert(KhachHang kh) {
-        String sql = "INSERT INTO dbo.KhachHang (tenKH, sdt, diemTL) VALUES (?, ?, ?)";
-        Connection con = ConnectDB.getInstance().getConnection();
-        try (PreparedStatement ps = con.prepareStatement(sql)) {
+        String sql = "INSERT INTO KhachHang(tenKH, sdt, diemTL) VALUES(?, ?, ?)";
+        try (Connection con = ConnectDB.getInstance().getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
             ps.setString(1, kh.getTenKH());
             ps.setString(2, kh.getSdt());
             ps.setInt(3, kh.getDiemTL());
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) { e.printStackTrace(); }
-        return false;
+
+            int n = ps.executeUpdate();
+            return n > 0;
+
+        } catch (com.microsoft.sqlserver.jdbc.SQLServerException ex) {
+            // LỖI TRÙNG KEY / TRÙNG SĐT
+            if (ex.getErrorCode() == 2627 || ex.getErrorCode() == 2601) {
+                // UNIQUE KEY violation → báo false cho UI xử lý
+                System.out.println("Khách hàng trùng SĐT / key, không chèn mới.");
+                return false;
+            }
+            ex.printStackTrace();
+            return false;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
+
 
     /** Cập nhật thông tin cơ bản theo mã */
     public boolean updateInfo(KhachHang kh) {

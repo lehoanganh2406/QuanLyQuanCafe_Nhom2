@@ -590,10 +590,11 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
 		if (nhanVienDangNhap == null) {
 	        nhanVienDangNhap = new NhanVien("NV001"); // TODO: thay bằng NV đăng nhập thực
 	    }
-		int giamGia = safeInt(txtGiamGia.getText());
+		int diemTru = safeInt(txtTruDiem.getText());
+		double giamGia = safeInt(txtGiamGia.getText());
 		double tongTien = parseVND(lblTongThanhToan.getText());
 	    double tienKhach = parseVND(txtTienKhachTra.getText());
-	    HoaDon hd = new HoaDon(maHD, banHienTai, khachHangHienTai, nhanVienDangNhap, thoiGianVao, tGianRa, true, giamGia, tongTien, tienKhach);
+	    HoaDon hd = new HoaDon(maHD, banHienTai, khachHangHienTai, nhanVienDangNhap, thoiGianVao, tGianRa, true,diemTru, giamGia, tongTien, tienKhach);
 	    
 	    if (hoaDonDAO.themHoaDon(hd)) {
 			chiTietHD = new ChiTietHoaDon_DAO();
@@ -697,7 +698,7 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
 	        	    (int) footerModel.getValueAt(0, 2),
 	        	    ((Number) footerModel.getValueAt(0, 4)).doubleValue(),
 	        	    safeInt(txtTruDiem.getText()),
-	        	    safeInt(txtGiamGia.getText()),
+	        	    safeDouble(txtGiamGia.getText()),
 	        	    parseVND(lblTongThanhToan.getText()),
 	        	    safeDouble(txtTienKhachTra.getText()),
 	        	    safeDouble(txtTienKhachTra.getText()) - parseVND(lblTongThanhToan.getText())

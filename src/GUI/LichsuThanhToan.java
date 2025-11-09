@@ -211,7 +211,7 @@ public class LichsuThanhToan extends JFrame implements ActionListener,MouseListe
         pCen.add(pNor,BorderLayout.NORTH);
         
         JPanel pTable = new JPanel(new BorderLayout());
-        String[] header= {"Mã HD","TG Tạo","TG Thanh Toán","MÃ NV","Giảm Giá","Tổng Thanh Toán","Trạng Thái"};
+        String[] header= {"Mã HD","TG Tạo","TG Thanh Toán","MÃ NV","Điểm TL","Giảm Giá","Tổng Thanh Toán","Trạng Thái"};
         
         mdHD=new DefaultTableModel(header,0);
         
@@ -436,6 +436,7 @@ public class LichsuThanhToan extends JFrame implements ActionListener,MouseListe
 	            hd.getThoiGianVao(),
 	            hd.getThoiGianRa(),
 	            hd.getMaNV() != null ? hd.getMaNV().getMaNV() : "",
+	            hd.getDiemTL(),
 	            hd.getGiamGia(),
 	            String.format("%,.0f", hd.getTongTien()),
 	            hd.isTrangThai() ? "Đã thanh toán" : "Chưa thanh toán"
@@ -461,7 +462,7 @@ public class LichsuThanhToan extends JFrame implements ActionListener,MouseListe
 	            txtTongTien.setText(String.format("%,.0f VND", hd.getTongTien()));
 	            
 	            txtTenKH.setText(hd.getMaKH() != null ? hd.getMaKH().getTenKH() : "");
-	            txtDTL.setText("0");
+	            txtDTL.setText(String.valueOf(hd.getDiemTL()));
 	            txtThanhtoan.setText(String.format("%,.0f VND", hd.getTienKhachTra()));
 	            txtTienthoi.setText("");
 
