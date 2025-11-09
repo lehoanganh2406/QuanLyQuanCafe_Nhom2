@@ -267,7 +267,7 @@ public class Order_GUI extends JFrame implements ActionListener {
         south.add(bottomBar, BorderLayout.SOUTH);
 
         jEst.add(south, BorderLayout.SOUTH);
-        jEst.setPreferredSize(new Dimension(400, getHeight()));
+        jEst.setPreferredSize(new Dimension(700, getHeight()));
         add(jEst, BorderLayout.EAST);
 
         // Lắng nghe chỉnh SL để tính lại thành tiền + tổng
