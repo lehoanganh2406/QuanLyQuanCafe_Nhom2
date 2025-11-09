@@ -23,13 +23,13 @@ public class XuatPDF {
             String tenKH,
             String thuNgan,
             DefaultTableModel modelBang,
-            long tongSL,
-            long thanhTien,
+            double tongSL,
+            double thanhTien,
             int diemTru,
             int giamGiaPT,
-            long tongCong,
-            long khachTra,
-            long traLai
+            double tongCong,
+            double khachTra,
+            double traLai
     ) throws Exception {
 
         // ===== Fonts =====

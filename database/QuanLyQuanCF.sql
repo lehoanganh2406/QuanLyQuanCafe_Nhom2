@@ -92,7 +92,8 @@ CREATE TABLE HoaDon (
     thoiGianRa DATETIME,
     trangThai INT NOT NULL DEFAULT (0),
     giamGia INT NOT NULL DEFAULT (0) CHECK (giamGia BETWEEN 0 AND 100),
-    tongTien DECIMAL(18,2) NOT NULL DEFAULT (0)
+    tongTien DECIMAL(18,2) NOT NULL DEFAULT (0),
+    tienKhachTra DECIMAL(18,2) NOT NULL DEFAULT (0)
 )
 GO
 

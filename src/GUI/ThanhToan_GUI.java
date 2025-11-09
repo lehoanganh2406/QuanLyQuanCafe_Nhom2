@@ -108,9 +108,7 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
         // ===== Cột trái
         JPanel cotTrai = new JPanel(new BorderLayout(0,12));
         cotTrai.setOpaque(false);
-        cotTrai.setPreferredSize(new Dimension(700, 600));
-        
-//        datự sửa lại cột này để khớp với mỗi máy tính 
+        cotTrai.setPreferredSize(new Dimension(1200, 900));
 
         // Top info
         JPanel thongTinTren = new JPanel();
@@ -400,30 +398,41 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
         for (Object[] row : cartRows) modelBang.addRow(row);
     }
 
-    private String dinhDangVND(long vnd) {
-        return String.format("%,d", vnd).replace(',', '.') + " VND";
+    private String dinhDangVND(double vnd) {
+        long rounded = Math.round(vnd);
+        return String.format("%,d", rounded).replace(',', '.') + " VND";
     }
 
-    private long parseVND(String s) {
-        if (s == null) return 0L;
+
+    private double parseVND(String s) {
+        if (s == null) return 0.0;
         s = s.replace(".", "").replace(" VND", "").trim();
-        try { return Long.parseLong(s); } catch (Exception e) { return 0L; }
+        try {
+            return Double.parseDouble(s);
+        } catch (Exception e) {
+            return 0.0;
+        }
     }
 
     private int safeInt(String s) {
         try { return Integer.parseInt(s.trim()); } catch (Exception e) { return 0; }
     }
-    private long safeLong(String s) {
-        try { return Long.parseLong(s.trim()); } catch (Exception e) { return 0L; }
+    private double safeDouble(String s) {
+        try {
+            return Double.parseDouble(s.trim());
+        } catch (Exception e) {
+            return 0.0;
+        }
     }
 
-    /** Tính toán tổng thanh toán + tiền thừa, theo phương thức */
     private void capNhatTongThanhToan() {
         // 1) Tổng gốc
-        long tongGoc = 0L;
+        double tongGoc = 0.0;
         for (int i = 0; i < modelBang.getRowCount(); i++) {
-            Number n = (Number) modelBang.getValueAt(i, 4);
-            if (n != null) tongGoc += n.longValue();
+            Object val = modelBang.getValueAt(i, 4);
+            if (val instanceof Number n) {
+                tongGoc += n.doubleValue();
+            }
         }
 
         // 2) Giảm giá & trừ điểm
@@ -434,28 +443,31 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
         if (tru  < 0)   tru  = 0;
 
         double sauPhanTram = tongGoc * (1.0 - (giam / 100.0));
-        long tongCuoi = Math.max(0, Math.round(sauPhanTram) - tru * 1000L);
+        double tongCuoi = Math.max(0.0, sauPhanTram - tru * 1000.0);
         lblTongThanhToan.setText(dinhDangVND(tongCuoi));
 
         // 3) Theo phương thức thanh toán
-        boolean laTienMat = (cboPhuongThuc == null) || "Tiền mặt".equals(cboPhuongThuc.getSelectedItem());
-        long tra;
+        boolean laTienMat = (cboPhuongThuc == null)
+                || "Tiền mặt".equals(cboPhuongThuc.getSelectedItem());
+
+        double tra;
         if (laTienMat) {
-        	txtTienKhachTra.setEditable(true);
-        	txtTienKhachTra.setForeground(Color.BLACK);
-            tra = safeLong(txtTienKhachTra.getText());
+            txtTienKhachTra.setEditable(true);
+            txtTienKhachTra.setForeground(Color.BLACK);
+            tra = safeDouble(txtTienKhachTra.getText());
         } else {
-        	txtTienKhachTra.setEditable(false);
-        	txtTienKhachTra.setForeground(Color.BLUE);
-            txtTienKhachTra.setText(String.valueOf(tongCuoi));
+            txtTienKhachTra.setEditable(false);
+            txtTienKhachTra.setForeground(Color.BLUE);
+            txtTienKhachTra.setText(String.valueOf(Math.round(tongCuoi)));
             tra = tongCuoi;
         }
 
-        // 4) Tiền thừa (có thể âm)
-        long thua = tra - tongCuoi;
+        // 4) Tiền thừa
+        double thua = tra - tongCuoi;
         lblTienThua.setText(dinhDangVND(thua));
         lblTienThua.setForeground(thua < 0 ? Color.RED : Color.BLACK);
     }
+
 
     /** Tính tổng SL/Thành tiền cho footer (1 dòng) */
     private void updateFooterSum() {
@@ -524,30 +536,6 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
         return p;
     }
 //    Nhận KH từ trang chọn và đổ xuống UI (label + giới hạn ô Trừ điểm) 
-    
-    
-    private void capnhattienkhachtra() {
-        String maHD = lblMaHoaDon.getText(); // Lấy mã hóa đơn từ label
-        long tienKhachTra;
-
-        try {
-            // Lấy số tiền khách trả từ giao diện
-            tienKhachTra = Long.parseLong(txtTienKhachTra.getText().replace(".", "").trim());
-            
-            // Gọi phương thức DAO để cập nhật
-            hoaDonDAO.capNhatTienKhachTra(maHD, tienKhachTra);
-            
-            // Thông báo thành công
-            JOptionPane.showMessageDialog(this, "Cập nhật tiền khách trả thành công!");
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Vui lòng nhập đúng số tiền!", "Lỗi", JOptionPane.WARNING_MESSAGE);
-        } catch (Exception e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Có lỗi xảy ra khi cập nhật!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-    
-    /** Nhận KH từ trang chọn và đổ xuống UI (label + giới hạn ô Trừ điểm) */
     private void capNhatThongTinKhachHang(KhachHang kh) {
         if (kh == null) return;
         this.khachHangHienTai = kh;
@@ -570,7 +558,7 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
 
         int diemDangCo = khachHangHienTai.getDiemTL();
         int diemDaDung = safeInt(txtTruDiem.getText());       // đã giới hạn bởi setNumericFilter
-        long soTienThucTra = parseVND(lblTongThanhToan.getText()); // sau giảm %, sau trừ điểm
+        double soTienThucTra = parseVND(lblTongThanhToan.getText()); // sau giảm %, sau trừ điểm
 
         // Quy đổi: 10.000 VND = 1 điểm
         int diemCong = (int) (soTienThucTra / 10_000L);
@@ -587,7 +575,7 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
         }
     }
     private void nutThanhToan() {
-    	long tienThua = parseVND(lblTienThua.getText());
+    	double tienThua = parseVND(lblTienThua.getText());
         if (tienThua < 0) {
             JOptionPane.showMessageDialog(this,
                     "Tiền khách trả chưa đủ, không thể thanh toán!",
@@ -603,8 +591,9 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
 	        nhanVienDangNhap = new NhanVien("NV001"); // TODO: thay bằng NV đăng nhập thực
 	    }
 		int giamGia = safeInt(txtGiamGia.getText());
-	    long tongTien = parseVND(lblTongThanhToan.getText());
-	    HoaDon hd = new HoaDon(maHD, banHienTai, khachHangHienTai, nhanVienDangNhap, thoiGianVao, tGianRa, true, giamGia, tongTien);
+		double tongTien = parseVND(lblTongThanhToan.getText());
+	    double tienKhach = parseVND(txtTienKhachTra.getText());
+	    HoaDon hd = new HoaDon(maHD, banHienTai, khachHangHienTai, nhanVienDangNhap, thoiGianVao, tGianRa, true, giamGia, tongTien, tienKhach);
 	    
 	    if (hoaDonDAO.themHoaDon(hd)) {
 			chiTietHD = new ChiTietHoaDon_DAO();
@@ -619,7 +608,6 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
 			}
 			if (!loiChiTiet) {
 				capNhatDiemTichLuySauThanhToan();
-				capnhattienkhachtra();
 				JOptionPane.showMessageDialog(this, "Thanh toán thành công");
 				xuatHoaDonPDF(maHD);
 				this.setVisible(false);
@@ -669,7 +657,7 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
 	        }
 		}else if (o.equals(cboPhuongThuc)) {
 			boolean laTienMat = "Tiền mặt".equals(cboPhuongThuc.getSelectedItem());
-	        long tong = parseVND(lblTongThanhToan.getText());
+	        double tong = parseVND(lblTongThanhToan.getText());
 	        if (!laTienMat) {
 	        	txtTienKhachTra.setEditable(false);
 	        	txtTienKhachTra.setForeground(Color.BLACK);
@@ -698,22 +686,23 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
 
 	        // 4️ Xuất PDF dạng bảng
 	        XuatPDF.xuatHoaDonPDF(
-	            outPath,
-	            fontPath,
-	            maHD,
-	            thoiGianVao,
-	            tGianRa,
-	            khachHangHienTai != null ? khachHangHienTai.getTenKH() : "Khách lẻ",
-	            nhanVienDangNhap != null ? nhanVienDangNhap.getMaNV() : "",
-	            modelBang,
-	            (int) footerModel.getValueAt(0, 2),
-	            (long) footerModel.getValueAt(0, 4),
-	            safeInt(txtTruDiem.getText()),
-	            safeInt(txtGiamGia.getText()),
-	            parseVND(lblTongThanhToan.getText()),
-	            safeLong(txtTienKhachTra.getText()),
-	            safeLong(txtTienKhachTra.getText()) - parseVND(lblTongThanhToan.getText())
-	        );
+	        	    outPath,
+	        	    fontPath,
+	        	    maHD,
+	        	    thoiGianVao,
+	        	    tGianRa,
+	        	    khachHangHienTai != null ? khachHangHienTai.getTenKH() : "Khách lẻ",
+	        	    nhanVienDangNhap != null ? nhanVienDangNhap.getMaNV() : "",
+	        	    modelBang,
+	        	    (int) footerModel.getValueAt(0, 2),
+	        	    ((Number) footerModel.getValueAt(0, 4)).doubleValue(),
+	        	    safeInt(txtTruDiem.getText()),
+	        	    safeInt(txtGiamGia.getText()),
+	        	    parseVND(lblTongThanhToan.getText()),
+	        	    safeDouble(txtTienKhachTra.getText()),
+	        	    safeDouble(txtTienKhachTra.getText()) - parseVND(lblTongThanhToan.getText())
+	        	);
+
 
 	        // 5️⃣ Thông báo thành công
 	        JOptionPane.showMessageDialog(this,
@@ -726,8 +715,6 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
 	            "PDF Error", JOptionPane.ERROR_MESSAGE);
 	    }
 	}
-	
-	
 
 
 }

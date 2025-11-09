@@ -101,8 +101,9 @@ public class HoaDon {
         this.tongTien = rs.getDouble("tongTien");
         this.tienKhachTra = rs.getDouble("tienKhachTra");
     }
+
 	public HoaDon(String maHD, Ban maBan, KhachHang maKH, NhanVien maNV, Timestamp thoiGianVao, Timestamp thoiGianRa,
-			boolean trangThai, double giamGia, double tongTien) {
+			boolean trangThai, double giamGia, double tongTien, double tienKhachTra) {
 		this.maHD = maHD;
 		this.maBan = maBan;
 		this.maKH = maKH;
@@ -112,7 +113,11 @@ public class HoaDon {
 		this.trangThai = trangThai;
 		this.giamGia = giamGia;
 		this.tongTien = tongTien;
+		this.tienKhachTra = tienKhachTra;
 	}
+
+
+	
 	
 	
 	

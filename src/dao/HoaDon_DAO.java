@@ -130,6 +130,7 @@ public class HoaDon_DAO {
             ps.setInt(7, hd.isTrangThai() ? 1 : 0);
             ps.setInt(8, (int) hd.getGiamGia());
             ps.setDouble(9, hd.getTongTien());
+            ps.setDouble(10, hd.getTienKhachTra());
 
             n = ps.executeUpdate();
             ps.close();
