@@ -13,7 +13,7 @@ public class HoaDon {
 	private Timestamp thoiGianVao;
 	private Timestamp thoiGianRa;
 	private boolean trangThai;
-	private int diemTL;
+	private int diemTru;
 	private double giamGia;
 	private double tongTien;
 	
@@ -28,12 +28,14 @@ public class HoaDon {
 	}
 	
 	
-	public int getDiemTL() {
-		return diemTL;
+	
+
+	public int getDiemTru() {
+		return diemTru;
 	}
 
-	public void setDiemTL(int diemTL) {
-		this.diemTL = diemTL;
+	public void setDiemTru(int diemTru) {
+		this.diemTru = diemTru;
 	}
 
 	public String getMaHD() {
@@ -106,14 +108,14 @@ public class HoaDon {
         this.thoiGianVao = rs.getTimestamp("thoiGianVao");
         this.thoiGianRa = rs.getTimestamp("thoiGianRa");
         this.trangThai = rs.getInt("trangThai") == 1;
-        this.diemTL = rs.getInt("diemTL");
+        this.diemTru = rs.getInt("diemTru");
         this.giamGia = rs.getInt("giamGia");
         this.tongTien = rs.getDouble("tongTien");
         this.tienKhachTra = rs.getDouble("tienKhachTra");
     }
 
 	public HoaDon(String maHD, Ban maBan, KhachHang maKH, NhanVien maNV, Timestamp thoiGianVao, Timestamp thoiGianRa,
-			boolean trangThai, int diemTL, double giamGia, double tongTien, double tienKhachTra) {
+			boolean trangThai, int diemTru, double giamGia, double tongTien, double tienKhachTra) {
 		this.maHD = maHD;
 		this.maBan = maBan;
 		this.maKH = maKH;
@@ -121,7 +123,7 @@ public class HoaDon {
 		this.thoiGianVao = thoiGianVao;
 		this.thoiGianRa = thoiGianRa;
 		this.trangThai = trangThai;
-		this.diemTL = diemTL;
+		this.diemTru=diemTru;
 		this.giamGia = giamGia;
 		this.tongTien = tongTien;
 		this.tienKhachTra = tienKhachTra;

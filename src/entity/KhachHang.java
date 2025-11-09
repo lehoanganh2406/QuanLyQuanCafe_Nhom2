@@ -29,6 +29,7 @@ public class KhachHang {
     public void setSdt(String sdt) {
         this.sdt = sdt;
     }
+    
 
     public int getDiemTL() {
         return diemTL;

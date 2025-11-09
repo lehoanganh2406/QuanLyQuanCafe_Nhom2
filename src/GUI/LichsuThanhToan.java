@@ -82,6 +82,7 @@ public class LichsuThanhToan extends JFrame implements ActionListener,MouseListe
 	private SanPham_DAO sp_dao;
 	private JDateChooser dateTuNgay;
 	private JDateChooser dateDenNgay;
+	private JScrollPane scroll;
 
 	public LichsuThanhToan() {
 		try {
@@ -216,9 +217,14 @@ public class LichsuThanhToan extends JFrame implements ActionListener,MouseListe
         mdHD=new DefaultTableModel(header,0);
         
         tableHD= new JTable(mdHD);
-        tableHD.setFont(new Font("Arial", Font.PLAIN, 15));
+        tableHD.setRowHeight(30);
+        tableHD.setFont(new Font("Arial", Font.PLAIN, 18));
 //        tableHD.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 20));
-        pTable.add(new JScrollPane(tableHD));
+        pTable.add(scroll=new JScrollPane(tableHD));
+        tableHD.getTableHeader().setFont(new Font("Arial", Font.BOLD, 20));
+
+
+        scroll.setPreferredSize(new Dimension(900, 700));
         
         
         
@@ -327,6 +333,10 @@ public class LichsuThanhToan extends JFrame implements ActionListener,MouseListe
         scoll.setPreferredSize(new Dimension(200, 200));
         pCTHD.add(scoll);
         pCTHD.setBorder(BorderFactory.createEmptyBorder(0, 20, 30, 20)); 
+        tableMon.setRowHeight(30);
+        tableMon.setFont(new Font("Arial", Font.PLAIN, 18));
+        
+        tableMon.getTableHeader().setFont(new Font("Arial", Font.BOLD, 20));
         
         
         pCen.add(pCTHD,BorderLayout.SOUTH);
@@ -378,7 +388,7 @@ public class LichsuThanhToan extends JFrame implements ActionListener,MouseListe
             }
         });
         
-        btnBack.addActionListener(e-> {
+        btnBack.addActionListener(evt-> {
         	this.setVisible(false);
         	new ThanhToan_GUI(null, 0, null, null);
         	
@@ -429,6 +439,7 @@ public class LichsuThanhToan extends JFrame implements ActionListener,MouseListe
 	}
 	
 	public void docDulieutuDBvaoTable() {
+		mdHD.setRowCount(0);
 		List<HoaDon> list= hd_dao.getAllHoaDon();
 		for (HoaDon hd : list) {
 	        mdHD.addRow(new Object[] {
@@ -436,7 +447,7 @@ public class LichsuThanhToan extends JFrame implements ActionListener,MouseListe
 	            hd.getThoiGianVao(),
 	            hd.getThoiGianRa(),
 	            hd.getMaNV() != null ? hd.getMaNV().getMaNV() : "",
-	            hd.getDiemTL(),
+	            hd.getDiemTru(),
 	            hd.getGiamGia(),
 	            String.format("%,.0f", hd.getTongTien()),
 	            hd.isTrangThai() ? "Đã thanh toán" : "Chưa thanh toán"
@@ -462,7 +473,7 @@ public class LichsuThanhToan extends JFrame implements ActionListener,MouseListe
 	            txtTongTien.setText(String.format("%,.0f VND", hd.getTongTien()));
 	            
 	            txtTenKH.setText(hd.getMaKH() != null ? hd.getMaKH().getTenKH() : "");
-	            txtDTL.setText(String.valueOf(hd.getDiemTL()));
+	            txtDTL.setText(String.valueOf(hd.getDiemTru()));
 	            txtThanhtoan.setText(String.format("%,.0f VND", hd.getTienKhachTra()));
 	            txtTienthoi.setText("");
 

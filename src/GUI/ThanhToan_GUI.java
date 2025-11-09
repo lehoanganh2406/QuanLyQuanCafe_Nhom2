@@ -108,7 +108,8 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
         // ===== Cột trái
         JPanel cotTrai = new JPanel(new BorderLayout(0,12));
         cotTrai.setOpaque(false);
-        cotTrai.setPreferredSize(new Dimension(1200, 900));
+        cotTrai.setPreferredSize(new Dimension(1200,900));
+        //1200,900
 
         // Top info
         JPanel thongTinTren = new JPanel();
@@ -588,7 +589,7 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
 		tGianRa = new Timestamp(System.currentTimeMillis());
 		Ban banHienTai = new Ban(String.format("B%03d", soBan));
 		if (nhanVienDangNhap == null) {
-	        nhanVienDangNhap = new NhanVien("NV001"); // TODO: thay bằng NV đăng nhập thực
+	        nhanVienDangNhap = new NhanVien("NV004"); // TODO: thay bằng NV đăng nhập thực
 	    }
 		int diemTru = safeInt(txtTruDiem.getText());
 		double giamGia = safeInt(txtGiamGia.getText());
@@ -617,10 +618,10 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
 				new Ban_GUI().setVisible(true);
 			
 			}else {
-				JOptionPane.showMessageDialog(this, "Thanh toán thất bại");
+				JOptionPane.showMessageDialog(this, "Thanh toán thất bại 1 ");
 			}
 		}else {
-			JOptionPane.showMessageDialog(this, "Thanh toán thất bại");
+			JOptionPane.showMessageDialog(this, "Thanh toán thất bại 2");
 		}
 	}
 	@Override

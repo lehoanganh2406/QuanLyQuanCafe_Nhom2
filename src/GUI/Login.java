@@ -98,7 +98,7 @@ public class Login extends JFrame implements ActionListener{
 	    ResultSet rs = null;
 
 	    try {
-	        String sql = "SELECT * FROM TaiKhoang WHERE tenDangNhap = ? AND matKhau = ?";
+	        String sql = "SELECT * FROM TaiKhoan WHERE tenDangNhap = ? AND matKhau = ?";
 	        stmt = con.prepareStatement(sql);
 	        stmt.setString(1, dangNhap);
 	        stmt.setString(2, matKhau);
