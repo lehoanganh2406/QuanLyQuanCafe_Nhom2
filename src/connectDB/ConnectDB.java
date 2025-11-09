@@ -15,6 +15,9 @@ public class ConnectDB {
         String username = "sa";
         String password = "Qazwsxedc@12345";
         String url = "jdbc:sqlserver://localhost:1433;databaseName=QuanLyQuanCF;encrypt=true;trustServerCertificate=true;loginTimeout=5";
+        
+
+        
         try {
         	if (con == null || con.isClosed()) {
         		con = DriverManager.getConnection(url, username, password);

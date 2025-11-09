@@ -106,9 +106,9 @@ public class Login extends JFrame implements ActionListener{
 	        rs = stmt.executeQuery();
 
 	        if (rs.next()) {
+	            String tenHienThi = rs.getString("tenHienThi"); // Lấy tên hiển thị
 	            JOptionPane.showMessageDialog(this, "Đăng nhập thành công!");
-
-	            ManHinhChinh mhc = new ManHinhChinh();
+	            ManHinhChinh mhc = new ManHinhChinh(tenHienThi); // Truyền tên vào màn hình chính
 	            mhc.setVisible(true);
 	            this.dispose();
 	        } else {

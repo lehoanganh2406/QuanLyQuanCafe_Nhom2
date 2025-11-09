@@ -1,6 +1,5 @@
 package GUI;
 
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -8,9 +7,21 @@ import java.awt.event.ActionListener;
 
 public class ManHinhChinh extends JFrame implements ActionListener {
 
-    private JButton btnLogout, btnOrder, btnMenu, btnThanhVien;
+    private JButton btnLogout, btnOrder, btnMenu, btnDSKhachHang, btnDSNhanVien, btnHoaDon, btnThongKe;
+    private String tenHienThi; // tên người đăng nhập
 
+    // ===== Constructor chính (nhận tên hiển thị từ form Login) =====
+    public ManHinhChinh(String tenHienThi) {
+        this.tenHienThi = tenHienThi;
+        initComponents();
+    }
+
+    // ===== Constructor phụ để test nhanh =====
     public ManHinhChinh() {
+        this("Khách");
+    }
+
+    private void initComponents() {
         setTitle("Coffee & Food & Tea");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -30,7 +41,12 @@ public class ManHinhChinh extends JFrame implements ActionListener {
         lblTitle.setFont(new Font("Arial", Font.BOLD, 18));
         lblTitle.setForeground(Color.WHITE);
 
+        JLabel lblUser = new JLabel("Xin chào, " + tenHienThi + "  ");
+        lblUser.setFont(new Font("Arial", Font.PLAIN, 16));
+        lblUser.setForeground(Color.WHITE);
+
         topPanel.add(lblTitle, BorderLayout.WEST);
+        topPanel.add(lblUser, BorderLayout.EAST);
         add(topPanel, BorderLayout.NORTH);
 
         // ======= THANH BÊN TRÁI =======
@@ -57,17 +73,28 @@ public class ManHinhChinh extends JFrame implements ActionListener {
         // === Các nút menu ===
         btnOrder = createSideButton("ORDER", brown, "src/img/order.png");
         btnMenu = createSideButton("MENU", brown, "src/img/menu.png");
-        btnThanhVien = createSideButton("DS THÀNH VIÊN", brown, "src/img/user.png");
+        btnDSKhachHang = createSideButton("DS KHÁCH HÀNG", brown, "src/img/user.png");
+        btnDSNhanVien = createSideButton("DS NHÂN VIÊN", brown, "src/img/staff.png");
+        btnHoaDon = createSideButton("HÓA ĐƠN", brown, "src/img/bill.png");
+        btnThongKe = createSideButton("THỐNG KÊ", brown, "src/img/statistics.png");
         btnLogout = createSideButton("ĐĂNG XUẤT", brown, "src/img/logout.png");
 
+        // Đăng ký ActionListener
         btnOrder.addActionListener(this);
         btnMenu.addActionListener(this);
-        btnThanhVien.addActionListener(this);
+        btnDSKhachHang.addActionListener(this);
+        btnDSNhanVien.addActionListener(this);
+        btnHoaDon.addActionListener(this);
+        btnThongKe.addActionListener(this);
         btnLogout.addActionListener(this);
 
+        // Thêm nút vào panel
         leftPanel.add(btnOrder);
         leftPanel.add(btnMenu);
-        leftPanel.add(btnThanhVien);
+        leftPanel.add(btnDSKhachHang);
+        leftPanel.add(btnDSNhanVien);
+        leftPanel.add(btnHoaDon);
+        leftPanel.add(btnThongKe);
         leftPanel.add(Box.createVerticalGlue());
         leftPanel.add(btnLogout);
 
@@ -90,7 +117,6 @@ public class ManHinhChinh extends JFrame implements ActionListener {
         centerPanel.add(lblText, BorderLayout.SOUTH);
 
         mainPanel.add(centerPanel, BorderLayout.CENTER);
-
         add(mainPanel, BorderLayout.CENTER);
     }
 
@@ -103,7 +129,6 @@ public class ManHinhChinh extends JFrame implements ActionListener {
 
         btn.setHorizontalAlignment(SwingConstants.LEFT);
         btn.setIconTextGap(10);
-
         btn.setFont(new Font("Arial", Font.BOLD, 13));
         btn.setForeground(color);
         btn.setFocusPainted(false);
@@ -124,15 +149,22 @@ public class ManHinhChinh extends JFrame implements ActionListener {
         } else if (o.equals(btnOrder)) {
             openOrder();
         } else if (o.equals(btnMenu)) {
-        //    openMenu();
-        } else if (o.equals(btnThanhVien)) {
-        //    openThanhVien();
+            openMenu();
+        } else if (o.equals(btnDSKhachHang)) {
+            openDSKhachHang();
+        } else if (o.equals(btnDSNhanVien)) {
+            openDSNhanVien();
+        } else if (o.equals(btnHoaDon)) {
+//            openHoaDon();
+        } else if (o.equals(btnThongKe)) {
+//           openThongKe();
         }
     }
 
+    // Các phương thức mở giao diện
     private void openOrder() {
         try {
-            new Order_GUI(1).setVisible(true);
+            new Ban_GUI().setVisible(true);
             this.dispose();
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Không thể mở giao diện Order!");
@@ -140,22 +172,52 @@ public class ManHinhChinh extends JFrame implements ActionListener {
         }
     }
 
-//    private void openMenu() {
+    private void openMenu() {
+        try {
+            new ThucDon_GUI().setVisible(true);
+            this.dispose();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Không thể mở giao diện Thực đơn!");
+            ex.printStackTrace();
+        }
+    }
+
+    private void openDSKhachHang() {
+        try {
+            new DsKhachHang().setVisible(true);
+            this.dispose();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Không thể mở giao diện Khách hàng!");
+            ex.printStackTrace();
+        }
+    }
+
+    private void openDSNhanVien() {
+        try {
+            new DSNhanVien_GUI().setVisible(true);
+            this.dispose();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Không thể mở giao diện Nhân viên!");
+            ex.printStackTrace();
+        }
+    }
+
+//    private void openHoaDon() {
 //        try {
-//            new Menu_GUI().setVisible(true);
+//            new HoaDon_GUI().setVisible(true);
 //            this.dispose();
 //        } catch (Exception ex) {
-//            JOptionPane.showMessageDialog(this, "Không thể mở giao diện Menu!");
+//            JOptionPane.showMessageDialog(this, "Không thể mở giao diện Hóa đơn!");
 //            ex.printStackTrace();
 //        }
 //    }
 //
-//    private void openThanhVien() {
+//    private void openThongKe() {
 //        try {
-//            new ThanhVien_GUI().setVisible(true);
+//            new ThongKe_GUI().setVisible(true);
 //            this.dispose();
 //        } catch (Exception ex) {
-//            JOptionPane.showMessageDialog(this, "Không thể mở giao diện Thành Viên!");
+//            JOptionPane.showMessageDialog(this, "Không thể mở giao diện Thống kê!");
 //            ex.printStackTrace();
 //        }
 //    }
