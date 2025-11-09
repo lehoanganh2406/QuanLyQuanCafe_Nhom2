@@ -73,8 +73,8 @@ public class ManHinhChinh extends JFrame implements ActionListener {
         // === Các nút menu ===
         btnOrder = createSideButton("ORDER", brown, "src/img/order.png");
         btnMenu = createSideButton("MENU", brown, "src/img/menu.png");
-        btnDSKhachHang = createSideButton("DS KHÁCH HÀNG", brown, "src/img/user.png");
-        btnDSNhanVien = createSideButton("DS NHÂN VIÊN", brown, "src/img/staff.png");
+        btnDSKhachHang = createSideButton("DANH SÁCH KHÁCH HÀNG", brown, "src/img/user.png");
+        btnDSNhanVien = createSideButton("DANH SÁCH NHÂN VIÊN", brown, "src/img/staff.png");
         btnHoaDon = createSideButton("HÓA ĐƠN", brown, "src/img/bill.png");
         btnThongKe = createSideButton("THỐNG KÊ", brown, "src/img/statistics.png");
         btnLogout = createSideButton("ĐĂNG XUẤT", brown, "src/img/logout.png");
