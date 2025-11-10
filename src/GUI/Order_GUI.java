@@ -98,7 +98,7 @@ public class Order_GUI extends JFrame implements ActionListener {
         String chucVu = (loaiTaiKhoan == 1) ? "Quản lý" : "Nhân viên";
 
         // Header
-        tieude = new PanelTieuDe("ORDER - Bàn " + soBan, "/img/iconOrder.png", chucVu, tenHienThi);
+        tieude = new PanelTieuDe("ORDER", "/img/iconOrder.png", chucVu, tenHienThi);
         add(tieude, BorderLayout.NORTH);
 
         // Menu trái (ẩn lúc đầu)
@@ -221,7 +221,7 @@ public class Order_GUI extends JFrame implements ActionListener {
                     case 0: return String.class;  // mã
                     case 2: return Integer.class; // SL
                     case 3:
-                    case 4: return Long.class;    // giá
+                    case 4: return Double.class;    // giá
                     default: return String.class; // tên
                 }
             }
@@ -321,8 +321,8 @@ public class Order_GUI extends JFrame implements ActionListener {
                     cartModel.setValueAt(1, row, 2);
                     return;
                 }
-                long donGia = (Long) cartModel.getValueAt(row, 3);
-                cartModel.setValueAt((long) sl * donGia, row, 4);
+                double donGia = (Double) cartModel.getValueAt(row, 3);
+                cartModel.setValueAt(sl * donGia, row, 4);
                 tinhTong();
             }
         });
@@ -469,7 +469,7 @@ public class Order_GUI extends JFrame implements ActionListener {
     private void addToCart(SanPham o) {
         String ma = o.getMaSP();
         String ten = o.getTenSP();
-        long donGia = Math.round(o.getDonGia());
+        double donGia = Math.round(o.getDonGia());
 
         // Check trùng mã → tăng SL
         for (int i = 0; i < cartModel.getRowCount(); i++) {
@@ -491,7 +491,7 @@ public class Order_GUI extends JFrame implements ActionListener {
         int tongSL = 0; long tongTien = 0;
         for (int i = 0; i < cartModel.getRowCount(); i++) {
             tongSL += (Integer) cartModel.getValueAt(i, 2);
-            tongTien += (Long) cartModel.getValueAt(i, 4);
+            tongTien += (Double) cartModel.getValueAt(i, 4);
         }
         lblTongSL.setText(String.valueOf(tongSL));
         lblTongTien.setText(String.format("%,d", tongTien).replace(',', '.'));
@@ -554,8 +554,7 @@ public class Order_GUI extends JFrame implements ActionListener {
 
     /* ===================== TIỆN ÍCH ===================== */
     private String formatVND(double vnd) {
-        long v = Math.round(vnd);
-        return String.format("%,d", v).replace(',', '.');
+        return String.format("%,.0f", vnd).replace(',', '.');
     }
 
     private class VNDRenderer extends DefaultTableCellRenderer {
@@ -600,7 +599,7 @@ public class Order_GUI extends JFrame implements ActionListener {
             return;
         }
         ArrayList<Object[]> items = new ArrayList<>();
-        long tongTien = 0L;
+        double tongTien = 0L;
         for (int i = 0; i < cartModel.getRowCount(); i++) {
             items.add(new Object[]{
                     cartModel.getValueAt(i, 0),
@@ -609,7 +608,7 @@ public class Order_GUI extends JFrame implements ActionListener {
                     cartModel.getValueAt(i, 3),
                     cartModel.getValueAt(i, 4)
             });
-            tongTien += (Long) cartModel.getValueAt(i, 4);
+            tongTien += (Double) cartModel.getValueAt(i, 4);
         }
         ThanhToan_GUI tt = new ThanhToan_GUI(this, soBan, items, tongTien, tenHienThi, loaiTaiKhoan, maNV);
         tt.setVisible(true);

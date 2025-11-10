@@ -57,7 +57,7 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
 	private String maNV;
 	
    
-    public ThanhToan_GUI(Order_GUI orderGui, int soBan, ArrayList<Object[]> cartRows, Long tongTien, String tenHienThi, int loaiTaiKhoan, String maNV) {
+    public ThanhToan_GUI(Order_GUI orderGui, int soBan, ArrayList<Object[]> cartRows, Double tongTien, String tenHienThi, int loaiTaiKhoan, String maNV) {
     	try {
 			ConnectDB.getInstance().connect();
 		} catch (Exception e) {
@@ -72,7 +72,7 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
         this.thoiGianVao = Ban_GUI.thoiGianVao.getOrDefault(
                 soBan, new Timestamp(System.currentTimeMillis()));
         if (cartRows == null) cartRows = new ArrayList<>();
-        if (tongTien == null) tongTien = 0L;
+        if (tongTien == null) tongTien = 0.0;
 
         setTitle("Menu - Bàn " + soBan);
         setSize(1650, 1024);
