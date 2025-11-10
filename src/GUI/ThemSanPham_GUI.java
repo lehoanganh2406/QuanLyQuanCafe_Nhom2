@@ -228,8 +228,14 @@ public class ThemSanPham_GUI extends JFrame implements ActionListener {
                     return;
                 }
                 LoaiSanPham loai = dsLoai.get(index);
-                String pathAnh = (fileAnh != null) ? fileAnh.getAbsolutePath()
-                                                   : (spSua != null ? spSua.getImg() : null); // dùng ảnh cũ nếu không chọn mới
+                String pathAnh = null;
+                if (fileAnh != null) {
+                    // chỉ lưu tên file, ví dụ "trasua.png"
+                    pathAnh = fileAnh.getName();
+                } else if (spSua != null) {
+                    // đang sửa mà không chọn ảnh mới -> giữ ảnh cũ
+                    pathAnh = spSua.getImg();
+                }
 
                 boolean ok;
                 if (spSua == null) {
