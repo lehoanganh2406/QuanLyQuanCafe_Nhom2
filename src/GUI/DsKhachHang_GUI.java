@@ -49,6 +49,11 @@ public class DsKhachHang_GUI extends JFrame implements ActionListener, MouseList
     private String tenHienThi;
     private int loaiTaiKhoan;
 	private String maNV;
+	private JButton btnLamMoi;
+	private JLabel lblTen;
+	private JLabel lblSDT;
+	private JLabel lblDiemTL;
+	private JLabel lblMaKH;
 
     // ===== Constructor chính (dùng khi mở từ ManHinhChinh) =====
     public DsKhachHang_GUI(String tenHienThi, int loaiTaiKhoan, String maNV) {
@@ -87,7 +92,7 @@ public class DsKhachHang_GUI extends JFrame implements ActionListener, MouseList
         String[] header = { "Mã KH", "Tên KH", "SĐT", "Điểm TL" };
         mdDSKH = new DefaultTableModel(header, 0);
         tableDSKH = new JTable(mdDSKH);
-        tableDSKH.setRowHeight(28);
+        tableDSKH.setRowHeight(40);
         tableDSKH.setFont(new Font("Arial", Font.PLAIN, 14));
         tableDSKH.setGridColor(new Color(180, 150, 120));
         tableDSKH.setSelectionBackground(new Color(210, 180, 140));
@@ -119,18 +124,45 @@ public class DsKhachHang_GUI extends JFrame implements ActionListener, MouseList
         a.add(Box.createHorizontalStrut(10));
         a.add(btnSua = new JButton("Sửa"));
         a.add(Box.createHorizontalStrut(10));
-        a.add(txtTim = new JTextField("nhập sdt cần tìm", 10));
+        a.add(btnLamMoi = new JButton("Làm mới"));
+        a.add(Box.createHorizontalStrut(10));
+        a.add(txtTim = new JTextField("Nhập số điện thoại cần tìm", 10));
         a.add(Box.createHorizontalStrut(10));
         a.add(btnTim = new JButton("Tìm"));
+        
         a.add(Box.createHorizontalStrut(20));
 
-        for (JButton btt : new JButton[] { btnBack, btnThem, btnSua, btnTim, btnXoa }) {
+        Font fontNut = new Font("Times New Roman", Font.BOLD, 18);
+
+        for (JButton btt : new JButton[] { btnBack, btnThem, btnSua, btnTim, btnXoa, btnLamMoi }) {
             btt.setBackground(brownColor);
             btt.setForeground(Color.WHITE);
             btt.setFocusPainted(false);
-            btt.setPreferredSize(new Dimension(100, 40));
+            btt.setFont(fontNut);
+            btt.setPreferredSize(new Dimension(180, 40)); // tăng chiều ngang
+            btt.setMaximumSize(new Dimension(180, 40));   // ép layout giữ nguyên
+            btt.setMinimumSize(new Dimension(180, 40));
+            btt.setBorder(BorderFactory.createLineBorder(new Color(120, 80, 60), 2, true));
+            btt.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         }
 
+        txtTim.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
+            public void focusGained(java.awt.event.FocusEvent e) {
+                if (txtTim.getText().equals("Nhập số điện thoại cần tìm")) {
+                    txtTim.setText("");
+                    txtTim.setForeground(Color.BLACK);
+                }
+            }
+
+            @Override
+            public void focusLost(java.awt.event.FocusEvent e) {
+                if (txtTim.getText().trim().isEmpty()) {
+                    txtTim.setText("Nhập số điện thoại cần tìm");
+                    txtTim.setForeground(Color.GRAY);
+                }
+            }
+        });
         c.add(Box.createVerticalStrut(15));
         c.add(a);
         c.add(Box.createVerticalStrut(15));
@@ -145,43 +177,51 @@ public class DsKhachHang_GUI extends JFrame implements ActionListener, MouseList
         b = Box.createVerticalBox();
 
         b1 = Box.createHorizontalBox();
-        b1.add(new JLabel("Mã khách hàng:"));
+        b1.add(lblMaKH = new JLabel("Mã khách hàng:"));
         b1.add(Box.createHorizontalStrut(27));
-        b1.add(txtma = new JTextField(20));
+        b1.add(txtma = new JTextField(30));
         txtma.setEditable(false);
         b.add(Box.createVerticalStrut(5));
         b.add(b1);
 
         b2 = Box.createHorizontalBox();
-        b2.add(new JLabel("Tên khách hàng:"));
+        b2.add(lblTen = new JLabel("Tên khách hàng:"));
         b2.add(Box.createHorizontalStrut(20));
-        b2.add(txtten = new JTextField(20));
+        b2.add(txtten = new JTextField(30));
         b.add(Box.createVerticalStrut(5));
         b.add(b2);
 
         b3 = Box.createHorizontalBox();
-        b3.add(new JLabel("SDT liên hệ:"));
-        b3.add(Box.createHorizontalStrut(49));
-        b3.add(txtsdt = new JTextField(20));
+        b3.add(lblSDT =new JLabel("SDT liên hệ:"));
+        b3.add(Box.createHorizontalStrut(60));
+        b3.add(txtsdt = new JTextField(30));
         b.add(Box.createVerticalStrut(5));
         b.add(b3);
 
         b4 = Box.createHorizontalBox();
-        b4.add(new JLabel("Điểm tích lũy:"));
-        b4.add(Box.createHorizontalStrut(40));
-        b4.add(txtdtl = new JTextField(20));
+        b4.add(lblDiemTL =new JLabel("Điểm tích lũy:"));
+        b4.add(Box.createHorizontalStrut(48));
+        b4.add(txtdtl = new JTextField(30));
+        txtdtl.setText("0");
+        txtdtl.setEditable(false);
         b.add(Box.createVerticalStrut(5));
         b.add(b4);
 
         b.setPreferredSize(new Dimension(400, 150));
         pform.add(b, BorderLayout.NORTH);
         pcenter.add(pform, BorderLayout.NORTH);
-
+        Font flbl = new Font("Times New Roman", Font.BOLD, 22);
+        Font ftxt = new Font("Times New Roman", Font.PLAIN, 22);
+        lblMaKH.setFont(flbl);
+        lblTen.setFont(flbl);
+        lblSDT.setFont(flbl);
+        lblDiemTL.setFont(flbl);
         for (JTextField txt : new JTextField[] { txtma, txtten, txtsdt, txtdtl }) {
-            txt.setBorder(null);
-            txt.setBackground(null);
+
             txt.setForeground(Color.BLACK);
             txt.setCaretColor(Color.BLACK);
+            txt.setFont(ftxt);
+
         }
 
         add(pcenter);
@@ -193,6 +233,7 @@ public class DsKhachHang_GUI extends JFrame implements ActionListener, MouseList
         btnSua.addActionListener(this);
         btnTim.addActionListener(this);
         btnXoa.addActionListener(this);
+        btnLamMoi.addActionListener(this);
 
         // Load dữ liệu ban đầu
         docDulieutuDBvaoTable();
@@ -224,6 +265,7 @@ public class DsKhachHang_GUI extends JFrame implements ActionListener, MouseList
         txtten.setText(mdDSKH.getValueAt(row, 1).toString());
         txtsdt.setText(mdDSKH.getValueAt(row, 2).toString());
         txtdtl.setText(mdDSKH.getValueAt(row, 3).toString());
+        txtdtl.setEditable(true);
     }
 
     @Override public void mousePressed(MouseEvent e) {}
@@ -370,7 +412,11 @@ public class DsKhachHang_GUI extends JFrame implements ActionListener, MouseList
                 JOptionPane.showMessageDialog(this,
                         "Không tìm thấy khách hàng có SĐT: " + sdt);
             }
-        }
+        } else if (o.equals(btnLamMoi)) {
+			cleartext();
+			mdDSKH.setRowCount(0);
+			docDulieutuDBvaoTable();
+		}
     }
 
     /* ===================== Helpers ===================== */
@@ -379,7 +425,10 @@ public class DsKhachHang_GUI extends JFrame implements ActionListener, MouseList
         txtma.setText("");
         txtten.setText("");
         txtsdt.setText("");
-        txtdtl.setText("");
+        txtdtl.setText("0");
+        txtdtl.setEditable(false);
+        txtTim.setText("Nhập số điện thoại cần tìm");
+        txtTim.setForeground(Color.GRAY);
     }
 
     public void docDulieutuDBvaoTable() {

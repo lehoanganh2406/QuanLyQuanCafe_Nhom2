@@ -14,7 +14,7 @@ public class KhachHang_JDiglog extends JDialog implements ActionListener, MouseL
     private JTextField txtma, txtten, txtsdt, txtdtl;
     private DefaultTableModel mdKH;
     private JTable tableKH;
-    private JButton btnBack, btnThem, btnChon;
+    private JButton btnBack, btnChon;
     private final Color nen = Color.decode("#E3CFC1");
     private final Color brownColor = Color.decode("#865A52");
 
@@ -22,7 +22,6 @@ public class KhachHang_JDiglog extends JDialog implements ActionListener, MouseL
         super(owner, "Quản lý khách hàng", Dialog.ModalityType.APPLICATION_MODAL);
         try {
 			ConnectDB.getInstance().connect();
-			System.out.println("ket nnoi thanh cong");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -95,6 +94,7 @@ public class KhachHang_JDiglog extends JDialog implements ActionListener, MouseL
         tableKH.setGridColor(new Color(180, 150, 120));
         tableKH.setSelectionBackground(new Color(210, 180, 140));
         tableKH.setSelectionForeground(Color.BLACK);
+        tableKH.setDefaultEditor(Object.class, null);
 
         JTableHeader headerTable = tableKH.getTableHeader();
         headerTable.setPreferredSize(new Dimension(headerTable.getWidth(), 45));
@@ -116,12 +116,11 @@ public class KhachHang_JDiglog extends JDialog implements ActionListener, MouseL
         a.add(Box.createHorizontalStrut(20));
         a.add(btnBack = new JButton("Quay lại"));
         a.add(Box.createHorizontalGlue());
-        a.add(btnThem = new JButton("Thêm"));
-        a.add(Box.createHorizontalStrut(10));
+
         a.add(btnChon = new JButton("Chọn"));
         a.add(Box.createHorizontalStrut(20));
 
-        for (JButton btt : new JButton[]{btnBack, btnThem, btnChon}) {
+        for (JButton btt : new JButton[]{btnBack, btnChon}) {
             btt.setBackground(brownColor);
             btt.setForeground(Color.WHITE);
             btt.setFocusPainted(false);
@@ -136,7 +135,6 @@ public class KhachHang_JDiglog extends JDialog implements ActionListener, MouseL
 
         // ===== EVENT =====
         btnBack.addActionListener(this);
-        btnThem.addActionListener(this);
         btnChon.addActionListener(this);
         tableKH.addMouseListener(this);
         txtsdt.addActionListener(e -> timTheoSoDienThoai());
@@ -188,48 +186,12 @@ public class KhachHang_JDiglog extends JDialog implements ActionListener, MouseL
     public void actionPerformed(ActionEvent e) {
         Object o = e.getSource();
 
-        if (o.equals(btnThem)) {
-            if (!valiData()) return;
-            String tenKH = txtten.getText().trim();
-            String sdt = txtsdt.getText().trim();
-            int diemTL = 0;
-
-            KhachHang kh = new KhachHang(null, tenKH, sdt, diemTL);
-            boolean success = themKhachHang(kh);
-
-            if (success) {
-                taidulieuKH();
-                JOptionPane.showMessageDialog(this, "Thêm khách hàng thành công!");
-                txtma.setText("");
-                txtten.setText("");
-                txtsdt.setText("");
-                txtdtl.setText("");
-            } else {
-                // ✅ Chỉ báo lỗi rồi RETURN, không đóng dialog, không đụng selected
-                JOptionPane.showMessageDialog(this, "Không thể thêm khách hàng (có thể trùng SĐT)");
-            }
-        }
-
         if (o.equals(btnChon)) {
-            int row = tableKH.getSelectedRow();
-            if (row == -1) {
-                JOptionPane.showMessageDialog(this, "Hãy chọn một khách hàng trong bảng!");
-                return;
-            }
-            String ma  = tableKH.getValueAt(row, 0).toString();
-            String ten = tableKH.getValueAt(row, 1).toString();
-            String sdt = tableKH.getValueAt(row, 2).toString();
-            int diem   = Integer.parseInt(tableKH.getValueAt(row, 3).toString());
-
-            selected = new KhachHang(ma, ten, sdt, diem);
-            dispose(); // ✅ Cho ThanhToan_GUI nhận getSelected()
-        }
-
-        if (o.equals(btnBack)) {
-            // ✅ Rõ ràng: không chọn khách
-            selected = null;
+            nutChon();
+        } else if (o.equals(btnBack)) {
+        	selected = null;
             dispose();
-        }
+		}
     }
 
     /* ===================== TABLE CLICK ===================== */
@@ -282,9 +244,71 @@ public class KhachHang_JDiglog extends JDialog implements ActionListener, MouseL
     public KhachHang getSelected() {
         return selected;
     }
+    
+    private void nutChon() {
+    	int row = tableKH.getSelectedRow();
+        String ten = txtten.getText().trim();
+        String sdt = txtsdt.getText().trim();
 
-    public static void main(String[] args) {
-        ConnectDB.getInstance().connect();
-        SwingUtilities.invokeLater(() -> new KhachHang_JDiglog((Window) null).setVisible(true));
-    }
+        // 1. Nếu đã chọn khách trong bảng -> dùng luôn
+        if (row != -1) {
+            String ma  = tableKH.getValueAt(row, 0).toString();
+            String t   = tableKH.getValueAt(row, 1).toString();
+            String so  = tableKH.getValueAt(row, 2).toString();
+            int diem   = Integer.parseInt(tableKH.getValueAt(row, 3).toString());
+
+            selected = new KhachHang(ma, t, so, diem);
+            dispose();
+            return;
+        }
+
+        // 2. Nếu chưa chọn dòng nào nhưng có nhập SĐT
+        if (!sdt.isEmpty()) {
+            if (!sdt.matches("^0\\d{9}$")) {
+                JOptionPane.showMessageDialog(this, "SĐT phải gồm 10 số và bắt đầu bằng 0");
+                return;
+            }
+
+            // 2.1. Thử tìm khách theo SĐT
+            KhachHang khTonTai = KhachHang_DAO.getInstance().getBySDT(sdt);
+            if (khTonTai != null) {
+                // Đã có trong DB -> chọn luôn
+                selected = khTonTai;
+                dispose();
+                return;
+            }
+
+            // 2.2. Chưa có trong DB -> yêu cầu nhập tên để tạo mới
+            if (ten.isEmpty()) {
+                JOptionPane.showMessageDialog(this,
+                        "Số điện thoại chưa tồn tại.\nHãy nhập tên khách hàng rồi bấm Chọn để tạo mới.");
+                txtten.requestFocus();
+                return;
+            }
+
+            // 2.3. Có tên + SĐT hợp lệ + chưa tồn tại -> tạo mới + chọn
+            KhachHang khMoi = new KhachHang(null, ten, sdt, 0);
+            boolean ok = themKhachHang(khMoi);
+
+            if (ok) {
+                // Lấy lại từ DB để có mã KH chính xác
+                KhachHang khInsert = KhachHang_DAO.getInstance().getBySDT(sdt);
+                if (khInsert != null) {
+                    selected = khInsert;
+                } else {
+                    selected = khMoi; // fallback
+                }
+                dispose();
+            } else {
+                JOptionPane.showMessageDialog(this,
+                        "Không thể thêm khách hàng (có thể SĐT đã tồn tại).");
+            }
+            return;
+        }
+
+        // 3. Không chọn dòng, không nhập SĐT -> nhắc
+        JOptionPane.showMessageDialog(this,
+                "Hãy chọn một khách trong bảng\nhoặc nhập SĐT (và tên nếu chưa có) rồi bấm Chọn.");
+
+	}
 }

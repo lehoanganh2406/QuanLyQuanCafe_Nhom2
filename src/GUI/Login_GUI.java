@@ -93,6 +93,8 @@ public class Login_GUI extends JFrame implements ActionListener{
         btnDangNhap.setFocusPainted(false);
         panelLogin.add(btnDangNhap);
         btnDangNhap.addActionListener(this);
+        txtPassword.addActionListener(this);
+        txtMaNV.addActionListener(this);
 
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -105,9 +107,11 @@ public class Login_GUI extends JFrame implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		Object o = e.getSource();
 		
-		if(o.equals(btnDangNhap))
+		if(o.equals(btnDangNhap) || o.equals(txtPassword))
 			kiemTraTaiKhoang();
-		
+		if (o.equals(txtMaNV)) {
+			txtPassword.requestFocus();
+		}
 	}
 
 	private void kiemTraTaiKhoang() {
@@ -139,8 +143,7 @@ public class Login_GUI extends JFrame implements ActionListener{
 	            String chucVu = rs.getString("chucVu");
 	            int loaiTaiKhoan = rs.getInt("loaiTaiKhoan");
 	            String maNV = rs.getString("maNV");
-	            JOptionPane.showMessageDialog(this, 
-	                "Đăng nhập thành công!\nXin chào, " + chucVu + " " + tenHienThi);
+	            
 	            ManHinhChinh_GUI mhc = new ManHinhChinh_GUI(tenHienThi, loaiTaiKhoan, maNV);
 	            mhc.setVisible(true);
 	            this.dispose();
