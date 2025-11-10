@@ -17,6 +17,9 @@ public class Login_GUI extends JFrame implements ActionListener{
     private JPasswordField txtPassword;
     private JButton btnDangNhap;
     private JRadioButton rdoNhanVien, rdoQuanLy;
+	private JLabel lblTogglePassword;
+	private boolean hienMatKhau = false;
+
 
     public Login_GUI() {
         setTitle("Đăng nhập");
@@ -30,7 +33,7 @@ public class Login_GUI extends JFrame implements ActionListener{
         GridBagConstraints gbc = new GridBagConstraints();
 
         JPanel panelLogin = new JPanel();
-        panelLogin.setBackground(new Color(120, 74, 57));
+        panelLogin.setBackground(Color.decode("#996C63"));
         panelLogin.setPreferredSize(new Dimension(350, 230));
         panelLogin.setLayout(null);
         panelLogin.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -63,8 +66,26 @@ public class Login_GUI extends JFrame implements ActionListener{
         txtPassword.setBounds(40, 120, 270, 25);
         txtPassword.setBackground(new Color(220, 220, 220));
         txtPassword.setBorder(null);
-        panelLogin.add(txtPassword);
+     // ===== Con mắt ẩn/hiện mật khẩu =====
+        ImageIcon eyeClose = new ImageIcon(
+        	    new ImageIcon(getClass().getResource("/img/anMatKhau.png"))
+        	    .getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
+        ImageIcon eyeOpen = new ImageIcon(
+        	    new ImageIcon(getClass().getResource("/img/nhinMatKhau.png"))
+        	    .getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
 
+        	lblTogglePassword = new JLabel(eyeClose);
+        	lblTogglePassword.setBounds(315, 120, 25, 25);
+        	lblTogglePassword.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        	panelLogin.add(lblTogglePassword);
+        panelLogin.add(txtPassword);
+        lblTogglePassword.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override public void mouseClicked(java.awt.event.MouseEvent e) {
+                hienMatKhau = !hienMatKhau;
+                txtPassword.setEchoChar(hienMatKhau ? (char)0 : '•');
+                lblTogglePassword.setIcon(hienMatKhau ? eyeOpen : eyeClose);
+            }
+        });
         btnDangNhap = new JButton("ĐĂNG NHẬP");
         btnDangNhap.setBounds(120, 155, 110, 30);
         btnDangNhap.setBackground(new Color(220, 220, 220));
