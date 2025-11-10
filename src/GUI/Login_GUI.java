@@ -41,7 +41,7 @@ public class Login_GUI extends JFrame implements ActionListener{
         lblTitle.setBounds(0, 10, 350, 30);
         panelLogin.add(lblTitle);
 
-        JLabel lblMaNV = new JLabel("MÃ NHÂN VIÊN");
+        JLabel lblMaNV = new JLabel("TÊN ĐĂNG NHẬP");
         lblMaNV.setForeground(Color.WHITE);
         lblMaNV.setFont(new Font("Arial", Font.BOLD, 12));
         lblMaNV.setBounds(40, 50, 120, 20);
