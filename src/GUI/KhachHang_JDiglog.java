@@ -20,6 +20,12 @@ public class KhachHang_JDiglog extends JDialog implements ActionListener, MouseL
 
     public KhachHang_JDiglog(Window owner) {
         super(owner, "Quản lý khách hàng", Dialog.ModalityType.APPLICATION_MODAL);
+        try {
+			ConnectDB.getInstance().connect();
+			System.out.println("ket nnoi thanh cong");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
         setSize(800, 750);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocationRelativeTo(owner);

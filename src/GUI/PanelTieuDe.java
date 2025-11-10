@@ -9,7 +9,7 @@ public class PanelTieuDe extends JPanel {
     public JButton btnMenu;
     public JLabel lblOrder;
 
-    public PanelTieuDe(String tieuDe, String iconPath) {
+    public PanelTieuDe(String tieuDe, String iconPath, String chucVu, String tenHienThi) {
         setLayout(new BorderLayout());
         setBackground(Color.decode("#865A52"));
         setPreferredSize(new Dimension(0, 60));
@@ -51,11 +51,20 @@ public class PanelTieuDe extends JPanel {
         lblOrder.setHorizontalAlignment(SwingConstants.LEFT);
 
         jNorCen.add(lblOrder);
+        
+     // ===== Panel phải: hiển thị chào người dùng =====
+        JPanel jNorRight = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 15));
+        jNorRight.setOpaque(false);
 
+        JLabel lblUser = new JLabel("Xin chào, " + chucVu + " " + tenHienThi);
+        lblUser.setFont(new Font("Arial", Font.BOLD, 16));
+        lblUser.setForeground(Color.WHITE);
+
+        jNorRight.add(lblUser);
         // ===== Thêm vào thanh =====
         jNor.add(jNorLeft, BorderLayout.WEST);
         jNor.add(jNorCen, BorderLayout.CENTER);
-
+        jNor.add(jNorRight, BorderLayout.EAST); 
         add(jNor, BorderLayout.NORTH);
     }
 

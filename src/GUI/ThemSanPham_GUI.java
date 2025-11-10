@@ -28,6 +28,12 @@ public class ThemSanPham_GUI extends JFrame implements ActionListener {
     }
 
     public ThemSanPham_GUI(SanPham sp) {
+    	try {
+			ConnectDB.getInstance().connect();
+			System.out.println("ket nnoi thanh cong");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
         this.spSua = sp;
         setTitle(sp == null ? "Thêm sản phẩm mới" : "Sửa sản phẩm");
         setSize(700, 650);

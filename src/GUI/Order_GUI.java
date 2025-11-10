@@ -48,17 +48,36 @@ public class Order_GUI extends JFrame implements ActionListener {
     private JLabel lblTongSL, lblTongTien;
     private JButton btnQuayLai, btnRemove, btnThanhToan;
 
-    public Order_GUI(int soBan) {
+	private String tenHienThi;
+
+	private int loaiTaiKhoan;
+
+	private PanelTieuDe tieude;
+
+	private pnThanhMenu menuPanel;
+
+	private String maNV;
+
+    public Order_GUI(int soBan, String tenHienThi, int loaiTaiKhoan, String maNV) {
+    	try {
+			ConnectDB.getInstance().connect();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
         this.soBan = soBan;
+        this.tenHienThi = tenHienThi;
+        this.loaiTaiKhoan = loaiTaiKhoan;
+        this.maNV = maNV;
         setTitle("Menu - Bàn " + soBan);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
 
         napMaLoaiFromDB();
         thanhTieuDe();
-        thanhBenTrai();
         menuCenter();
+        thanhBenTrai();
         thanhBenPhai();
 
         // Sự kiện nút chức năng
@@ -73,16 +92,28 @@ public class Order_GUI extends JFrame implements ActionListener {
         showCategory("Tất cả");
     }
 
-    public static void main(String[] args) {
-        ConnectDB.getInstance().connect();
-        SwingUtilities.invokeLater(() -> new Order_GUI(1).setVisible(true));
-    }
 
     /* ===================== TIÊU ĐỀ ===================== */
     private void thanhTieuDe() {
-        PanelTieuDe tieude = new PanelTieuDe("Order", "/img/iconOrder.png");
+        String chucVu = (loaiTaiKhoan == 1) ? "Quản lý" : "Nhân viên";
+
+        // Header
+        tieude = new PanelTieuDe("ORDER - Bàn " + soBan, "/img/iconOrder.png", chucVu, tenHienThi);
         add(tieude, BorderLayout.NORTH);
+
+        // Menu trái (ẩn lúc đầu)
+        menuPanel = new pnThanhMenu(tenHienThi, loaiTaiKhoan, maNV);
+        menuPanel.setVisible(false);
+        add(menuPanel, BorderLayout.WEST);
+
+        // Toggle khi bấm 3 gạch
+        tieude.getBtnMenu().addActionListener(e -> {
+            menuPanel.setVisible(!menuPanel.isVisible());
+            revalidate();
+            repaint();
+        });
     }
+
 
     /* ===================== CỘT TRÁI: DANH MỤC ===================== */
     private void thanhBenTrai() {
@@ -102,7 +133,7 @@ public class Order_GUI extends JFrame implements ActionListener {
         }
 
         jWes.setPreferredSize(new Dimension(170, getHeight()));
-        add(jWes, BorderLayout.WEST);
+        jCen.add(jWes, BorderLayout.WEST);
     }
 
     private JButton taoNutMenu(String text) {
@@ -580,7 +611,7 @@ public class Order_GUI extends JFrame implements ActionListener {
             });
             tongTien += (Long) cartModel.getValueAt(i, 4);
         }
-        ThanhToan_GUI tt = new ThanhToan_GUI(this, soBan, items, tongTien);
+        ThanhToan_GUI tt = new ThanhToan_GUI(this, soBan, items, tongTien, tenHienThi, loaiTaiKhoan, maNV);
         tt.setVisible(true);
     }
 
@@ -597,7 +628,7 @@ public class Order_GUI extends JFrame implements ActionListener {
         } else if (o.equals(btnThanhToan)) {
             moManHinhThanhToan();
         } else if (o.equals(btnQuayLai)) {
-            new Ban_GUI().setVisible(true);
+        	new Ban_GUI(tenHienThi, loaiTaiKhoan, maNV).setVisible(true);
             dispose();
         }
     }

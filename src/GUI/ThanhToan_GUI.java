@@ -25,7 +25,6 @@ import java.util.ArrayList;
 
 public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener {
     private int soBan;
-    private JButton btnMenu;
     private JLabel lblOrder;
     private JLabel lblThongTinKhachHang;
     private JTextField txtTruDiem, txtGiamGia;
@@ -53,15 +52,23 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
 	private ChiTietHoaDon_DAO chiTietHD;
 	private KhachHang_DAO khachHang_DAO;
 	private Timestamp tGianRa;
+	private String tenHienThi;
+	private int loaiTaiKhoan;
+	private String maNV;
 	
-    
-    public static void main(String[] args) {
-        ConnectDB.getInstance().connect();
-        SwingUtilities.invokeLater(() -> new ThanhToan_GUI(null, 1, new ArrayList<>(), 0L).setVisible(true));
-    }
-    public ThanhToan_GUI(Order_GUI orderGui, int soBan, ArrayList<Object[]> cartRows, Long tongTien) {
-        this.soBan = soBan;
+   
+    public ThanhToan_GUI(Order_GUI orderGui, int soBan, ArrayList<Object[]> cartRows, Long tongTien, String tenHienThi, int loaiTaiKhoan, String maNV) {
+    	try {
+			ConnectDB.getInstance().connect();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    	this.soBan = soBan;
         this.orderGui = orderGui;
+        this.tenHienThi = tenHienThi;
+        this.loaiTaiKhoan = loaiTaiKhoan;
+        this.maNV = maNV;
+        this.nhanVienDangNhap = new NhanVien(maNV);
         this.thoiGianVao = Ban_GUI.thoiGianVao.getOrDefault(
                 soBan, new Timestamp(System.currentTimeMillis()));
         if (cartRows == null) cartRows = new ArrayList<>();
@@ -96,7 +103,8 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
 
     // Thanh tiêu đề
     private void thanhTieuDe() {
-    	PanelTieuDe panel = new PanelTieuDe("Thanh Toán", "/img/thanhtoan.png");
+    	String chucVu = (loaiTaiKhoan == 1) ? "Quản lý" : "Nhân viên";
+    	PanelTieuDe panel = new PanelTieuDe("Thanh Toán", "/img/thanhtoan.png", chucVu, tenHienThi);
         add(panel, BorderLayout.NORTH);
     }
 
@@ -201,8 +209,7 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
         lblMaHoaDon.setFont(new Font("Times New Roman", Font.PLAIN, 22));
         phanNor.add(hangDong("Mã hóa đơn:", lblMaHoaDon));
         phanNor.add(Box.createVerticalStrut(8));
-        phanNor.add(tieuDeDonGian("Mã nhân viên:"));
-        phanNor.add(Box.createVerticalStrut(16));
+        
 
         // Ô text nhập trực tiếp
         txtTruDiem = taoOText("Nhập điểm tích lũy...");
@@ -588,9 +595,7 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
 		String maHD = lblMaHoaDon.getText();
 		tGianRa = new Timestamp(System.currentTimeMillis());
 		Ban banHienTai = new Ban(String.format("B%03d", soBan));
-		if (nhanVienDangNhap == null) {
-	        nhanVienDangNhap = new NhanVien("NV004"); // TODO: thay bằng NV đăng nhập thực
-	    }
+		
 		int diemTru = safeInt(txtTruDiem.getText());
 		double giamGia = safeInt(txtGiamGia.getText());
 		double tongTien = parseVND(lblTongThanhToan.getText());
@@ -615,7 +620,7 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
 				this.setVisible(false);
 				orderGui.dispose();
 				Ban_GUI.thoiGianVao.remove(soBan);
-				new Ban_GUI().setVisible(true);
+				new Ban_GUI(tenHienThi, loaiTaiKhoan, maNV).setVisible(true);
 			
 			}else {
 				JOptionPane.showMessageDialog(this, "Thanh toán thất bại 1 ");

@@ -53,7 +53,7 @@ import entity.ChiTietHoaDon;
 import entity.HoaDon;
 import entity.KhachHang;
 
-public class LichsuThanhToan extends JFrame implements ActionListener,MouseListener,PropertyChangeListener{
+public class DsHoaDon_GUI extends JFrame implements ActionListener,MouseListener,PropertyChangeListener{
 	private JButton btnMenu;
 	private JLabel lbl;
 	private JButton btnClose;
@@ -83,11 +83,16 @@ public class LichsuThanhToan extends JFrame implements ActionListener,MouseListe
 	private JDateChooser dateTuNgay;
 	private JDateChooser dateDenNgay;
 	private JScrollPane scroll;
+	private String tenHienThi;
+	private int loaiTaiKhoan;
+	private String maNV;
 
-	public LichsuThanhToan() {
+	public DsHoaDon_GUI(String tenHienThi, int loaiTaiKhoan, String maNV) {
+		this.tenHienThi = tenHienThi;
+        this.loaiTaiKhoan = loaiTaiKhoan;
+        this.maNV = maNV;
 		try {
 			ConnectDB.getInstance().connect();
-			System.out.println("ket nnoi thanh cong");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -99,44 +104,18 @@ public class LichsuThanhToan extends JFrame implements ActionListener,MouseListe
 		setTitle("lich su hoa don");
 		setExtendedState(JFrame.MAXIMIZED_BOTH);
 		setLocationRelativeTo(null);
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		
-		
-		JPanel pTil = new JPanel(new BorderLayout());
-		pTil.setBackground(Color.decode("#865A52"));  
-        pTil.setPreferredSize(new Dimension(0,60));
-        JPanel pTil_trai = new JPanel(new FlowLayout(FlowLayout.LEFT,10,8));
-        pTil_trai.setOpaque(false); 
-        ImageIcon iconMenu = new ImageIcon(new ImageIcon(getClass().getResource("/img/iconMenu.png"))
-        		.getImage().getScaledInstance(49, 32, Image.SCALE_SMOOTH));
-        pTil_trai.add(btnMenu = new JButton(iconMenu));
-        btnMenu.setBackground(Color.decode("#865A52"));
-        btnMenu.setBorderPainted(false); 
-        btnMenu.setFocusPainted(false);   
-        
-        JPanel pTil_phai = new JPanel(new BorderLayout());
-        pTil_phai.setOpaque(false);
+		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+		addWindowListener(new java.awt.event.WindowAdapter() {
+		    @Override
+		    public void windowClosing(java.awt.event.WindowEvent e) {
+		        // Quay lại màn hình chính, giữ đúng tài khoản + tên hiển thị
+		        new ManHinhChinh_GUI(tenHienThi, loaiTaiKhoan, maNV).setVisible(true);
+		        dispose();
+		    }
+		});
 
-        ImageIcon iconCoin = new ImageIcon(new ImageIcon(getClass().getResource("/img/iconcoin.png"))
-                .getImage().getScaledInstance(40, 50, Image.SCALE_SMOOTH));
-
-        lbl = new JLabel("Lịch sử hóa đơn", iconCoin, SwingConstants.LEFT);
-        lbl.setFont(new Font("Arial", Font.BOLD, 28));
-        lbl.setBackground(Color.decode("#FFF1E6"));
-        lbl.setOpaque(true);
-        lbl.setIconTextGap(12);
-        lbl.setPreferredSize(new Dimension(300, 60)); 
-        pTil_phai.add(lbl,BorderLayout.WEST);
-       
-        
-        
-        btnClose= new JButton("X");
-		btnClose.setBackground(Color.decode("#865A52"));
-		btnClose.setForeground(Color.white);
-		pTil_phai.add(btnClose,BorderLayout.EAST);
-        
-        pTil.add(pTil_trai, BorderLayout.WEST);
-        pTil.add(pTil_phai);
+		
+		taoThanhTieuDe();
         
         
         JPanel pCen = new JPanel(new BorderLayout());
@@ -149,10 +128,9 @@ public class LichsuThanhToan extends JFrame implements ActionListener,MouseListe
         b=Box.createHorizontalBox();
         B.add(Box.createVerticalStrut(20));
         b.add(Box.createHorizontalStrut(35));
-        btnTim=new JButton("Tìm");
-        btnTim.setFont(new Font("Arial", Font.PLAIN, 20));
-        btnTim.setBackground(Color.decode("#865A52"));
-        btnTim.setForeground(Color.white);
+        btnTim= taoNut("Tìm");
+        btnTim.setPreferredSize(new Dimension(140, 40));
+
         b.add(txtTim=new JTextField(20));
         txtTim.setText("Nhập mã hóa đơn cần tìm...");
         txtTim.setFont(new Font("Arial", Font.PLAIN, 17));
@@ -175,7 +153,6 @@ public class LichsuThanhToan extends JFrame implements ActionListener,MouseListe
         });
         b.add(Box.createHorizontalStrut(35));
         b.add(btnTim);
-        btnTim.setPreferredSize(new Dimension(120, 30));
         
         b.add(Box.createHorizontalStrut(15));
         
@@ -346,14 +323,11 @@ public class LichsuThanhToan extends JFrame implements ActionListener,MouseListe
         add(pCen);
         
         JPanel pDuoi = new JPanel();
-        pDuoi.add(btnBack= new JButton("Quay lại"),BorderLayout.WEST);
-        pDuoi.add(btnXoa=new JButton("Xóa"),BorderLayout.EAST);
-        btnBack.setBackground(Color.decode("#865A52"));
-        btnBack.setForeground(Color.white);
-        btnXoa.setBackground(Color.decode("#865A52"));
-        btnXoa.setForeground(Color.white);
-        btnBack.setPreferredSize(new Dimension(100, 40));
-        btnXoa.setPreferredSize(new Dimension(100, 40));
+        pDuoi.add(btnBack= taoNut("Quay lại"),BorderLayout.WEST);
+        pDuoi.add(btnXoa= taoNut("Xóa"),BorderLayout.EAST);
+        btnBack.setPreferredSize(new Dimension(140, 40));
+        btnXoa.setPreferredSize(new Dimension(140, 40));
+
         
         
         for (JTextField txt : new JTextField[]{txtMaHD, txtMaKH, txtMaNV, txtTGTT,txtTGTao
@@ -369,7 +343,6 @@ public class LichsuThanhToan extends JFrame implements ActionListener,MouseListe
         pCTHD.setBackground(Color.decode("#E3CFC1"));
         
         add(pDuoi,BorderLayout.SOUTH);
-        add(pTil,BorderLayout.NORTH);
         tableHD.addMouseListener(this);
         tableMon.addMouseListener(this);
         txtThanhtoan.addActionListener(e -> tinhTienThoi());
@@ -389,21 +362,28 @@ public class LichsuThanhToan extends JFrame implements ActionListener,MouseListe
         });
         
         btnBack.addActionListener(evt-> {
-        	this.setVisible(false);
-        	new ThanhToan_GUI(null, 0, null, null);
-        	
-        	
+        	dispose(); // đóng cửa sổ hiện tại
+            new ManHinhChinh_GUI(tenHienThi, loaiTaiKhoan, maNV).setVisible(true);   	
         });
         
+        applyPermission();
 	
 	}
+	private void taoThanhTieuDe() {
+	    String chucVu = (loaiTaiKhoan == 1) ? "Quản lý" : "Nhân viên";
+	    PanelTieuDe pnl = new PanelTieuDe("LỊCH SỬ HÓA ĐƠN", "/img/iconcoin.png", chucVu, tenHienThi);
+	    add(pnl, BorderLayout.NORTH);
+	    pnThanhMenu menu = new pnThanhMenu(tenHienThi, loaiTaiKhoan, maNV);
+	    menu.setVisible(false);
+	    add(menu, BorderLayout.WEST);
 
-	public static void main(String[] args) {
-		 SwingUtilities.invokeLater(() -> {
-		        new LichsuThanhToan().setVisible(true);
-		    });
-
+	    pnl.getBtnMenu().addActionListener(e -> {
+	        menu.setVisible(!menu.isVisible());
+	        revalidate();
+	        repaint();
+	    });
 	}
+
 	
 	private void setTextFieldBackground(Box box, Color color) {
         for (Component component : box.getComponents()) {
@@ -447,7 +427,7 @@ public class LichsuThanhToan extends JFrame implements ActionListener,MouseListe
 	            hd.getThoiGianVao(),
 	            hd.getThoiGianRa(),
 	            hd.getMaNV() != null ? hd.getMaNV().getMaNV() : "",
-	            hd.getDiemTru(),
+	            hd.getDiemTL(),
 	            hd.getGiamGia(),
 	            String.format("%,.0f", hd.getTongTien()),
 	            hd.isTrangThai() ? "Đã thanh toán" : "Chưa thanh toán"
@@ -473,7 +453,7 @@ public class LichsuThanhToan extends JFrame implements ActionListener,MouseListe
 	            txtTongTien.setText(String.format("%,.0f VND", hd.getTongTien()));
 	            
 	            txtTenKH.setText(hd.getMaKH() != null ? hd.getMaKH().getTenKH() : "");
-	            txtDTL.setText(String.valueOf(hd.getDiemTru()));
+	            txtDTL.setText(String.valueOf(hd.getDiemTL()));
 	            txtThanhtoan.setText(String.format("%,.0f VND", hd.getTienKhachTra()));
 	            txtTienthoi.setText("");
 
@@ -682,8 +662,24 @@ public class LichsuThanhToan extends JFrame implements ActionListener,MouseListe
 		
 	}
 	
-	
-	
+	private void applyPermission() {
+	    if (loaiTaiKhoan == 0) { // Nhân viên
+	        // chỉ xem, không cho xóa hóa đơn
+	        if (btnXoa != null) {
+	            btnXoa.setEnabled(false);
+	        }
+	    }
+	    // Quản lý: giữ nguyên, full quyền
+	}
+
+	private JButton taoNut(String text) {
+        JButton btn = new JButton(text);
+        btn.setBackground(Color.WHITE);
+        btn.setForeground(Color.BLACK);
+        btn.setFocusPainted(false);
+        btn.setFont(new Font("Times New Roman", Font.BOLD, 18));
+        return btn;
+    }
 	
 
 }

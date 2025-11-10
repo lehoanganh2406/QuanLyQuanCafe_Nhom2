@@ -25,32 +25,71 @@ public class ThucDon_GUI extends JFrame implements ActionListener {
     private JLabel lblTitle;
     private SanPham selectedSP;
     private JPanel selectedCard;
-    
-    public ThucDon_GUI() {
+    private String tenHienThi;
+    private int loaiTaiKhoan;
+
+    // NEW: menu + header
+    private pnThanhMenu menuPanel;
+    private PanelTieuDe tieude;
+	private String maNV;
+
+    public ThucDon_GUI(String tenHienThi, int loaiTaiKhoan, String maNV) {
+        try {
+            ConnectDB.getInstance().connect();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        this.tenHienThi = tenHienThi;
+        this.loaiTaiKhoan = loaiTaiKhoan;
+        this.maNV = maNV;
+
         setTitle("Quản lý thực đơn");
         setExtendedState(JFrame.MAXIMIZED_BOTH);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        
-        //Đặt font mặc định cho toàn bộ giao diện
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        setLayout(new BorderLayout()); 
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent e) {
+                // Mở lại màn hình chính, truyền đúng tên + loại tài khoản
+                new ManHinhChinh_GUI(tenHienThi, loaiTaiKhoan, maNV).setVisible(true);
+                dispose(); // đóng cửa sổ Thực đơn
+            }
+        });
+
+
+        // Font mặc định
         Font fontlbl = new Font("Times New Roman", Font.BOLD, 18);
         Font fonttxt = new Font("Times New Roman", Font.PLAIN, 18);
         UIManager.put("Label.font", fontlbl);
         UIManager.put("Button.font", fonttxt);
         UIManager.put("TextField.font", fonttxt);
         UIManager.put("ComboBox.font", fonttxt);
-        
-        buildNorth();
-        buildWest();
-        buildCenter();
+
+        buildNorth();   // header + thanh tìm kiếm + nút chức năng
+        buildCenter();  // pCenter + pCards
+        buildWest();    // menu loại món nằm trong pCenter (bên trái)
+
+        // ===== Menu trái ẩn/hiện khi bấm icon =====
+        menuPanel = new pnThanhMenu(tenHienThi, loaiTaiKhoan, maNV);
+        menuPanel.setVisible(false);
+        add(menuPanel, BorderLayout.WEST);
+
+        tieude.getBtnMenu().addActionListener(e -> {
+            menuPanel.setVisible(!menuPanel.isVisible());
+            revalidate();
+            repaint();
+        });
 
         loadCard(CARD_ALL);
+        applyPermission();
     }
 
     private void buildNorth() {
-        // Tạo panel tiêu đề riêng
-        PanelTieuDe tieude = new PanelTieuDe("Thực đơn", "/img/thucdon.png");
-        
-        // Panel chứa thanh tìm kiếm và nút chức năng
+        String chucVu = (loaiTaiKhoan == 1) ? "Quản lý" : "Nhân viên";
+        tieude = new PanelTieuDe("Thực đơn", "/img/thucdon.png", chucVu, tenHienThi);
+
+        // Panel chứa thanh tìm kiếm & nút chức năng
         JPanel pChucNang = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
         pChucNang.setBackground(MAU_NAU_DAM);
 
@@ -61,7 +100,6 @@ public class ThucDon_GUI extends JFrame implements ActionListener {
         txtTim = new JTextField("Nhập tên, mã hoặc loại món...");
         txtTim.setPreferredSize(new Dimension(400, 30));
         txtTim.setForeground(Color.GRAY);
-
         txtTim.addFocusListener(new FocusAdapter() {
             public void focusGained(FocusEvent e) {
                 if (txtTim.getText().equals("Nhập tên, mã hoặc loại món...")) {
@@ -69,6 +107,7 @@ public class ThucDon_GUI extends JFrame implements ActionListener {
                     txtTim.setForeground(Color.BLACK);
                 }
             }
+
             public void focusLost(FocusEvent e) {
                 if (txtTim.getText().isEmpty()) {
                     txtTim.setText("Nhập tên, mã hoặc loại món...");
@@ -83,7 +122,6 @@ public class ThucDon_GUI extends JFrame implements ActionListener {
         btnSua = new JButton("Sửa");
         btnChiTiet = new JButton("Chi tiết");
 
-        // Gán style chung cho các nút
         for (JButton b : new JButton[]{btnTim, btnThem, btnXoa, btnSua, btnChiTiet}) {
             b.setFont(new Font("Times New Roman", Font.BOLD, 18));
             b.setBackground(Color.WHITE);
@@ -115,6 +153,13 @@ public class ThucDon_GUI extends JFrame implements ActionListener {
         btnChiTiet.addActionListener(this);
     }
 
+    private void buildCenter() {
+        pCenter = new JPanel(new BorderLayout());
+        pCards = new JPanel(cardLayout);
+        pCenter.add(pCards, BorderLayout.CENTER);
+        add(pCenter, BorderLayout.CENTER);
+    }
+
     private void buildWest() {
         pWest = new JPanel(new GridLayout(10, 1, 10, 10));
         pWest.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -129,7 +174,9 @@ public class ThucDon_GUI extends JFrame implements ActionListener {
             pWest.add(b);
             b.addActionListener(e -> showCard(loai));
         }
-        add(pWest, BorderLayout.WEST);
+
+        //  THAY ĐỔI: add vào pCenter (trái), KHÔNG add vào JFrame.WEST
+        pCenter.add(pWest, BorderLayout.WEST);
 
         btnTatCa.addActionListener(e -> showCard(CARD_ALL));
     }
@@ -140,13 +187,6 @@ public class ThucDon_GUI extends JFrame implements ActionListener {
         btn.setBackground(Color.WHITE);
         btn.setFocusPainted(false);
         return btn;
-    }
-
-    private void buildCenter() {
-        pCenter = new JPanel(new BorderLayout());
-        pCards = new JPanel(cardLayout);
-        pCenter.add(pCards, BorderLayout.CENTER);
-        add(pCenter, BorderLayout.CENTER);
     }
 
     private void loadCard(String cardKey) {
@@ -173,23 +213,21 @@ public class ThucDon_GUI extends JFrame implements ActionListener {
         pCards.add(scroll, cardKey);
     }
 
+
     private JPanel cardSanPham(SanPham sp) {
         JPanel card = new JPanel(new BorderLayout());
         card.setPreferredSize(new Dimension(310, 320));
         card.setBackground(Color.WHITE);
         card.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
 
-        // Ảnh
         JLabel lblImg = taiAnh(sp.getImg());
         lblImg.setPreferredSize(new Dimension(270, 200));
         card.add(lblImg, BorderLayout.CENTER);
 
-        // Tên món
         JLabel lblTen = new JLabel(sp.getTenSP(), SwingConstants.CENTER);
         lblTen.setFont(new Font("Times New Roman", Font.BOLD, 20));
         lblTen.setBorder(BorderFactory.createEmptyBorder(10, 0, 5, 0));
 
-        // Giá tiền
         JLabel lblGia = new JLabel(String.format("%,.0f đ", sp.getDonGia()), SwingConstants.CENTER);
         lblGia.setFont(new Font("Times New Roman", Font.BOLD, 18));
         lblGia.setForeground(Color.RED);
@@ -215,11 +253,9 @@ public class ThucDon_GUI extends JFrame implements ActionListener {
             }
             @Override
             public void mouseClicked(MouseEvent e) {
-                // Bỏ viền card cũ
                 if (selectedCard != null && selectedCard != card) {
                     selectedCard.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
                 }
-                // Đặt card mới
                 selectedCard = card;
                 selectedSP = sp;
                 card.setBorder(BorderFactory.createLineBorder(MAU_NAU_DAM, 5));
@@ -233,7 +269,6 @@ public class ThucDon_GUI extends JFrame implements ActionListener {
         return card;
     }
 
-
     private JLabel taiAnh(String imgPath) {
         JLabel lbl = new JLabel("", SwingConstants.CENTER);
         lbl.setPreferredSize(new Dimension(280, 200));
@@ -246,10 +281,8 @@ public class ThucDon_GUI extends JFrame implements ActionListener {
             }
             ImageIcon icon;
             if (new File(imgPath).exists()) {
-                //Ảnh nằm ở ổ đĩa máy
                 icon = new ImageIcon(imgPath);
             } else {
-                //Ảnh nằm trong thư mục img của project
                 java.net.URL url = getClass().getResource("/img/" + imgPath);
                 if (url != null) {
                     icon = new ImageIcon(url);
@@ -278,7 +311,6 @@ public class ThucDon_GUI extends JFrame implements ActionListener {
         cardLayout.show(pCards, key);
     }
 
-    
     private void showChiTiet(SanPham sp) {
         JFrame frmChiTiet = new JFrame("Chi tiết sản phẩm");
         frmChiTiet.setSize(700, 750);
@@ -363,7 +395,7 @@ public class ThucDon_GUI extends JFrame implements ActionListener {
         btnDong.addActionListener(ev -> frmChiTiet.dispose());
         frmChiTiet.setVisible(true);
     }
-    // Hàm tạo dòng hiển thị thông tin (chỉ đọc)
+ // Hàm tạo dòng hiển thị thông tin (chỉ đọc)
     private JPanel createRowView(String label, String value) {
         JPanel p = new JPanel(new BorderLayout(10, 10));
         p.setBackground(new Color(227, 207, 193));
@@ -377,20 +409,17 @@ public class ThucDon_GUI extends JFrame implements ActionListener {
         return p;
     }
 
-
-    
     @Override
     public void actionPerformed(ActionEvent e) {
         Object o = e.getSource();
-        
+
         if (o.equals(btnTim)) {
             String kw = txtTim.getText().trim();
             List<SanPham> kq = spDAO.search(kw);
-            
+
             if (kq.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Không tìm thấy!");
-            } 
-            else {
+            } else {
                 JPanel grid = new JPanel(new GridLayout(0, 3, 30, 30));
                 for (SanPham sp : kq)
                     grid.add(cardSanPham(sp));
@@ -398,23 +427,30 @@ public class ThucDon_GUI extends JFrame implements ActionListener {
                 pCards.add(scroll, "SEARCH");
                 cardLayout.show(pCards, "SEARCH");
             }
-        } 
-        
-        else if (o.equals(btnThem)) {
+        } else if (o.equals(btnThem)) {
+            if (loaiTaiKhoan == 0) {
+                JOptionPane.showMessageDialog(this, "Bạn không có quyền thêm món!");
+                return;
+            }
             new ThemSanPham_GUI().setVisible(true);
-        } 
-        
-        else if (o.equals(btnXoa)) {
+
+        } else if (o.equals(btnXoa)) {
+            if (loaiTaiKhoan == 0) {
+                JOptionPane.showMessageDialog(this, "Bạn không có quyền xóa món!");
+                return;
+            }
             if (selectedSP == null) {
                 JOptionPane.showMessageDialog(this, "Vui lòng chọn món cần xóa!");
                 return;
             }
-            int confirm = JOptionPane.showConfirmDialog(this, "Bạn có chắc muốn xóa sản phẩm: " + selectedSP.getTenSP() + " ?", "Xác nhận", JOptionPane.YES_NO_OPTION);
+            int confirm = JOptionPane.showConfirmDialog(this,
+                    "Bạn có chắc muốn xóa sản phẩm: " + selectedSP.getTenSP() + " ?",
+                    "Xác nhận", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
                 boolean ok = spDAO.xoaSanPham(selectedSP.getMaSP());
                 if (ok) {
                     JOptionPane.showMessageDialog(this, "Xóa thành công!");
-                    pCards.removeAll();  //tải lại danh sách
+                    pCards.removeAll();
                     loadCard(CARD_ALL);
                     pCards.revalidate();
                     pCards.repaint();
@@ -422,24 +458,25 @@ public class ThucDon_GUI extends JFrame implements ActionListener {
                     JOptionPane.showMessageDialog(this, "Xóa thất bại!");
                 }
             }
-        }
-        
-        else if (o.equals(btnSua)) {
+
+        } else if (o.equals(btnSua)) {
+            if (loaiTaiKhoan == 0) {
+                JOptionPane.showMessageDialog(this, "Bạn không có quyền sửa món!");
+                return;
+            }
             if (selectedSP == null) {
                 JOptionPane.showMessageDialog(this, "Vui lòng chọn món cần sửa!");
                 return;
             }
-            // Mở form sửa, truyền sản phẩm được chọn
             ThemSanPham_GUI suaSP = new ThemSanPham_GUI(selectedSP);
             suaSP.setVisible(true);
-            
+
             pCards.removeAll();
             loadCard(CARD_ALL);
             pCards.revalidate();
             pCards.repaint();
-        }
-        
-        else if (o.equals(btnChiTiet)) {
+
+        } else if (o.equals(btnChiTiet)) {
             if (selectedSP != null)
                 showChiTiet(selectedSP);
             else
@@ -447,8 +484,12 @@ public class ThucDon_GUI extends JFrame implements ActionListener {
         }
     }
 
-    public static void main(String[] args) {
-        ConnectDB.getInstance().connect();
-        SwingUtilities.invokeLater(() -> new ThucDon_GUI().setVisible(true));
+    private void applyPermission() {
+        if (loaiTaiKhoan == 0) {
+            if (btnThem != null) btnThem.setEnabled(false);
+            if (btnSua  != null) btnSua.setEnabled(false);
+            if (btnXoa  != null) btnXoa.setEnabled(false);
+        }
     }
+
 }

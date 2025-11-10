@@ -31,7 +31,7 @@ public class HoaDon_DAO {
     }
     
     public List<HoaDon> getAllHoaDon() {
-        String sql = "SELECT maHD, maBan, maKH, maNV, thoiGianVao, thoiGianRa, trangThai, diemTru ,giamGia, tongTien,tienKhachTra FROM HoaDon";
+        String sql = "SELECT maHD, maBan, maKH, maNV, thoiGianVao, thoiGianRa, trangThai, diemTL ,giamGia, tongTien,tienKhachTra FROM HoaDon";
         List<HoaDon> dsHD = new ArrayList<>();
         Connection con = ConnectDB.getConnection();
 
@@ -64,7 +64,7 @@ public class HoaDon_DAO {
                 hd.setThoiGianVao(rs.getTimestamp("thoiGianVao"));
                 hd.setThoiGianRa(rs.getTimestamp("thoiGianRa"));
                 hd.setTrangThai(rs.getInt("trangThai") == 1);
-                hd.setDiemTru(rs.getInt("diemTru"));
+                hd.setDiemTL(rs.getInt("diemTL"));
                 hd.setGiamGia(rs.getDouble("giamGia"));
                 hd.setTongTien(rs.getDouble("tongTien"));
 
@@ -113,7 +113,7 @@ public class HoaDon_DAO {
         try {
             Connection con = ConnectDB.getConnection();
             String sql = "INSERT INTO HoaDon(" +
-                         " maHD, maBan, maKH, maNV, thoiGianVao, thoiGianRa, trangThai, diemTru ,giamGia, tongTien, tienKhachTra) " +
+                         " maHD, maBan, maKH, maNV, thoiGianVao, thoiGianRa, trangThai, diemTL ,giamGia, tongTien, tienKhachTra) " +
                          "VALUES (?,?,?,?,?,?,?,?,?,?,?)";
             PreparedStatement ps = con.prepareStatement(sql);
 
@@ -130,7 +130,7 @@ public class HoaDon_DAO {
             ps.setTimestamp(5, hd.getThoiGianVao());
             ps.setTimestamp(6, hd.getThoiGianRa());
             ps.setInt(7, hd.isTrangThai() ? 1 : 0);
-            ps.setInt(8, hd.getDiemTru());
+            ps.setInt(8, hd.getDiemTL());
             ps.setDouble(9, hd.getGiamGia());
             ps.setDouble(10, hd.getTongTien());
             ps.setDouble(11, hd.getTienKhachTra());

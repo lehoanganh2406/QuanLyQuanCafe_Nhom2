@@ -48,14 +48,34 @@ public class DSNhanVien_GUI extends JFrame implements ActionListener, MouseListe
 	private JComboBox<String> comboChucVu;
 	private NhanVien_DAO nv_DAO;
 	private JLabel lbMess;
+	private String tenHienThi;
+	private int loaiTaiKhoan;
+	private String maNV;
 
-    public DSNhanVien_GUI() {
+    public DSNhanVien_GUI(String tenHienThi, int loaiTaiKhoan, String maNV) {
+    	try {
+            ConnectDB.getInstance().connect();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    	this.tenHienThi = tenHienThi;
+        this.loaiTaiKhoan = loaiTaiKhoan;
+        this.maNV = maNV;
     	nv_DAO = new NhanVien_DAO();
         setTitle("Danh sách nhân viên ");
         setExtendedState(JFrame.MAXIMIZED_BOTH);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         setLocationRelativeTo(null);
-        setLayout(new BorderLayout()); // quan trọng
+        setLayout(new BorderLayout()); 
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent e) {
+                // Quay lại màn hình chính, giữ đúng tài khoản + tên hiển thị
+                new ManHinhChinh_GUI(tenHienThi, loaiTaiKhoan, maNV).setVisible(true);
+                dispose();
+            }
+        });
+
 
         thanhTieuDe();
 
@@ -233,14 +253,20 @@ public class DSNhanVien_GUI extends JFrame implements ActionListener, MouseListe
 
     /* ===================== TIÊU ĐỀ ===================== */
     private void thanhTieuDe() {
-        PanelTieuDe tieude = new PanelTieuDe("Danh sách nhân viên", "/img/nhanvien.png");
+    	String chucVu = (loaiTaiKhoan == 1) ? "Quản lý" : "Nhân viên";
+        PanelTieuDe tieude = new PanelTieuDe("Danh sách nhân viên", "/img/nhanvien.png", chucVu, tenHienThi);
         add(tieude, BorderLayout.NORTH);
+        pnThanhMenu menu = new pnThanhMenu(tenHienThi, loaiTaiKhoan,maNV);
+		menu.setVisible(false);
+		add(menu, BorderLayout.WEST);
+
+		tieude.getBtnMenu().addActionListener(e -> {
+		    menu.setVisible(!menu.isVisible());
+		    revalidate();
+		    repaint();
+		});
     }
 
-    public static void main(String[] args) {
-        ConnectDB.getInstance().connect();
-        SwingUtilities.invokeLater(() -> new DSNhanVien_GUI().setVisible(true));
-    }
 
     private JButton taoNut(String text) {
         JButton btn = new JButton(text);

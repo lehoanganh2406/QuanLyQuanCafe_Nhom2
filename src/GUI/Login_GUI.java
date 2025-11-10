@@ -1,5 +1,5 @@
 package GUI;
-import GUI.ManHinhChinh;
+import GUI.ManHinhChinh_GUI;
 import javax.swing.*;
 
 import connectDB.ConnectDB;
@@ -11,14 +11,14 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-public class Login extends JFrame implements ActionListener{
+public class Login_GUI extends JFrame implements ActionListener{
 
     private JTextField txtMaNV;
     private JPasswordField txtPassword;
     private JButton btnDangNhap;
     private JRadioButton rdoNhanVien, rdoQuanLy;
 
-    public Login() {
+    public Login_GUI() {
         setTitle("Đăng nhập");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(800, 500);
@@ -98,7 +98,15 @@ public class Login extends JFrame implements ActionListener{
 	    ResultSet rs = null;
 
 	    try {
-	        String sql = "SELECT * FROM TaiKhoan WHERE tenDangNhap = ? AND matKhau = ?";
+	        // Truy vấn JOIN để lấy thêm họ tên và chức vụ
+	        String sql = """
+	            SELECT tk.tenDangNhap, tk.matKhau, tk.tenHienThi, tk.loaiTaiKhoan, tk.maNV,
+	                   nv.hoTen, nv.chucVu
+	            FROM TaiKhoan tk
+	            JOIN NhanVien nv ON tk.maNV = nv.maNV
+	            WHERE tk.tenDangNhap = ? AND tk.matKhau = ?
+	        """;
+
 	        stmt = con.prepareStatement(sql);
 	        stmt.setString(1, dangNhap);
 	        stmt.setString(2, matKhau);
@@ -106,9 +114,13 @@ public class Login extends JFrame implements ActionListener{
 	        rs = stmt.executeQuery();
 
 	        if (rs.next()) {
-	            String tenHienThi = rs.getString("tenHienThi"); // Lấy tên hiển thị
-	            JOptionPane.showMessageDialog(this, "Đăng nhập thành công!");
-	            ManHinhChinh mhc = new ManHinhChinh(tenHienThi); // Truyền tên vào màn hình chính
+	            String tenHienThi = rs.getString("hoTen");   
+	            String chucVu = rs.getString("chucVu");
+	            int loaiTaiKhoan = rs.getInt("loaiTaiKhoan");
+	            String maNV = rs.getString("maNV");
+	            JOptionPane.showMessageDialog(this, 
+	                "Đăng nhập thành công!\nXin chào, " + chucVu + " " + tenHienThi);
+	            ManHinhChinh_GUI mhc = new ManHinhChinh_GUI(tenHienThi, loaiTaiKhoan, maNV);
 	            mhc.setVisible(true);
 	            this.dispose();
 	        } else {
@@ -128,10 +140,11 @@ public class Login extends JFrame implements ActionListener{
 	    }
 	}
 
+
 	
 	public static void main(String[] args) {
 	    SwingUtilities.invokeLater(() -> {
-	        new Login().setVisible(true);
+	        new Login_GUI().setVisible(true);
 	    });
 	}
 }
