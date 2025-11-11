@@ -152,138 +152,121 @@ public class ThemSanPham_GUI extends JFrame implements ActionListener {
         txtSoLuong.setText(String.valueOf(sp.getSoLuong()));
         txtDonGia.setText(String.valueOf(sp.getDonGia()));
         txtMoTa.setText(sp.getMoTa());
-        // chọn loại đúng
+
+        //chọn đúng loại sản phẩm
         for (int i = 0; i < dsLoai.size(); i++) {
             if (dsLoai.get(i).getMaLoai().equals(sp.getLoaiSP().getMaLoai())) {
                 cboLoai.setSelectedIndex(i);
                 break;
             }
         }
-        //hiển thị ảnh
+
+        // Hiển thị ảnh
+        lblAnh.setText("Không có ảnh");
+        lblAnh.setOpaque(true);
+        lblAnh.setBackground(Color.LIGHT_GRAY);
+
         if (sp.getImg() != null && !sp.getImg().isEmpty()) {
             try {
+                ImageIcon icon = null;
                 File f = new File(sp.getImg());
-                ImageIcon icon;
-
-                if (f.exists()) {
-                    //Ảnh nằm ngoài ổ đĩa (đường dẫn tuyệt đối)
-                    icon = new ImageIcon(f.getAbsolutePath());
-                } else {
-                    //Ảnh nằm trong thư mục resources /img/
+                if (f.exists()) icon = new ImageIcon(f.getAbsolutePath());
+                else {
                     java.net.URL url = getClass().getResource("/img/" + sp.getImg());
-                    if (url != null)
-                        icon = new ImageIcon(url);
-                    else
-                        throw new Exception("Không tìm thấy ảnh");
+                    if (url != null) icon = new ImageIcon(url);
                 }
 
-                Image scaled = icon.getImage().getScaledInstance(400, 250, Image.SCALE_SMOOTH);
-                lblAnh.setIcon(new ImageIcon(scaled));
-                lblAnh.setText("");
-                lblAnh.repaint();
-
-            } catch (Exception ex) {
+                if (icon != null) {
+                    Image img = icon.getImage().getScaledInstance(400, 250, Image.SCALE_SMOOTH);
+                    lblAnh.setIcon(new ImageIcon(img));
+                    lblAnh.setText("");
+                }
+            } catch (Exception e) {
                 lblAnh.setText("Không tìm thấy ảnh");
-                lblAnh.setOpaque(true);
-                lblAnh.setBackground(Color.LIGHT_GRAY);
             }
-        } else {
-            lblAnh.setText("Không có ảnh");
-            lblAnh.setOpaque(true);
-            lblAnh.setBackground(Color.LIGHT_GRAY);
         }
     }
 
+    
     @Override
     public void actionPerformed(ActionEvent e) {
         Object o = e.getSource();
 
         if (o.equals(btnHuy)) {
             dispose();
-        } 
-        else if (o.equals(btnChonAnh)) {
-            JFileChooser chooser = new JFileChooser();
+        }
+        
+        if (o.equals(btnChonAnh)) {
+            JFileChooser chooser = new JFileChooser(); //tạo cửa sổ chọn file
             chooser.setDialogTitle("Chọn ảnh sản phẩm");
             chooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Hình ảnh", "jpg", "png", "jpeg"));
-            int result = chooser.showOpenDialog(this);
-            if (result == JFileChooser.APPROVE_OPTION) {
+
+            if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) { 
+                // Hiển thị hộp thoại mở file, nếu người dùng chọn file và nhấn "Open"
                 fileAnh = chooser.getSelectedFile();
-                ImageIcon icon = new ImageIcon(fileAnh.getAbsolutePath());
-                Image img = icon.getImage().getScaledInstance(400, 250, Image.SCALE_SMOOTH);
+                Image img = new ImageIcon(fileAnh.getAbsolutePath()).getImage()
+                                .getScaledInstance(400, 250, Image.SCALE_SMOOTH);
+                //tạo ImageIcon từ đường dẫn file, sau đó lấy Image và scale (resize) về 400x250 pixel
                 lblAnh.setIcon(new ImageIcon(img));
-            }
-        } 
-        
-        else if (o.equals(btnLuu)) {
-            try {
-            	String ten = txtTenSP.getText().trim();
-            	String soLuongStr = txtSoLuong.getText().trim();
-            	String donGiaStr = txtDonGia.getText().trim();
-            	String moTa = txtMoTa.getText().trim();
-
-            	// Kiểm tra rỗng
-            	if (ten.isEmpty() || soLuongStr.isEmpty() || donGiaStr.isEmpty()) {
-            	    JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ Tên, Số lượng và Đơn giá!");
-            	    return;
-            	}
-
-            	// Kiểm tra định dạng
-            	int soLuong;
-            	double donGia;
-            	try {
-            	    soLuong = Integer.parseInt(soLuongStr);
-            	    donGia = Double.parseDouble(donGiaStr);
-            	} catch (NumberFormatException ex) {
-            	    JOptionPane.showMessageDialog(this, "Số lượng và đơn giá phải là số hợp lệ!");
-            	    return;
-            	}
-
-                int index = cboLoai.getSelectedIndex();
-                if (index < 0) {
-                    JOptionPane.showMessageDialog(this, "Vui lòng chọn loại sản phẩm!");
-                    return;
-                }
-                LoaiSanPham loai = dsLoai.get(index);
-                String pathAnh = null;
-                if (fileAnh != null) {
-                    // chỉ lưu tên file, ví dụ "trasua.png"
-                    pathAnh = fileAnh.getName();
-                } else if (spSua != null) {
-                    // đang sửa mà không chọn ảnh mới -> giữ ảnh cũ
-                    pathAnh = spSua.getImg();
-                }
-
-                boolean ok;
-                if (spSua == null) {
-                    // thêm
-                    SanPham spMoi = new SanPham(null, ten, soLuong, donGia, pathAnh, loai, moTa);
-                    ok = spDAO.themSanPham(spMoi);
-                } else {
-                    // sửa
-                    spSua.setTenSP(ten);
-                    spSua.setSoLuong(soLuong);
-                    spSua.setDonGia(donGia);
-                    spSua.setMoTa(moTa);
-                    spSua.setLoaiSP(loai);
-                    spSua.setImg(pathAnh);
-                    ok = spDAO.suaSanPham(spSua);
-                }
-
-                if (ok) {
-                    JOptionPane.showMessageDialog(this,
-                            (spSua == null ? "Thêm" : "Cập nhật") + " sản phẩm thành công!");
-                    dispose();
-                } else {
-                    JOptionPane.showMessageDialog(this,
-                            (spSua == null ? "Thêm" : "Cập nhật") + " sản phẩm thất bại!");
-                }
-
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                JOptionPane.showMessageDialog(this, "Vui lòng nhập đúng định dạng dữ liệu!");
             }
         }
 
+        
+        else if (o.equals(btnLuu)) {
+            String ten = txtTenSP.getText().trim();
+            String soLuongStr = txtSoLuong.getText().trim();
+            String donGiaStr = txtDonGia.getText().trim();
+            String moTa = txtMoTa.getText().trim();
+
+            if (ten.isEmpty() || soLuongStr.isEmpty() || donGiaStr.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ Tên, Số lượng và Đơn giá!");
+                return;
+            }
+
+            int soLuong;
+            double donGia;
+            try {
+                soLuong = Integer.parseInt(soLuongStr);
+                donGia = Double.parseDouble(donGiaStr);
+                if (soLuong <= 0 || donGia <= 0) {
+                    JOptionPane.showMessageDialog(this, "Số lượng và đơn giá phải lớn hơn 0!");
+                    return;
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Số lượng và đơn giá phải là số hợp lệ!");
+                return;
+            }
+
+            // Lấy loại sản phẩm
+            int index = cboLoai.getSelectedIndex();
+            if (index < 0) {
+                JOptionPane.showMessageDialog(this, "Vui lòng chọn loại sản phẩm!");
+                return;
+            }
+            LoaiSanPham loai = dsLoai.get(index);
+
+            //Xử lý ảnh
+            String pathAnh = (fileAnh != null) ? fileAnh.getName() : (spSua != null ? spSua.getImg() : null);
+
+            //Thêm hoặc sửa sản phẩm
+            boolean ok;
+            if (spSua == null) {
+                SanPham spMoi = new SanPham(null, ten, soLuong, donGia, pathAnh, loai, moTa);
+                ok = spDAO.themSanPham(spMoi);
+            } else {
+                spSua.setTenSP(ten);
+                spSua.setSoLuong(soLuong);
+                spSua.setDonGia(donGia);
+                spSua.setMoTa(moTa);
+                spSua.setLoaiSP(loai);
+                spSua.setImg(pathAnh);
+                ok = spDAO.suaSanPham(spSua);
+            }
+            JOptionPane.showMessageDialog(this,
+                    (ok ? (spSua == null ? "Thêm" : "Cập nhật") + " sản phẩm thành công!"
+                        : (spSua == null ? "Thêm" : "Cập nhật") + " sản phẩm thất bại!"));
+            if (ok) dispose();
+        }
     }
 
     public static void main(String[] args) {
