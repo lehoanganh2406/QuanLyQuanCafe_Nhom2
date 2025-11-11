@@ -213,6 +213,7 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
 
         // Ô text nhập trực tiếp
         txtTruDiem = taoOText("Nhập điểm tích lũy...");
+        txtTruDiem.setEditable(false);
         txtGiamGia = taoOText("Nhập % giảm giá...");
         setNumericFilter(txtTruDiem, 0, Integer.MAX_VALUE);
         setNumericFilter(txtGiamGia, 0, 100);
@@ -552,6 +553,7 @@ public class ThanhToan_GUI extends JFrame implements ActionListener, KeyListener
                 kh.getMaKH(), kh.getTenKH(), kh.getDiemTL()));
 
         // Giới hạn ô Trừ điểm theo điểm tích lũy hiện có
+        txtTruDiem.setEditable(true); 
         setNumericFilter(txtTruDiem, 0, kh.getDiemTL());      // thay max động = điểm KH
         txtTruDiem.setText("0");                               // reset về 0 cho chắc
         txtTruDiem.setToolTipText("Tối đa " + kh.getDiemTL() + " điểm");

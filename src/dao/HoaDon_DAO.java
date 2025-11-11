@@ -63,7 +63,7 @@ public class HoaDon_DAO {
                 hd.setMaNV(new NhanVien(rs.getString("maNV")));
                 hd.setThoiGianVao(rs.getTimestamp("thoiGianVao"));
                 hd.setThoiGianRa(rs.getTimestamp("thoiGianRa"));
-                hd.setTrangThai(rs.getInt("trangThai") == 1);
+                hd.setTrangThai(rs.getBoolean("trangThai"));
                 hd.setDiemTL(rs.getInt("diemTL"));
                 hd.setGiamGia(rs.getDouble("giamGia"));
                 hd.setTongTien(rs.getDouble("tongTien"));
@@ -129,7 +129,7 @@ public class HoaDon_DAO {
             ps.setString(4, hd.getMaNV().getMaNV());
             ps.setTimestamp(5, hd.getThoiGianVao());
             ps.setTimestamp(6, hd.getThoiGianRa());
-            ps.setInt(7, hd.isTrangThai() ? 1 : 0);
+            ps.setBoolean(7, hd.isTrangThai());
             ps.setInt(8, hd.getDiemTL());
             ps.setDouble(9, hd.getGiamGia());
             ps.setDouble(10, hd.getTongTien());
@@ -156,19 +156,17 @@ public class HoaDon_DAO {
     }
 
     
-    public boolean xoaHoaDon(String maHD) {
-		String sql= "delete FROM HoaDon WHERE maHD = ?";
-		Connection con= ConnectDB.getInstance().getConnection();
-		try (PreparedStatement st= con.prepareStatement(sql)) {
-			st.setString(1, maHD);
-			int aff= st.executeUpdate();
-			return aff>0;      //xoa thanh cong
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return false;     //xoa that bai
-		
-	}
+    public boolean huyHoaDon(String maHD) {
+        String sql = "UPDATE HoaDon SET trangThai = 0 WHERE maHD = ?"; // 1 = đã hủy
+        Connection con = ConnectDB.getInstance().getConnection();
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, maHD);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
     
     public List<SanPham> getSPtheomaHD(String maHD) {
 		List<SanPham> list= new ArrayList<SanPham>();

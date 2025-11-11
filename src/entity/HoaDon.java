@@ -105,7 +105,7 @@ public class HoaDon {
         this.maNV = new NhanVien(rs.getString("maNV"));
         this.thoiGianVao = rs.getTimestamp("thoiGianVao");
         this.thoiGianRa = rs.getTimestamp("thoiGianRa");
-        this.trangThai = rs.getInt("trangThai") == 1;
+        this.trangThai = rs.getBoolean("trangThai");
         this.diemTL = rs.getInt("diemTL");
         this.giamGia = rs.getInt("giamGia");
         this.tongTien = rs.getDouble("tongTien");

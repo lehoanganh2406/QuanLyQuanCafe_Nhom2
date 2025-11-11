@@ -430,7 +430,7 @@ public class DsHoaDon_GUI extends JFrame implements ActionListener,MouseListener
 	            hd.getDiemTL(),
 	            hd.getGiamGia(),
 	            String.format("%,.0f", hd.getTongTien()),
-	            hd.isTrangThai() ? "Đã thanh toán" : "Chưa thanh toán"
+	            hd.isTrangThai() ? "Đã thanh toán" : "Đã hủy" 
 	        });
 	    }
 		
@@ -544,37 +544,35 @@ public class DsHoaDon_GUI extends JFrame implements ActionListener,MouseListener
 	}
 	
 	public void xoa() {
-		int row= tableHD.getSelectedRow();
-		if (row<0) {
-			JOptionPane.showMessageDialog(this, "Hãy chọn hóa đơn để xóa");
-			return ;
-			
-		}
-		
-		String ma= tableHD.getValueAt(row, 0).toString();
-		int confirm= JOptionPane.showConfirmDialog(this, "Có chắc chắn muốn xóa hóa đơn [" + ma + "] không?",
-				"Xác nhận xóa",
-				JOptionPane.YES_NO_OPTION,
-				JOptionPane.QUESTION_MESSAGE
-		);
-		
-		if (confirm!=JOptionPane.YES_OPTION) {
-			return;
-		}
-		
-		boolean re= hd_dao.xoaHoaDon(ma);
-		if (re) {
-			DefaultTableModel md= (DefaultTableModel) tableHD.getModel();
-			md.removeRow(row);
-			JOptionPane.showMessageDialog(this, "Đã xóa hóa đơn thành công");
-		}
-		else {
-			JOptionPane.showMessageDialog(this, "Xóa hóa đơn thất bại");
+	    int row = tableHD.getSelectedRow();
+	    if (row < 0) {
+	        JOptionPane.showMessageDialog(this, "Hãy chọn hóa đơn để hủy");
+	        return;
+	    }
 
-		}
-		
-		
+	    String ma = tableHD.getValueAt(row, 0).toString();
+	    String trangThai = tableHD.getValueAt(row, 7).toString();
+
+	    if ("Đã hủy".equalsIgnoreCase(trangThai)) {
+	        JOptionPane.showMessageDialog(this, "Hóa đơn này đã bị hủy trước đó.");
+	        return;
+	    }
+
+	    int confirm = JOptionPane.showConfirmDialog(this,
+	            "Bạn có chắc muốn hủy hóa đơn [" + ma + "] không?",
+	            "Xác nhận hủy",
+	            JOptionPane.YES_NO_OPTION);
+	    if (confirm != JOptionPane.YES_OPTION) return;
+
+	    boolean re = hd_dao.huyHoaDon(ma);
+	    if (re) {
+	        tableHD.setValueAt("Đã hủy", row, 7);
+	        JOptionPane.showMessageDialog(this, "Đã hủy hóa đơn thành công!");
+	    } else {
+	        JOptionPane.showMessageDialog(this, "Hủy hóa đơn thất bại!");
+	    }
 	}
+
 	 
 	public void timKiem() {
 		String ma= txtTim.getText().trim();

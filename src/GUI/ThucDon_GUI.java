@@ -420,7 +420,8 @@ public class ThucDon_GUI extends JFrame implements ActionListener {
             if (kq.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Không tìm thấy!");
             } else {
-                JPanel grid = new JPanel(new GridLayout(0, 3, 30, 30));
+                JPanel grid = new JPanel(new GridLayout(0, 4, 30, 30));
+                grid.setBackground(MAU_NAU_NHAT);
                 for (SanPham sp : kq)
                     grid.add(cardSanPham(sp));
                 JScrollPane scroll = new JScrollPane(grid);

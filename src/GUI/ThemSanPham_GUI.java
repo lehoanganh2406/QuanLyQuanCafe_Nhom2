@@ -192,7 +192,6 @@ public class ThemSanPham_GUI extends JFrame implements ActionListener {
             lblAnh.setOpaque(true);
             lblAnh.setBackground(Color.LIGHT_GRAY);
         }
-
     }
 
     @Override
@@ -217,10 +216,27 @@ public class ThemSanPham_GUI extends JFrame implements ActionListener {
         
         else if (o.equals(btnLuu)) {
             try {
-                String ten = txtTenSP.getText().trim();
-                int soLuong = Integer.parseInt(txtSoLuong.getText().trim());
-                double donGia = Double.parseDouble(txtDonGia.getText().trim());
-                String moTa = txtMoTa.getText().trim();
+            	String ten = txtTenSP.getText().trim();
+            	String soLuongStr = txtSoLuong.getText().trim();
+            	String donGiaStr = txtDonGia.getText().trim();
+            	String moTa = txtMoTa.getText().trim();
+
+            	// Kiểm tra rỗng
+            	if (ten.isEmpty() || soLuongStr.isEmpty() || donGiaStr.isEmpty()) {
+            	    JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ Tên, Số lượng và Đơn giá!");
+            	    return;
+            	}
+
+            	// Kiểm tra định dạng
+            	int soLuong;
+            	double donGia;
+            	try {
+            	    soLuong = Integer.parseInt(soLuongStr);
+            	    donGia = Double.parseDouble(donGiaStr);
+            	} catch (NumberFormatException ex) {
+            	    JOptionPane.showMessageDialog(this, "Số lượng và đơn giá phải là số hợp lệ!");
+            	    return;
+            	}
 
                 int index = cboLoai.getSelectedIndex();
                 if (index < 0) {
