@@ -593,9 +593,10 @@ public class DsHoaDon_GUI extends JFrame implements ActionListener,MouseListener
 	            hd.getThoiGianVao(),
 	            hd.getThoiGianRa(),
 	            hd.getMaNV() != null ? hd.getMaNV().getMaNV() : "",
+	            hd.getDiemTL(), 
 	            hd.getGiamGia(),
 	            String.format("%,.0f", hd.getTongTien()),
-	            hd.isTrangThai() ? "Đã thanh toán" : "Chưa thanh toán"
+	            hd.isTrangThai() ? "Đã thanh toán" : "Đã hủy"
 	        });
 	    }
 	    
@@ -646,9 +647,10 @@ public class DsHoaDon_GUI extends JFrame implements ActionListener,MouseListener
 			md.addRow(new Object[] {
 					h.getMaHD(),h.getThoiGianVao(),h.getThoiGianRa(),
 					h.getMaNV()!=null ? h.getMaNV().getMaNV() : "",
+							h.getDiemTL(),
 							h.getGiamGia(),
 							String.format("%,.0f", h.getTongTien()),
-				            h.isTrangThai() ? "Đã thanh toán" : "Chưa thanh toán"
+				            h.isTrangThai() ? "Đã thanh toán" : "Đã hủy"
 			});
 			
 		}

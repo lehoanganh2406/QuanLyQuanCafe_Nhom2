@@ -488,13 +488,13 @@ public class Order_GUI extends JFrame implements ActionListener {
     }
 
     private void tinhTong() {
-        int tongSL = 0; long tongTien = 0;
+        int tongSL = 0; double tongTien = 0;
         for (int i = 0; i < cartModel.getRowCount(); i++) {
             tongSL += (Integer) cartModel.getValueAt(i, 2);
             tongTien += (Double) cartModel.getValueAt(i, 4);
         }
         lblTongSL.setText(String.valueOf(tongSL));
-        lblTongTien.setText(String.format("%,d", tongTien).replace(',', '.'));
+        lblTongTien.setText(formatVND(tongTien));
     }
 
     /* ===================== TÌM KIẾM ===================== */
