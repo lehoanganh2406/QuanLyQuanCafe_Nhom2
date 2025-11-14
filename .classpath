@@ -9,5 +9,6 @@
 	<classpathentry kind="lib" path="lib/jcalendar-1.4.jar"/>
 	<classpathentry kind="lib" path="lib/mssql-jdbc-12.10.0.jre11.jar"/>
 	<classpathentry kind="lib" path="lib/itextpdf-5.5.9.jar"/>
+	<classpathentry kind="lib" path="lib/jfreechart-1.5.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

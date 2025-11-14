@@ -7,7 +7,7 @@ import java.awt.event.ActionListener;
 
 public class pnThanhMenu extends JPanel implements ActionListener {
 
-    private JButton btnHome, btnOrder, btnMenu, btnDSKhachHang, btnDSNhanVien, btnHoaDon, btnLogout;
+    private JButton btnHome,btnThongKe, btnOrder, btnMenu, btnDSKhachHang, btnDSNhanVien, btnHoaDon, btnLogout;
     private String tenHienThi;
     private int loaiTaiKhoan; // 1 = Quản lý, 0 = Nhân viên
     private Color themeColor = new Color(120, 74, 57);
@@ -34,14 +34,16 @@ public class pnThanhMenu extends JPanel implements ActionListener {
         btnDSKhachHang  = createSideButton("DANH SÁCH KHÁCH HÀNG", "src/img/user.png");
         btnDSNhanVien   = createSideButton("DANH SÁCH NHÂN VIÊN", "src/img/staff.png");
         btnHoaDon       = createSideButton("LỊCH SỬ HÓA ĐƠN", "src/img/bill.png");
+        btnThongKe      = createSideButton("THỐNG KÊ", "src/img/thongke.png");
         btnLogout       = createSideButton("ĐĂNG XUẤT", "src/img/logout.png");
 
         // ===== Sắp xếp menu =====
         add(btnHome);
         add(btnOrder);
         add(btnMenu);
-        add(btnDSKhachHang);   // luôn hiện
-        add(btnDSNhanVien);    // luôn hiện
+        add(btnDSKhachHang);   
+        add(btnDSNhanVien);    
+        add(btnThongKe);
         add(btnHoaDon);
 
         add(Box.createVerticalGlue());
@@ -51,13 +53,14 @@ public class pnThanhMenu extends JPanel implements ActionListener {
         if (loaiTaiKhoan == 0) {
             btnDSKhachHang.setToolTipText("Chỉ quản lý mới được truy cập");
             btnDSNhanVien.setToolTipText("Chỉ quản lý mới được truy cập");
+            btnThongKe.setToolTipText("Chỉ quản lý mới được truy cập");
         }
 
         // Gắn sự kiện
         for (JButton btn : new JButton[]{
                 btnHome, btnOrder, btnMenu,
                 btnDSKhachHang, btnDSNhanVien,
-                btnHoaDon, btnLogout}) {
+                btnHoaDon, btnLogout, btnThongKe}) {
             btn.addActionListener(this);
         }
     }
@@ -126,7 +129,10 @@ public class pnThanhMenu extends JPanel implements ActionListener {
                 showNoPermission();
             }
 
-        } else if (src.equals(btnHoaDon)) {
+        } else if (src.equals(btnThongKe)) {
+			openThongKe();
+		}
+        else if (src.equals(btnHoaDon)) {
             // Cả 2 vào, xóa chỉ cho QL xử lý trong LichsuThanhToan
             openHoaDon();
 
@@ -182,6 +188,11 @@ public class pnThanhMenu extends JPanel implements ActionListener {
             closeCurrent();
         }
     }
+    private void openThongKe() {
+    	new ThongKe_GUI(tenHienThi, loaiTaiKhoan, maNV).setVisible(true);
+        closeCurrent();
+
+	}
 
     private void closeCurrent() {
         Window w = SwingUtilities.getWindowAncestor(this);
