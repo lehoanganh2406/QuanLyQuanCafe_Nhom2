@@ -130,11 +130,7 @@ public class pnThanhMenu extends JPanel implements ActionListener {
             }
 
         } else if (src.equals(btnThongKe)) {
-        	if (loaiTaiKhoan == 1) {
-                openThongKe();
-            } else {
-                showNoPermission();
-            }
+			openThongKe();
 		}
         else if (src.equals(btnHoaDon)) {
             // Cả 2 vào, xóa chỉ cho QL xử lý trong LichsuThanhToan
