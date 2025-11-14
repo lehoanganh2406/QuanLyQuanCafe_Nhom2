@@ -750,8 +750,8 @@ public class ThongKe_GUI extends JFrame implements ActionListener {
             "WHERE CONVERT(date, hd.thoiGianVao) BETWEEN ? AND ? AND hd.trangThai = 1 " +
             "GROUP BY sp.tenSP " +
             "ORDER BY soLuongBan DESC";
-
-        try (Connection con = ConnectDB.getInstance().getConnection();
+        Connection con = ConnectDB.getInstance().getConnection();
+        try (
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setDate(1, java.sql.Date.valueOf(from));
@@ -816,8 +816,8 @@ public class ThongKe_GUI extends JFrame implements ActionListener {
             "FROM HoaDon " +
             "WHERE CONVERT(date, thoiGianVao) BETWEEN ? AND ? AND trangThai = 1 " +
             "ORDER BY thoiGianVao";
-
-        try (Connection con = ConnectDB.getInstance().getConnection();
+        Connection con = ConnectDB.getInstance().getConnection();
+        try (
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setDate(1, java.sql.Date.valueOf(from));

@@ -1,6 +1,5 @@
 package GUI;
 
-import GUI.ManHinhChinh_GUI;
 import javax.swing.*;
 
 import connectDB.ConnectDB;
@@ -27,46 +26,57 @@ public class Login_GUI extends JFrame implements ActionListener {
         setLocationRelativeTo(null);
         setResizable(false);
 
+        // ===== Panel trái: hình cà phê =====
         JPanel panelLeft = new JPanel(new BorderLayout());
-        ImageIcon icon = new ImageIcon("src/img/caphelogo.jpg"); 
+        ImageIcon icon = new ImageIcon("src/img/caphelogo.jpg");   // ảnh nền bên trái
         Image img = icon.getImage().getScaledInstance(450, 500, Image.SCALE_SMOOTH);
         JLabel lblImage = new JLabel(new ImageIcon(img));
         panelLeft.add(lblImage, BorderLayout.CENTER);
 
+        // ===== Panel phải: dùng GridBagLayout để căn giữa form =====
         JPanel panelLogin = new JPanel();
         panelLogin.setBackground(Color.decode("#996C63"));
-        panelLogin.setLayout(null);
+        panelLogin.setLayout(new GridBagLayout()); // căn giữa mọi thứ trong panel này
 
+        // Panel con chứa form, vẫn dùng setBounds cho dễ canh
+        JPanel loginForm = new JPanel(null);
+        loginForm.setPreferredSize(new Dimension(350, 260));
+        loginForm.setBackground(Color.decode("#996C63"));
+
+        // ======= Tiêu đề =======
         JLabel lblTitle = new JLabel("ĐĂNG NHẬP", SwingConstants.CENTER);
         lblTitle.setFont(new Font("Arial", Font.BOLD, 18));
         lblTitle.setForeground(Color.WHITE);
-        lblTitle.setBounds(0, 50, 450, 30);
-        panelLogin.add(lblTitle);
+        lblTitle.setBounds(0, 10, 350, 30);
+        loginForm.add(lblTitle);
 
+        // ======= Tên đăng nhập =======
         JLabel lblMaNV = new JLabel("TÊN ĐĂNG NHẬP");
         lblMaNV.setForeground(Color.WHITE);
         lblMaNV.setFont(new Font("Arial", Font.BOLD, 12));
-        lblMaNV.setBounds(50, 120, 120, 20);
-        panelLogin.add(lblMaNV);
+        lblMaNV.setBounds(40, 60, 150, 20);
+        loginForm.add(lblMaNV);
 
         txtMaNV = new JTextField();
-        txtMaNV.setBounds(50, 140, 270, 25);
+        txtMaNV.setBounds(40, 80, 260, 28);
         txtMaNV.setBackground(new Color(220, 220, 220));
         txtMaNV.setBorder(null);
-        panelLogin.add(txtMaNV);
+        loginForm.add(txtMaNV);
 
+        // ======= Mật khẩu =======
         JLabel lblPassword = new JLabel("PASSWORD");
         lblPassword.setForeground(Color.WHITE);
         lblPassword.setFont(new Font("Arial", Font.BOLD, 12));
-        lblPassword.setBounds(50, 180, 120, 20);
-        panelLogin.add(lblPassword);
+        lblPassword.setBounds(40, 120, 120, 20);
+        loginForm.add(lblPassword);
 
         txtPassword = new JPasswordField();
-        txtPassword.setBounds(50, 200, 270, 25);
+        txtPassword.setBounds(40, 140, 260, 28);
         txtPassword.setBackground(new Color(220, 220, 220));
         txtPassword.setBorder(null);
-        panelLogin.add(txtPassword);
+        loginForm.add(txtPassword);
 
+        // Icon ẩn/hiện mật khẩu
         ImageIcon eyeClose = new ImageIcon(
                 new ImageIcon(getClass().getResource("/img/anMatKhau.png"))
                         .getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
@@ -75,7 +85,7 @@ public class Login_GUI extends JFrame implements ActionListener {
                         .getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
 
         lblTogglePassword = new JLabel(eyeClose);
-        lblTogglePassword.setBounds(325, 200, 25, 25);
+        lblTogglePassword.setBounds(305, 140, 25, 25);
         lblTogglePassword.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         lblTogglePassword.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
@@ -85,25 +95,34 @@ public class Login_GUI extends JFrame implements ActionListener {
                 lblTogglePassword.setIcon(hienMatKhau ? eyeOpen : eyeClose);
             }
         });
-        panelLogin.add(lblTogglePassword);
+        loginForm.add(lblTogglePassword);
 
+        // ======= Nút đăng nhập =======
         btnDangNhap = new JButton("ĐĂNG NHẬP");
-        btnDangNhap.setBounds(150, 250, 110, 30);
+        btnDangNhap.setBounds(115, 190, 120, 32);
         btnDangNhap.setBackground(new Color(220, 220, 220));
-        btnDangNhap.setFont(new Font("Arial", Font.BOLD, 12));
+        btnDangNhap.setFont(new Font("Arial", Font.BOLD, 13));
         btnDangNhap.setFocusPainted(false);
-        panelLogin.add(btnDangNhap);
+        loginForm.add(btnDangNhap);
 
+        // Đưa loginForm vào giữa panelLogin bằng GridBagLayout
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        panelLogin.add(loginForm, gbc);
+
+        // ===== Gắn listener =====
         btnDangNhap.addActionListener(this);
         txtPassword.addActionListener(this);
         txtMaNV.addActionListener(this);
 
+        // ===== Tách trái/phải =====
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setLeftComponent(panelLeft);
         splitPane.setRightComponent(panelLogin);
-        splitPane.setDividerLocation(450); 
+        splitPane.setDividerLocation(450);
         splitPane.setDividerSize(0);
-        splitPane.setEnabled(false); 
+        splitPane.setEnabled(false);
 
         add(splitPane, BorderLayout.CENTER);
     }
