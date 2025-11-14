@@ -84,9 +84,8 @@ public class ThongKe_GUI extends JFrame implements ActionListener {
     // DAO
     private ThongKe_DAO thongKeDAO = new ThongKe_DAO();
 
-    // =====================================================
     // ===================== CONSTRUCTOR ====================
-    // =====================================================
+
     public ThongKe_GUI(String tenHienThi, int loaiTaiKhoan, String maNV) {
         try {
             ConnectDB.getInstance().connect();
@@ -118,9 +117,7 @@ public class ThongKe_GUI extends JFrame implements ActionListener {
         hienThiBieuDoDoanhThu();
     }
 
-    // =====================================================
     // ====================== TITLE BAR =====================
-    // =====================================================
     private void taoThanhTieuDe() {
         String chucVu = (loaiTaiKhoan == 1) ? "Quản lý" : "Nhân viên";
         PanelTieuDe td = new PanelTieuDe("Thống kê", "/img/thongke.png", chucVu, tenHienThi);
@@ -137,9 +134,7 @@ public class ThongKe_GUI extends JFrame implements ActionListener {
         });
     }
 
-    // =====================================================
     // ====================== MAIN PANEL ====================
-    // =====================================================
     private void taoNoiDungChinh() {
         JPanel pnCenter = new JPanel(new BorderLayout());
         pnCenter.setBackground(MAU_NEN);
@@ -270,9 +265,8 @@ public class ThongKe_GUI extends JFrame implements ActionListener {
 
     }
 
-    // =====================================================
     // ===================== SUMMARY CARDS ==================
-    // =====================================================
+
     private JPanel taoPanelTongQuan() {
         JPanel pn = new JPanel();
         pn.setBackground(MAU_NEN);
@@ -309,9 +303,7 @@ public class ThongKe_GUI extends JFrame implements ActionListener {
         return card;
     }
 
-    // =====================================================
     // ====================== STYLE FUNCTIONS ===============
-    // =====================================================
     private void styleLabels(JLabel... ls) {
         for (JLabel l : ls) {
             l.setFont(FONT_LABEL);
@@ -402,9 +394,8 @@ public class ThongKe_GUI extends JFrame implements ActionListener {
     }
   
 
-    // =====================================================
     // ===================== DATE RANGE =====================
-    // =====================================================
+
     private LocalDate toLocalDate(Date d) {
         if (d == null) return null;
         return d.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
@@ -433,9 +424,7 @@ public class ThongKe_GUI extends JFrame implements ActionListener {
         return new LocalDate[]{ from, to };
     }
 
-    // =====================================================
     // ======================= BIỂU ĐỒ ======================
-    // =====================================================
     private void hienThiBieuDoDoanhThu() {
         pnChartContainer.removeAll();
 
@@ -540,9 +529,7 @@ public class ThongKe_GUI extends JFrame implements ActionListener {
     }
 
 
-    // =====================================================
-    // ======================= XUẤT EXCEL ==================
-    // =====================================================
+    // ======================= ACTIONPERFORMED ==================
     @Override
     public void actionPerformed(ActionEvent e) {
         Object o = e.getSource();
@@ -871,10 +858,4 @@ public class ThongKe_GUI extends JFrame implements ActionListener {
             sheet.autoSizeColumn(i);
     }
 
-    // =====================================================
-    // ======================== MAIN ========================
-    // =====================================================
-    public static void main(String[] args) {
-        new ThongKe_GUI("Admin Demo", 1, "NV001").setVisible(true);
-    }
 }
