@@ -6,9 +6,19 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="lib/jcalendar-1.4.jar"/>
-	<classpathentry kind="lib" path="lib/mssql-jdbc-12.10.0.jre11.jar"/>
+	<classpathentry kind="lib" path="lib/commons-collections4-4.4.jar"/>
+	<classpathentry kind="lib" path="lib/commons-compress-1.26.2.jar"/>
+	<classpathentry kind="lib" path="lib/commons-io-2.15.1.jar"/>
+	<classpathentry kind="lib" path="lib/curvesapi-1.07.jar"/>
 	<classpathentry kind="lib" path="lib/itextpdf-5.5.9.jar"/>
+	<classpathentry kind="lib" path="lib/jcalendar-1.4.jar"/>
 	<classpathentry kind="lib" path="lib/jfreechart-1.5.4.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-api-2.23.1.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-core-2.23.1.jar"/>
+	<classpathentry kind="lib" path="lib/mssql-jdbc-12.10.0.jre11.jar"/>
+	<classpathentry kind="lib" path="lib/poi-5.4.1.jar"/>
+	<classpathentry kind="lib" path="lib/poi-ooxml-5.4.1.jar"/>
+	<classpathentry kind="lib" path="lib/poi-ooxml-lite-5.4.1.jar"/>
+	<classpathentry kind="lib" path="lib/xmlbeans-5.1.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
